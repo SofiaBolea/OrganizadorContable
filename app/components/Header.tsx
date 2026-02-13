@@ -1,5 +1,4 @@
 'use client'
-
 import { UserButton, OrganizationSwitcher, Protect } from '@clerk/nextjs'
 import Link from 'next/link'
 
@@ -10,6 +9,7 @@ export function Header() {
         <Link href="/" className="text-xl font-bold">
           Organizador Contable
         </Link>
+        
         <OrganizationSwitcher
           hidePersonal
           afterCreateOrganizationUrl="/"

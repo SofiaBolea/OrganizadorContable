@@ -6,9 +6,211 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// =======================================
+// EXTENSIÓN DE ORGANIZACIÓN
+// Datos extra que Clerk no almacena
+// =======================================
+model Organizacion {
+  id                 String   @id @default(cuid())
+  clerkOrganizationId String  @unique
+  razonSocial        String?  @db.VarChar(150)
+  cuit               String?  @db.VarChar(11)
+  emailContacto      String?  @db.VarChar(100)
+  telefonoContacto   String?  @db.VarChar(50)
+  direccion          String?  @db.VarChar(200)
+  activa             Boolean  @default(true)
+  fechaAlta          DateTime @default(now())
+
+  // Relaciones
+  recursos           Recurso[]
+  registrosAuditoria RegistroAuditoria[]
+
+  @@map("organizaciones")
+}
+
+// =======================================
+// AUDITORÍA
+// =======================================
+model RegistroAuditoria {
+  id                 String   @id @default(cuid())
+  organizacionId     String
+  organizacion       Organizacion @relation(fields: [organizacionId], references: [id])
+  clerkSessionId     String?
+  ejecutadoPorId     String   // clerkUserId del ejecutor
+  usuarioAfectadoId  String?  // clerkUserId del afectado
+  accion             String   @db.VarChar(50)
+  fecha              DateTime @default(now())
+  detalleAccion      String?  @db.Text
+
+  @@index([organizacionId])
+  @@index([ejecutadoPorId])
+  @@map("registros_auditoria")
+}
+
+// =======================================
+// RECURSOS (ESTRATEGIA TPT)
+// =======================================
+model Recurso {
+  id              String   @id @default(cuid())
+  organizacionId  String
+  organizacion    Organizacion @relation(fields: [organizacionId], references: [id])
+  nombre          String   @db.VarChar(100)
+  descripcion     String?  @db.VarChar(255)
+  tipoRecurso     String   @db.VarChar(50) // "CLIENTE", "TAREA", "VENCIMIENTO", "COLOR", "REFERENCIA"
+
+  // Herencia TPT
+  cliente         Cliente?
+  tarea           Tarea?
+  vencimiento     Vencimiento?
+  refColor        RefColor?
+  recursoRef      RecursoRef?
+
+  @@index([organizacionId])
+  @@index([tipoRecurso])
+  @@map("recursos")
+}
+
+model RecursoRef {
+  id     String  @id
+  recurso Recurso @relation(fields: [id], references: [id], onDelete: Cascade)
+  titulo String  @db.VarChar(100)
+  url    String  @db.VarChar(255)
+  tipo   String  @db.VarChar(50)
+
+  @@map("recursos_ref")
+}
+
+model RefColor {
+  id          String  @id
+  recurso     Recurso @relation(fields: [id], references: [id], onDelete: Cascade)
+  titulo      String  @db.VarChar(50)
+  codigoHexa  String  @db.VarChar(7)
+
+  // Relaciones
+  tareasAsignadas TareaAsignacion[]
+
+  @@map("ref_colores")
+}
+
+model Cliente {
+  id             String  @id
+  recurso        Recurso @relation(fields: [id], references: [id], onDelete: Cascade)
+  nombreCompleto String  @db.VarChar(100)
+  email          String? @db.VarChar(100)
+  telefono       String? @db.VarChar(50)
+  estado         String  @default("ACTIVO") @db.VarChar(20)
+
+  @@map("clientes")
+}
+
+// =======================================
+// MOTOR DE TAREAS (WORKFLOW ENGINE)
+// =======================================
+model Tarea {
+  id                   String   @id
+  recurso              Recurso  @relation(fields: [id], references: [id], onDelete: Cascade)
+  titulo               String   @db.VarChar(100)
+  prioridad            String   @default("MEDIA") @db.VarChar(20)
+  fechaVencimientoBase DateTime?
+  tipoTarea            String   @db.VarChar(20)
+
+  // Relaciones
+  recurrencia          Recurrencia?
+  asignaciones         TareaAsignacion[]
+
+  @@map("tareas")
+}
+
+model Recurrencia {
+  id               String   @id @default(cuid())
+  tareaId          String   @unique
+  tarea            Tarea    @relation(fields: [tareaId], references: [id], onDelete: Cascade)
+  frecuencia       String   @db.VarChar(20) // DAILY, WEEKLY, MONTHLY, YEARLY
+  intervalo        Int      @default(1)
+
+  // Atributos RFC 5545
+  diaSemana        String?  @db.VarChar(50)   // BYDAY
+  diaDelMes        String?  @db.VarChar(50)   // BYMONTHDAY
+  mesDelAnio       String?  @db.VarChar(50)   // BYMONTH
+  posicionConjunto Int?                        // BYSETPOS
+
+  // Límites de la serie
+  hastaFecha       DateTime?                   // UNTIL
+  conteoMaximo     Int?                        // COUNT
+
+  @@map("recurrencias")
+}
+
+model TareaAsignacion {
+  id              String   @id @default(cuid())
+  tareaId         String
+  tarea           Tarea    @relation(fields: [tareaId], references: [id], onDelete: Cascade)
+  refColorId      String?
+  refColor        RefColor? @relation(fields: [refColorId], references: [id])
+  asignadoId      String   // clerkUserId del asignado
+  asignadoPorId   String   // clerkUserId del que asigna
+  fechaAsignacion DateTime @default(now())
+  estado          String   @default("PENDIENTE") @db.VarChar(20)
+
+  // Relaciones
+  ocurrencias     Ocurrencia[]
+
+  @@index([tareaId])
+  @@index([asignadoId])
+  @@map("tareas_asignaciones")
+}
+
+model Ocurrencia {
+  id                 String   @id @default(cuid())
+  tareaAsignacionId  String
+  tareaAsignacion    TareaAsignacion @relation(fields: [tareaAsignacionId], references: [id], onDelete: Cascade)
+  fechaOriginal      DateTime @db.Date
+  fechaEjecucion     DateTime?
+  fechaOverride      DateTime? @db.Date
+  tituloOverride     String?  @db.VarChar(100)
+  estado             String   @default("PENDIENTE") @db.VarChar(20)
+  colorOverride      String?  @db.VarChar(7)
+
+  @@index([tareaAsignacionId])
+  @@index([fechaOriginal])
+  @@map("ocurrencias")
+}
+
+// =======================================
+// GESTIÓN DE VENCIMIENTOS
+// =======================================
+model Vencimiento {
+  id               String  @id
+  recurso          Recurso @relation(fields: [id], references: [id], onDelete: Cascade)
+  usuarioCreadorId String  // clerkUserId del creador
+  tipoVencimiento  String  @db.VarChar(20)
+  jurisdiccion     String? @db.VarChar(50)
+  titulo           String  @db.VarChar(100)
+  periodicidad     String  @db.VarChar(20)
+  estado           String  @default("ACTIVO") @db.VarChar(20)
+
+  // Relaciones
+  ocurrencias      VencimientoOcurrencia[]
+
+  @@index([usuarioCreadorId])
+  @@map("vencimientos")
+}
+
+model VencimientoOcurrencia {
+  id              String      @id @default(cuid())
+  vencimientoId   String
+  vencimiento     Vencimiento @relation(fields: [vencimientoId], references: [id], onDelete: Cascade)
+  fechaVencimiento DateTime   @db.Date
+  estado          String      @default("PENDIENTE") @db.VarChar(20)
+
+  @@index([vencimientoId])
+  @@index([fechaVencimiento])
+  @@map("vencimientos_ocurrencias")
 }
