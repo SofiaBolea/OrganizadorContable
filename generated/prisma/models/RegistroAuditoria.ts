@@ -27,7 +27,7 @@ export type AggregateRegistroAuditoria = {
 export type RegistroAuditoriaMinAggregateOutputType = {
   id: string | null
   organizacionId: string | null
-  clerkSessionId: string | null
+  sesionId: string | null
   ejecutadoPorId: string | null
   usuarioAfectadoId: string | null
   accion: string | null
@@ -38,7 +38,7 @@ export type RegistroAuditoriaMinAggregateOutputType = {
 export type RegistroAuditoriaMaxAggregateOutputType = {
   id: string | null
   organizacionId: string | null
-  clerkSessionId: string | null
+  sesionId: string | null
   ejecutadoPorId: string | null
   usuarioAfectadoId: string | null
   accion: string | null
@@ -49,7 +49,7 @@ export type RegistroAuditoriaMaxAggregateOutputType = {
 export type RegistroAuditoriaCountAggregateOutputType = {
   id: number
   organizacionId: number
-  clerkSessionId: number
+  sesionId: number
   ejecutadoPorId: number
   usuarioAfectadoId: number
   accion: number
@@ -62,7 +62,7 @@ export type RegistroAuditoriaCountAggregateOutputType = {
 export type RegistroAuditoriaMinAggregateInputType = {
   id?: true
   organizacionId?: true
-  clerkSessionId?: true
+  sesionId?: true
   ejecutadoPorId?: true
   usuarioAfectadoId?: true
   accion?: true
@@ -73,7 +73,7 @@ export type RegistroAuditoriaMinAggregateInputType = {
 export type RegistroAuditoriaMaxAggregateInputType = {
   id?: true
   organizacionId?: true
-  clerkSessionId?: true
+  sesionId?: true
   ejecutadoPorId?: true
   usuarioAfectadoId?: true
   accion?: true
@@ -84,7 +84,7 @@ export type RegistroAuditoriaMaxAggregateInputType = {
 export type RegistroAuditoriaCountAggregateInputType = {
   id?: true
   organizacionId?: true
-  clerkSessionId?: true
+  sesionId?: true
   ejecutadoPorId?: true
   usuarioAfectadoId?: true
   accion?: true
@@ -168,7 +168,7 @@ export type RegistroAuditoriaGroupByArgs<ExtArgs extends runtime.Types.Extension
 export type RegistroAuditoriaGroupByOutputType = {
   id: string
   organizacionId: string
-  clerkSessionId: string | null
+  sesionId: string | null
   ejecutadoPorId: string
   usuarioAfectadoId: string | null
   accion: string
@@ -200,25 +200,31 @@ export type RegistroAuditoriaWhereInput = {
   NOT?: Prisma.RegistroAuditoriaWhereInput | Prisma.RegistroAuditoriaWhereInput[]
   id?: Prisma.StringFilter<"RegistroAuditoria"> | string
   organizacionId?: Prisma.StringFilter<"RegistroAuditoria"> | string
-  clerkSessionId?: Prisma.StringNullableFilter<"RegistroAuditoria"> | string | null
+  sesionId?: Prisma.StringNullableFilter<"RegistroAuditoria"> | string | null
   ejecutadoPorId?: Prisma.StringFilter<"RegistroAuditoria"> | string
   usuarioAfectadoId?: Prisma.StringNullableFilter<"RegistroAuditoria"> | string | null
   accion?: Prisma.StringFilter<"RegistroAuditoria"> | string
   fecha?: Prisma.DateTimeFilter<"RegistroAuditoria"> | Date | string
   detalleAccion?: Prisma.StringNullableFilter<"RegistroAuditoria"> | string | null
   organizacion?: Prisma.XOR<Prisma.OrganizacionScalarRelationFilter, Prisma.OrganizacionWhereInput>
+  sesion?: Prisma.XOR<Prisma.SesionNullableScalarRelationFilter, Prisma.SesionWhereInput> | null
+  ejecutadoPor?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
+  usuarioAfectado?: Prisma.XOR<Prisma.UsuarioNullableScalarRelationFilter, Prisma.UsuarioWhereInput> | null
 }
 
 export type RegistroAuditoriaOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   organizacionId?: Prisma.SortOrder
-  clerkSessionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  sesionId?: Prisma.SortOrderInput | Prisma.SortOrder
   ejecutadoPorId?: Prisma.SortOrder
   usuarioAfectadoId?: Prisma.SortOrderInput | Prisma.SortOrder
   accion?: Prisma.SortOrder
   fecha?: Prisma.SortOrder
   detalleAccion?: Prisma.SortOrderInput | Prisma.SortOrder
   organizacion?: Prisma.OrganizacionOrderByWithRelationInput
+  sesion?: Prisma.SesionOrderByWithRelationInput
+  ejecutadoPor?: Prisma.UsuarioOrderByWithRelationInput
+  usuarioAfectado?: Prisma.UsuarioOrderByWithRelationInput
 }
 
 export type RegistroAuditoriaWhereUniqueInput = Prisma.AtLeast<{
@@ -227,19 +233,22 @@ export type RegistroAuditoriaWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.RegistroAuditoriaWhereInput[]
   NOT?: Prisma.RegistroAuditoriaWhereInput | Prisma.RegistroAuditoriaWhereInput[]
   organizacionId?: Prisma.StringFilter<"RegistroAuditoria"> | string
-  clerkSessionId?: Prisma.StringNullableFilter<"RegistroAuditoria"> | string | null
+  sesionId?: Prisma.StringNullableFilter<"RegistroAuditoria"> | string | null
   ejecutadoPorId?: Prisma.StringFilter<"RegistroAuditoria"> | string
   usuarioAfectadoId?: Prisma.StringNullableFilter<"RegistroAuditoria"> | string | null
   accion?: Prisma.StringFilter<"RegistroAuditoria"> | string
   fecha?: Prisma.DateTimeFilter<"RegistroAuditoria"> | Date | string
   detalleAccion?: Prisma.StringNullableFilter<"RegistroAuditoria"> | string | null
   organizacion?: Prisma.XOR<Prisma.OrganizacionScalarRelationFilter, Prisma.OrganizacionWhereInput>
+  sesion?: Prisma.XOR<Prisma.SesionNullableScalarRelationFilter, Prisma.SesionWhereInput> | null
+  ejecutadoPor?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
+  usuarioAfectado?: Prisma.XOR<Prisma.UsuarioNullableScalarRelationFilter, Prisma.UsuarioWhereInput> | null
 }, "id">
 
 export type RegistroAuditoriaOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   organizacionId?: Prisma.SortOrder
-  clerkSessionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  sesionId?: Prisma.SortOrderInput | Prisma.SortOrder
   ejecutadoPorId?: Prisma.SortOrder
   usuarioAfectadoId?: Prisma.SortOrderInput | Prisma.SortOrder
   accion?: Prisma.SortOrder
@@ -256,7 +265,7 @@ export type RegistroAuditoriaScalarWhereWithAggregatesInput = {
   NOT?: Prisma.RegistroAuditoriaScalarWhereWithAggregatesInput | Prisma.RegistroAuditoriaScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"RegistroAuditoria"> | string
   organizacionId?: Prisma.StringWithAggregatesFilter<"RegistroAuditoria"> | string
-  clerkSessionId?: Prisma.StringNullableWithAggregatesFilter<"RegistroAuditoria"> | string | null
+  sesionId?: Prisma.StringNullableWithAggregatesFilter<"RegistroAuditoria"> | string | null
   ejecutadoPorId?: Prisma.StringWithAggregatesFilter<"RegistroAuditoria"> | string
   usuarioAfectadoId?: Prisma.StringNullableWithAggregatesFilter<"RegistroAuditoria"> | string | null
   accion?: Prisma.StringWithAggregatesFilter<"RegistroAuditoria"> | string
@@ -266,19 +275,19 @@ export type RegistroAuditoriaScalarWhereWithAggregatesInput = {
 
 export type RegistroAuditoriaCreateInput = {
   id?: string
-  clerkSessionId?: string | null
-  ejecutadoPorId: string
-  usuarioAfectadoId?: string | null
   accion: string
   fecha?: Date | string
   detalleAccion?: string | null
   organizacion: Prisma.OrganizacionCreateNestedOneWithoutRegistrosAuditoriaInput
+  sesion?: Prisma.SesionCreateNestedOneWithoutRegistrosAuditoriaInput
+  ejecutadoPor: Prisma.UsuarioCreateNestedOneWithoutAuditoriasEjecutadasInput
+  usuarioAfectado?: Prisma.UsuarioCreateNestedOneWithoutAuditoriasAfectadasInput
 }
 
 export type RegistroAuditoriaUncheckedCreateInput = {
   id?: string
   organizacionId: string
-  clerkSessionId?: string | null
+  sesionId?: string | null
   ejecutadoPorId: string
   usuarioAfectadoId?: string | null
   accion: string
@@ -288,19 +297,19 @@ export type RegistroAuditoriaUncheckedCreateInput = {
 
 export type RegistroAuditoriaUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  clerkSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ejecutadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
-  usuarioAfectadoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accion?: Prisma.StringFieldUpdateOperationsInput | string
   fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   detalleAccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutRegistrosAuditoriaNestedInput
+  sesion?: Prisma.SesionUpdateOneWithoutRegistrosAuditoriaNestedInput
+  ejecutadoPor?: Prisma.UsuarioUpdateOneRequiredWithoutAuditoriasEjecutadasNestedInput
+  usuarioAfectado?: Prisma.UsuarioUpdateOneWithoutAuditoriasAfectadasNestedInput
 }
 
 export type RegistroAuditoriaUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
-  clerkSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sesionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ejecutadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
   usuarioAfectadoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accion?: Prisma.StringFieldUpdateOperationsInput | string
@@ -311,7 +320,7 @@ export type RegistroAuditoriaUncheckedUpdateInput = {
 export type RegistroAuditoriaCreateManyInput = {
   id?: string
   organizacionId: string
-  clerkSessionId?: string | null
+  sesionId?: string | null
   ejecutadoPorId: string
   usuarioAfectadoId?: string | null
   accion: string
@@ -321,9 +330,6 @@ export type RegistroAuditoriaCreateManyInput = {
 
 export type RegistroAuditoriaUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  clerkSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ejecutadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
-  usuarioAfectadoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accion?: Prisma.StringFieldUpdateOperationsInput | string
   fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   detalleAccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -332,7 +338,7 @@ export type RegistroAuditoriaUpdateManyMutationInput = {
 export type RegistroAuditoriaUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
-  clerkSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sesionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ejecutadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
   usuarioAfectadoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accion?: Prisma.StringFieldUpdateOperationsInput | string
@@ -353,7 +359,7 @@ export type RegistroAuditoriaOrderByRelationAggregateInput = {
 export type RegistroAuditoriaCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   organizacionId?: Prisma.SortOrder
-  clerkSessionId?: Prisma.SortOrder
+  sesionId?: Prisma.SortOrder
   ejecutadoPorId?: Prisma.SortOrder
   usuarioAfectadoId?: Prisma.SortOrder
   accion?: Prisma.SortOrder
@@ -364,7 +370,7 @@ export type RegistroAuditoriaCountOrderByAggregateInput = {
 export type RegistroAuditoriaMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   organizacionId?: Prisma.SortOrder
-  clerkSessionId?: Prisma.SortOrder
+  sesionId?: Prisma.SortOrder
   ejecutadoPorId?: Prisma.SortOrder
   usuarioAfectadoId?: Prisma.SortOrder
   accion?: Prisma.SortOrder
@@ -375,7 +381,7 @@ export type RegistroAuditoriaMaxOrderByAggregateInput = {
 export type RegistroAuditoriaMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   organizacionId?: Prisma.SortOrder
-  clerkSessionId?: Prisma.SortOrder
+  sesionId?: Prisma.SortOrder
   ejecutadoPorId?: Prisma.SortOrder
   usuarioAfectadoId?: Prisma.SortOrder
   accion?: Prisma.SortOrder
@@ -425,19 +431,145 @@ export type RegistroAuditoriaUncheckedUpdateManyWithoutOrganizacionNestedInput =
   deleteMany?: Prisma.RegistroAuditoriaScalarWhereInput | Prisma.RegistroAuditoriaScalarWhereInput[]
 }
 
+export type RegistroAuditoriaCreateNestedManyWithoutEjecutadoPorInput = {
+  create?: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutEjecutadoPorInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutEjecutadoPorInput> | Prisma.RegistroAuditoriaCreateWithoutEjecutadoPorInput[] | Prisma.RegistroAuditoriaUncheckedCreateWithoutEjecutadoPorInput[]
+  connectOrCreate?: Prisma.RegistroAuditoriaCreateOrConnectWithoutEjecutadoPorInput | Prisma.RegistroAuditoriaCreateOrConnectWithoutEjecutadoPorInput[]
+  createMany?: Prisma.RegistroAuditoriaCreateManyEjecutadoPorInputEnvelope
+  connect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+}
+
+export type RegistroAuditoriaCreateNestedManyWithoutUsuarioAfectadoInput = {
+  create?: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutUsuarioAfectadoInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutUsuarioAfectadoInput> | Prisma.RegistroAuditoriaCreateWithoutUsuarioAfectadoInput[] | Prisma.RegistroAuditoriaUncheckedCreateWithoutUsuarioAfectadoInput[]
+  connectOrCreate?: Prisma.RegistroAuditoriaCreateOrConnectWithoutUsuarioAfectadoInput | Prisma.RegistroAuditoriaCreateOrConnectWithoutUsuarioAfectadoInput[]
+  createMany?: Prisma.RegistroAuditoriaCreateManyUsuarioAfectadoInputEnvelope
+  connect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+}
+
+export type RegistroAuditoriaUncheckedCreateNestedManyWithoutEjecutadoPorInput = {
+  create?: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutEjecutadoPorInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutEjecutadoPorInput> | Prisma.RegistroAuditoriaCreateWithoutEjecutadoPorInput[] | Prisma.RegistroAuditoriaUncheckedCreateWithoutEjecutadoPorInput[]
+  connectOrCreate?: Prisma.RegistroAuditoriaCreateOrConnectWithoutEjecutadoPorInput | Prisma.RegistroAuditoriaCreateOrConnectWithoutEjecutadoPorInput[]
+  createMany?: Prisma.RegistroAuditoriaCreateManyEjecutadoPorInputEnvelope
+  connect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+}
+
+export type RegistroAuditoriaUncheckedCreateNestedManyWithoutUsuarioAfectadoInput = {
+  create?: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutUsuarioAfectadoInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutUsuarioAfectadoInput> | Prisma.RegistroAuditoriaCreateWithoutUsuarioAfectadoInput[] | Prisma.RegistroAuditoriaUncheckedCreateWithoutUsuarioAfectadoInput[]
+  connectOrCreate?: Prisma.RegistroAuditoriaCreateOrConnectWithoutUsuarioAfectadoInput | Prisma.RegistroAuditoriaCreateOrConnectWithoutUsuarioAfectadoInput[]
+  createMany?: Prisma.RegistroAuditoriaCreateManyUsuarioAfectadoInputEnvelope
+  connect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+}
+
+export type RegistroAuditoriaUpdateManyWithoutEjecutadoPorNestedInput = {
+  create?: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutEjecutadoPorInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutEjecutadoPorInput> | Prisma.RegistroAuditoriaCreateWithoutEjecutadoPorInput[] | Prisma.RegistroAuditoriaUncheckedCreateWithoutEjecutadoPorInput[]
+  connectOrCreate?: Prisma.RegistroAuditoriaCreateOrConnectWithoutEjecutadoPorInput | Prisma.RegistroAuditoriaCreateOrConnectWithoutEjecutadoPorInput[]
+  upsert?: Prisma.RegistroAuditoriaUpsertWithWhereUniqueWithoutEjecutadoPorInput | Prisma.RegistroAuditoriaUpsertWithWhereUniqueWithoutEjecutadoPorInput[]
+  createMany?: Prisma.RegistroAuditoriaCreateManyEjecutadoPorInputEnvelope
+  set?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  disconnect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  delete?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  connect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  update?: Prisma.RegistroAuditoriaUpdateWithWhereUniqueWithoutEjecutadoPorInput | Prisma.RegistroAuditoriaUpdateWithWhereUniqueWithoutEjecutadoPorInput[]
+  updateMany?: Prisma.RegistroAuditoriaUpdateManyWithWhereWithoutEjecutadoPorInput | Prisma.RegistroAuditoriaUpdateManyWithWhereWithoutEjecutadoPorInput[]
+  deleteMany?: Prisma.RegistroAuditoriaScalarWhereInput | Prisma.RegistroAuditoriaScalarWhereInput[]
+}
+
+export type RegistroAuditoriaUpdateManyWithoutUsuarioAfectadoNestedInput = {
+  create?: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutUsuarioAfectadoInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutUsuarioAfectadoInput> | Prisma.RegistroAuditoriaCreateWithoutUsuarioAfectadoInput[] | Prisma.RegistroAuditoriaUncheckedCreateWithoutUsuarioAfectadoInput[]
+  connectOrCreate?: Prisma.RegistroAuditoriaCreateOrConnectWithoutUsuarioAfectadoInput | Prisma.RegistroAuditoriaCreateOrConnectWithoutUsuarioAfectadoInput[]
+  upsert?: Prisma.RegistroAuditoriaUpsertWithWhereUniqueWithoutUsuarioAfectadoInput | Prisma.RegistroAuditoriaUpsertWithWhereUniqueWithoutUsuarioAfectadoInput[]
+  createMany?: Prisma.RegistroAuditoriaCreateManyUsuarioAfectadoInputEnvelope
+  set?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  disconnect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  delete?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  connect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  update?: Prisma.RegistroAuditoriaUpdateWithWhereUniqueWithoutUsuarioAfectadoInput | Prisma.RegistroAuditoriaUpdateWithWhereUniqueWithoutUsuarioAfectadoInput[]
+  updateMany?: Prisma.RegistroAuditoriaUpdateManyWithWhereWithoutUsuarioAfectadoInput | Prisma.RegistroAuditoriaUpdateManyWithWhereWithoutUsuarioAfectadoInput[]
+  deleteMany?: Prisma.RegistroAuditoriaScalarWhereInput | Prisma.RegistroAuditoriaScalarWhereInput[]
+}
+
+export type RegistroAuditoriaUncheckedUpdateManyWithoutEjecutadoPorNestedInput = {
+  create?: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutEjecutadoPorInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutEjecutadoPorInput> | Prisma.RegistroAuditoriaCreateWithoutEjecutadoPorInput[] | Prisma.RegistroAuditoriaUncheckedCreateWithoutEjecutadoPorInput[]
+  connectOrCreate?: Prisma.RegistroAuditoriaCreateOrConnectWithoutEjecutadoPorInput | Prisma.RegistroAuditoriaCreateOrConnectWithoutEjecutadoPorInput[]
+  upsert?: Prisma.RegistroAuditoriaUpsertWithWhereUniqueWithoutEjecutadoPorInput | Prisma.RegistroAuditoriaUpsertWithWhereUniqueWithoutEjecutadoPorInput[]
+  createMany?: Prisma.RegistroAuditoriaCreateManyEjecutadoPorInputEnvelope
+  set?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  disconnect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  delete?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  connect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  update?: Prisma.RegistroAuditoriaUpdateWithWhereUniqueWithoutEjecutadoPorInput | Prisma.RegistroAuditoriaUpdateWithWhereUniqueWithoutEjecutadoPorInput[]
+  updateMany?: Prisma.RegistroAuditoriaUpdateManyWithWhereWithoutEjecutadoPorInput | Prisma.RegistroAuditoriaUpdateManyWithWhereWithoutEjecutadoPorInput[]
+  deleteMany?: Prisma.RegistroAuditoriaScalarWhereInput | Prisma.RegistroAuditoriaScalarWhereInput[]
+}
+
+export type RegistroAuditoriaUncheckedUpdateManyWithoutUsuarioAfectadoNestedInput = {
+  create?: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutUsuarioAfectadoInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutUsuarioAfectadoInput> | Prisma.RegistroAuditoriaCreateWithoutUsuarioAfectadoInput[] | Prisma.RegistroAuditoriaUncheckedCreateWithoutUsuarioAfectadoInput[]
+  connectOrCreate?: Prisma.RegistroAuditoriaCreateOrConnectWithoutUsuarioAfectadoInput | Prisma.RegistroAuditoriaCreateOrConnectWithoutUsuarioAfectadoInput[]
+  upsert?: Prisma.RegistroAuditoriaUpsertWithWhereUniqueWithoutUsuarioAfectadoInput | Prisma.RegistroAuditoriaUpsertWithWhereUniqueWithoutUsuarioAfectadoInput[]
+  createMany?: Prisma.RegistroAuditoriaCreateManyUsuarioAfectadoInputEnvelope
+  set?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  disconnect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  delete?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  connect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  update?: Prisma.RegistroAuditoriaUpdateWithWhereUniqueWithoutUsuarioAfectadoInput | Prisma.RegistroAuditoriaUpdateWithWhereUniqueWithoutUsuarioAfectadoInput[]
+  updateMany?: Prisma.RegistroAuditoriaUpdateManyWithWhereWithoutUsuarioAfectadoInput | Prisma.RegistroAuditoriaUpdateManyWithWhereWithoutUsuarioAfectadoInput[]
+  deleteMany?: Prisma.RegistroAuditoriaScalarWhereInput | Prisma.RegistroAuditoriaScalarWhereInput[]
+}
+
+export type RegistroAuditoriaCreateNestedManyWithoutSesionInput = {
+  create?: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutSesionInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutSesionInput> | Prisma.RegistroAuditoriaCreateWithoutSesionInput[] | Prisma.RegistroAuditoriaUncheckedCreateWithoutSesionInput[]
+  connectOrCreate?: Prisma.RegistroAuditoriaCreateOrConnectWithoutSesionInput | Prisma.RegistroAuditoriaCreateOrConnectWithoutSesionInput[]
+  createMany?: Prisma.RegistroAuditoriaCreateManySesionInputEnvelope
+  connect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+}
+
+export type RegistroAuditoriaUncheckedCreateNestedManyWithoutSesionInput = {
+  create?: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutSesionInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutSesionInput> | Prisma.RegistroAuditoriaCreateWithoutSesionInput[] | Prisma.RegistroAuditoriaUncheckedCreateWithoutSesionInput[]
+  connectOrCreate?: Prisma.RegistroAuditoriaCreateOrConnectWithoutSesionInput | Prisma.RegistroAuditoriaCreateOrConnectWithoutSesionInput[]
+  createMany?: Prisma.RegistroAuditoriaCreateManySesionInputEnvelope
+  connect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+}
+
+export type RegistroAuditoriaUpdateManyWithoutSesionNestedInput = {
+  create?: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutSesionInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutSesionInput> | Prisma.RegistroAuditoriaCreateWithoutSesionInput[] | Prisma.RegistroAuditoriaUncheckedCreateWithoutSesionInput[]
+  connectOrCreate?: Prisma.RegistroAuditoriaCreateOrConnectWithoutSesionInput | Prisma.RegistroAuditoriaCreateOrConnectWithoutSesionInput[]
+  upsert?: Prisma.RegistroAuditoriaUpsertWithWhereUniqueWithoutSesionInput | Prisma.RegistroAuditoriaUpsertWithWhereUniqueWithoutSesionInput[]
+  createMany?: Prisma.RegistroAuditoriaCreateManySesionInputEnvelope
+  set?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  disconnect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  delete?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  connect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  update?: Prisma.RegistroAuditoriaUpdateWithWhereUniqueWithoutSesionInput | Prisma.RegistroAuditoriaUpdateWithWhereUniqueWithoutSesionInput[]
+  updateMany?: Prisma.RegistroAuditoriaUpdateManyWithWhereWithoutSesionInput | Prisma.RegistroAuditoriaUpdateManyWithWhereWithoutSesionInput[]
+  deleteMany?: Prisma.RegistroAuditoriaScalarWhereInput | Prisma.RegistroAuditoriaScalarWhereInput[]
+}
+
+export type RegistroAuditoriaUncheckedUpdateManyWithoutSesionNestedInput = {
+  create?: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutSesionInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutSesionInput> | Prisma.RegistroAuditoriaCreateWithoutSesionInput[] | Prisma.RegistroAuditoriaUncheckedCreateWithoutSesionInput[]
+  connectOrCreate?: Prisma.RegistroAuditoriaCreateOrConnectWithoutSesionInput | Prisma.RegistroAuditoriaCreateOrConnectWithoutSesionInput[]
+  upsert?: Prisma.RegistroAuditoriaUpsertWithWhereUniqueWithoutSesionInput | Prisma.RegistroAuditoriaUpsertWithWhereUniqueWithoutSesionInput[]
+  createMany?: Prisma.RegistroAuditoriaCreateManySesionInputEnvelope
+  set?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  disconnect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  delete?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  connect?: Prisma.RegistroAuditoriaWhereUniqueInput | Prisma.RegistroAuditoriaWhereUniqueInput[]
+  update?: Prisma.RegistroAuditoriaUpdateWithWhereUniqueWithoutSesionInput | Prisma.RegistroAuditoriaUpdateWithWhereUniqueWithoutSesionInput[]
+  updateMany?: Prisma.RegistroAuditoriaUpdateManyWithWhereWithoutSesionInput | Prisma.RegistroAuditoriaUpdateManyWithWhereWithoutSesionInput[]
+  deleteMany?: Prisma.RegistroAuditoriaScalarWhereInput | Prisma.RegistroAuditoriaScalarWhereInput[]
+}
+
 export type RegistroAuditoriaCreateWithoutOrganizacionInput = {
   id?: string
-  clerkSessionId?: string | null
-  ejecutadoPorId: string
-  usuarioAfectadoId?: string | null
   accion: string
   fecha?: Date | string
   detalleAccion?: string | null
+  sesion?: Prisma.SesionCreateNestedOneWithoutRegistrosAuditoriaInput
+  ejecutadoPor: Prisma.UsuarioCreateNestedOneWithoutAuditoriasEjecutadasInput
+  usuarioAfectado?: Prisma.UsuarioCreateNestedOneWithoutAuditoriasAfectadasInput
 }
 
 export type RegistroAuditoriaUncheckedCreateWithoutOrganizacionInput = {
   id?: string
-  clerkSessionId?: string | null
+  sesionId?: string | null
   ejecutadoPorId: string
   usuarioAfectadoId?: string | null
   accion: string
@@ -477,7 +609,7 @@ export type RegistroAuditoriaScalarWhereInput = {
   NOT?: Prisma.RegistroAuditoriaScalarWhereInput | Prisma.RegistroAuditoriaScalarWhereInput[]
   id?: Prisma.StringFilter<"RegistroAuditoria"> | string
   organizacionId?: Prisma.StringFilter<"RegistroAuditoria"> | string
-  clerkSessionId?: Prisma.StringNullableFilter<"RegistroAuditoria"> | string | null
+  sesionId?: Prisma.StringNullableFilter<"RegistroAuditoria"> | string | null
   ejecutadoPorId?: Prisma.StringFilter<"RegistroAuditoria"> | string
   usuarioAfectadoId?: Prisma.StringNullableFilter<"RegistroAuditoria"> | string | null
   accion?: Prisma.StringFilter<"RegistroAuditoria"> | string
@@ -485,9 +617,147 @@ export type RegistroAuditoriaScalarWhereInput = {
   detalleAccion?: Prisma.StringNullableFilter<"RegistroAuditoria"> | string | null
 }
 
+export type RegistroAuditoriaCreateWithoutEjecutadoPorInput = {
+  id?: string
+  accion: string
+  fecha?: Date | string
+  detalleAccion?: string | null
+  organizacion: Prisma.OrganizacionCreateNestedOneWithoutRegistrosAuditoriaInput
+  sesion?: Prisma.SesionCreateNestedOneWithoutRegistrosAuditoriaInput
+  usuarioAfectado?: Prisma.UsuarioCreateNestedOneWithoutAuditoriasAfectadasInput
+}
+
+export type RegistroAuditoriaUncheckedCreateWithoutEjecutadoPorInput = {
+  id?: string
+  organizacionId: string
+  sesionId?: string | null
+  usuarioAfectadoId?: string | null
+  accion: string
+  fecha?: Date | string
+  detalleAccion?: string | null
+}
+
+export type RegistroAuditoriaCreateOrConnectWithoutEjecutadoPorInput = {
+  where: Prisma.RegistroAuditoriaWhereUniqueInput
+  create: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutEjecutadoPorInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutEjecutadoPorInput>
+}
+
+export type RegistroAuditoriaCreateManyEjecutadoPorInputEnvelope = {
+  data: Prisma.RegistroAuditoriaCreateManyEjecutadoPorInput | Prisma.RegistroAuditoriaCreateManyEjecutadoPorInput[]
+  skipDuplicates?: boolean
+}
+
+export type RegistroAuditoriaCreateWithoutUsuarioAfectadoInput = {
+  id?: string
+  accion: string
+  fecha?: Date | string
+  detalleAccion?: string | null
+  organizacion: Prisma.OrganizacionCreateNestedOneWithoutRegistrosAuditoriaInput
+  sesion?: Prisma.SesionCreateNestedOneWithoutRegistrosAuditoriaInput
+  ejecutadoPor: Prisma.UsuarioCreateNestedOneWithoutAuditoriasEjecutadasInput
+}
+
+export type RegistroAuditoriaUncheckedCreateWithoutUsuarioAfectadoInput = {
+  id?: string
+  organizacionId: string
+  sesionId?: string | null
+  ejecutadoPorId: string
+  accion: string
+  fecha?: Date | string
+  detalleAccion?: string | null
+}
+
+export type RegistroAuditoriaCreateOrConnectWithoutUsuarioAfectadoInput = {
+  where: Prisma.RegistroAuditoriaWhereUniqueInput
+  create: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutUsuarioAfectadoInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutUsuarioAfectadoInput>
+}
+
+export type RegistroAuditoriaCreateManyUsuarioAfectadoInputEnvelope = {
+  data: Prisma.RegistroAuditoriaCreateManyUsuarioAfectadoInput | Prisma.RegistroAuditoriaCreateManyUsuarioAfectadoInput[]
+  skipDuplicates?: boolean
+}
+
+export type RegistroAuditoriaUpsertWithWhereUniqueWithoutEjecutadoPorInput = {
+  where: Prisma.RegistroAuditoriaWhereUniqueInput
+  update: Prisma.XOR<Prisma.RegistroAuditoriaUpdateWithoutEjecutadoPorInput, Prisma.RegistroAuditoriaUncheckedUpdateWithoutEjecutadoPorInput>
+  create: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutEjecutadoPorInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutEjecutadoPorInput>
+}
+
+export type RegistroAuditoriaUpdateWithWhereUniqueWithoutEjecutadoPorInput = {
+  where: Prisma.RegistroAuditoriaWhereUniqueInput
+  data: Prisma.XOR<Prisma.RegistroAuditoriaUpdateWithoutEjecutadoPorInput, Prisma.RegistroAuditoriaUncheckedUpdateWithoutEjecutadoPorInput>
+}
+
+export type RegistroAuditoriaUpdateManyWithWhereWithoutEjecutadoPorInput = {
+  where: Prisma.RegistroAuditoriaScalarWhereInput
+  data: Prisma.XOR<Prisma.RegistroAuditoriaUpdateManyMutationInput, Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutEjecutadoPorInput>
+}
+
+export type RegistroAuditoriaUpsertWithWhereUniqueWithoutUsuarioAfectadoInput = {
+  where: Prisma.RegistroAuditoriaWhereUniqueInput
+  update: Prisma.XOR<Prisma.RegistroAuditoriaUpdateWithoutUsuarioAfectadoInput, Prisma.RegistroAuditoriaUncheckedUpdateWithoutUsuarioAfectadoInput>
+  create: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutUsuarioAfectadoInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutUsuarioAfectadoInput>
+}
+
+export type RegistroAuditoriaUpdateWithWhereUniqueWithoutUsuarioAfectadoInput = {
+  where: Prisma.RegistroAuditoriaWhereUniqueInput
+  data: Prisma.XOR<Prisma.RegistroAuditoriaUpdateWithoutUsuarioAfectadoInput, Prisma.RegistroAuditoriaUncheckedUpdateWithoutUsuarioAfectadoInput>
+}
+
+export type RegistroAuditoriaUpdateManyWithWhereWithoutUsuarioAfectadoInput = {
+  where: Prisma.RegistroAuditoriaScalarWhereInput
+  data: Prisma.XOR<Prisma.RegistroAuditoriaUpdateManyMutationInput, Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutUsuarioAfectadoInput>
+}
+
+export type RegistroAuditoriaCreateWithoutSesionInput = {
+  id?: string
+  accion: string
+  fecha?: Date | string
+  detalleAccion?: string | null
+  organizacion: Prisma.OrganizacionCreateNestedOneWithoutRegistrosAuditoriaInput
+  ejecutadoPor: Prisma.UsuarioCreateNestedOneWithoutAuditoriasEjecutadasInput
+  usuarioAfectado?: Prisma.UsuarioCreateNestedOneWithoutAuditoriasAfectadasInput
+}
+
+export type RegistroAuditoriaUncheckedCreateWithoutSesionInput = {
+  id?: string
+  organizacionId: string
+  ejecutadoPorId: string
+  usuarioAfectadoId?: string | null
+  accion: string
+  fecha?: Date | string
+  detalleAccion?: string | null
+}
+
+export type RegistroAuditoriaCreateOrConnectWithoutSesionInput = {
+  where: Prisma.RegistroAuditoriaWhereUniqueInput
+  create: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutSesionInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutSesionInput>
+}
+
+export type RegistroAuditoriaCreateManySesionInputEnvelope = {
+  data: Prisma.RegistroAuditoriaCreateManySesionInput | Prisma.RegistroAuditoriaCreateManySesionInput[]
+  skipDuplicates?: boolean
+}
+
+export type RegistroAuditoriaUpsertWithWhereUniqueWithoutSesionInput = {
+  where: Prisma.RegistroAuditoriaWhereUniqueInput
+  update: Prisma.XOR<Prisma.RegistroAuditoriaUpdateWithoutSesionInput, Prisma.RegistroAuditoriaUncheckedUpdateWithoutSesionInput>
+  create: Prisma.XOR<Prisma.RegistroAuditoriaCreateWithoutSesionInput, Prisma.RegistroAuditoriaUncheckedCreateWithoutSesionInput>
+}
+
+export type RegistroAuditoriaUpdateWithWhereUniqueWithoutSesionInput = {
+  where: Prisma.RegistroAuditoriaWhereUniqueInput
+  data: Prisma.XOR<Prisma.RegistroAuditoriaUpdateWithoutSesionInput, Prisma.RegistroAuditoriaUncheckedUpdateWithoutSesionInput>
+}
+
+export type RegistroAuditoriaUpdateManyWithWhereWithoutSesionInput = {
+  where: Prisma.RegistroAuditoriaScalarWhereInput
+  data: Prisma.XOR<Prisma.RegistroAuditoriaUpdateManyMutationInput, Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutSesionInput>
+}
+
 export type RegistroAuditoriaCreateManyOrganizacionInput = {
   id?: string
-  clerkSessionId?: string | null
+  sesionId?: string | null
   ejecutadoPorId: string
   usuarioAfectadoId?: string | null
   accion: string
@@ -497,17 +767,17 @@ export type RegistroAuditoriaCreateManyOrganizacionInput = {
 
 export type RegistroAuditoriaUpdateWithoutOrganizacionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  clerkSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ejecutadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
-  usuarioAfectadoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accion?: Prisma.StringFieldUpdateOperationsInput | string
   fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   detalleAccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sesion?: Prisma.SesionUpdateOneWithoutRegistrosAuditoriaNestedInput
+  ejecutadoPor?: Prisma.UsuarioUpdateOneRequiredWithoutAuditoriasEjecutadasNestedInput
+  usuarioAfectado?: Prisma.UsuarioUpdateOneWithoutAuditoriasAfectadasNestedInput
 }
 
 export type RegistroAuditoriaUncheckedUpdateWithoutOrganizacionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  clerkSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sesionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ejecutadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
   usuarioAfectadoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accion?: Prisma.StringFieldUpdateOperationsInput | string
@@ -517,7 +787,127 @@ export type RegistroAuditoriaUncheckedUpdateWithoutOrganizacionInput = {
 
 export type RegistroAuditoriaUncheckedUpdateManyWithoutOrganizacionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  clerkSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sesionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ejecutadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
+  usuarioAfectadoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accion?: Prisma.StringFieldUpdateOperationsInput | string
+  fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detalleAccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type RegistroAuditoriaCreateManyEjecutadoPorInput = {
+  id?: string
+  organizacionId: string
+  sesionId?: string | null
+  usuarioAfectadoId?: string | null
+  accion: string
+  fecha?: Date | string
+  detalleAccion?: string | null
+}
+
+export type RegistroAuditoriaCreateManyUsuarioAfectadoInput = {
+  id?: string
+  organizacionId: string
+  sesionId?: string | null
+  ejecutadoPorId: string
+  accion: string
+  fecha?: Date | string
+  detalleAccion?: string | null
+}
+
+export type RegistroAuditoriaUpdateWithoutEjecutadoPorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accion?: Prisma.StringFieldUpdateOperationsInput | string
+  fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detalleAccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutRegistrosAuditoriaNestedInput
+  sesion?: Prisma.SesionUpdateOneWithoutRegistrosAuditoriaNestedInput
+  usuarioAfectado?: Prisma.UsuarioUpdateOneWithoutAuditoriasAfectadasNestedInput
+}
+
+export type RegistroAuditoriaUncheckedUpdateWithoutEjecutadoPorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
+  sesionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuarioAfectadoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accion?: Prisma.StringFieldUpdateOperationsInput | string
+  fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detalleAccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type RegistroAuditoriaUncheckedUpdateManyWithoutEjecutadoPorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
+  sesionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuarioAfectadoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accion?: Prisma.StringFieldUpdateOperationsInput | string
+  fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detalleAccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type RegistroAuditoriaUpdateWithoutUsuarioAfectadoInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accion?: Prisma.StringFieldUpdateOperationsInput | string
+  fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detalleAccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutRegistrosAuditoriaNestedInput
+  sesion?: Prisma.SesionUpdateOneWithoutRegistrosAuditoriaNestedInput
+  ejecutadoPor?: Prisma.UsuarioUpdateOneRequiredWithoutAuditoriasEjecutadasNestedInput
+}
+
+export type RegistroAuditoriaUncheckedUpdateWithoutUsuarioAfectadoInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
+  sesionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ejecutadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
+  accion?: Prisma.StringFieldUpdateOperationsInput | string
+  fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detalleAccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type RegistroAuditoriaUncheckedUpdateManyWithoutUsuarioAfectadoInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
+  sesionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ejecutadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
+  accion?: Prisma.StringFieldUpdateOperationsInput | string
+  fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detalleAccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type RegistroAuditoriaCreateManySesionInput = {
+  id?: string
+  organizacionId: string
+  ejecutadoPorId: string
+  usuarioAfectadoId?: string | null
+  accion: string
+  fecha?: Date | string
+  detalleAccion?: string | null
+}
+
+export type RegistroAuditoriaUpdateWithoutSesionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accion?: Prisma.StringFieldUpdateOperationsInput | string
+  fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detalleAccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutRegistrosAuditoriaNestedInput
+  ejecutadoPor?: Prisma.UsuarioUpdateOneRequiredWithoutAuditoriasEjecutadasNestedInput
+  usuarioAfectado?: Prisma.UsuarioUpdateOneWithoutAuditoriasAfectadasNestedInput
+}
+
+export type RegistroAuditoriaUncheckedUpdateWithoutSesionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
+  ejecutadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
+  usuarioAfectadoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accion?: Prisma.StringFieldUpdateOperationsInput | string
+  fecha?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detalleAccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type RegistroAuditoriaUncheckedUpdateManyWithoutSesionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
   ejecutadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
   usuarioAfectadoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accion?: Prisma.StringFieldUpdateOperationsInput | string
@@ -530,43 +920,52 @@ export type RegistroAuditoriaUncheckedUpdateManyWithoutOrganizacionInput = {
 export type RegistroAuditoriaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   organizacionId?: boolean
-  clerkSessionId?: boolean
+  sesionId?: boolean
   ejecutadoPorId?: boolean
   usuarioAfectadoId?: boolean
   accion?: boolean
   fecha?: boolean
   detalleAccion?: boolean
   organizacion?: boolean | Prisma.OrganizacionDefaultArgs<ExtArgs>
+  sesion?: boolean | Prisma.RegistroAuditoria$sesionArgs<ExtArgs>
+  ejecutadoPor?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  usuarioAfectado?: boolean | Prisma.RegistroAuditoria$usuarioAfectadoArgs<ExtArgs>
 }, ExtArgs["result"]["registroAuditoria"]>
 
 export type RegistroAuditoriaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   organizacionId?: boolean
-  clerkSessionId?: boolean
+  sesionId?: boolean
   ejecutadoPorId?: boolean
   usuarioAfectadoId?: boolean
   accion?: boolean
   fecha?: boolean
   detalleAccion?: boolean
   organizacion?: boolean | Prisma.OrganizacionDefaultArgs<ExtArgs>
+  sesion?: boolean | Prisma.RegistroAuditoria$sesionArgs<ExtArgs>
+  ejecutadoPor?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  usuarioAfectado?: boolean | Prisma.RegistroAuditoria$usuarioAfectadoArgs<ExtArgs>
 }, ExtArgs["result"]["registroAuditoria"]>
 
 export type RegistroAuditoriaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   organizacionId?: boolean
-  clerkSessionId?: boolean
+  sesionId?: boolean
   ejecutadoPorId?: boolean
   usuarioAfectadoId?: boolean
   accion?: boolean
   fecha?: boolean
   detalleAccion?: boolean
   organizacion?: boolean | Prisma.OrganizacionDefaultArgs<ExtArgs>
+  sesion?: boolean | Prisma.RegistroAuditoria$sesionArgs<ExtArgs>
+  ejecutadoPor?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  usuarioAfectado?: boolean | Prisma.RegistroAuditoria$usuarioAfectadoArgs<ExtArgs>
 }, ExtArgs["result"]["registroAuditoria"]>
 
 export type RegistroAuditoriaSelectScalar = {
   id?: boolean
   organizacionId?: boolean
-  clerkSessionId?: boolean
+  sesionId?: boolean
   ejecutadoPorId?: boolean
   usuarioAfectadoId?: boolean
   accion?: boolean
@@ -574,26 +973,38 @@ export type RegistroAuditoriaSelectScalar = {
   detalleAccion?: boolean
 }
 
-export type RegistroAuditoriaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizacionId" | "clerkSessionId" | "ejecutadoPorId" | "usuarioAfectadoId" | "accion" | "fecha" | "detalleAccion", ExtArgs["result"]["registroAuditoria"]>
+export type RegistroAuditoriaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizacionId" | "sesionId" | "ejecutadoPorId" | "usuarioAfectadoId" | "accion" | "fecha" | "detalleAccion", ExtArgs["result"]["registroAuditoria"]>
 export type RegistroAuditoriaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organizacion?: boolean | Prisma.OrganizacionDefaultArgs<ExtArgs>
+  sesion?: boolean | Prisma.RegistroAuditoria$sesionArgs<ExtArgs>
+  ejecutadoPor?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  usuarioAfectado?: boolean | Prisma.RegistroAuditoria$usuarioAfectadoArgs<ExtArgs>
 }
 export type RegistroAuditoriaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organizacion?: boolean | Prisma.OrganizacionDefaultArgs<ExtArgs>
+  sesion?: boolean | Prisma.RegistroAuditoria$sesionArgs<ExtArgs>
+  ejecutadoPor?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  usuarioAfectado?: boolean | Prisma.RegistroAuditoria$usuarioAfectadoArgs<ExtArgs>
 }
 export type RegistroAuditoriaIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organizacion?: boolean | Prisma.OrganizacionDefaultArgs<ExtArgs>
+  sesion?: boolean | Prisma.RegistroAuditoria$sesionArgs<ExtArgs>
+  ejecutadoPor?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  usuarioAfectado?: boolean | Prisma.RegistroAuditoria$usuarioAfectadoArgs<ExtArgs>
 }
 
 export type $RegistroAuditoriaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "RegistroAuditoria"
   objects: {
     organizacion: Prisma.$OrganizacionPayload<ExtArgs>
+    sesion: Prisma.$SesionPayload<ExtArgs> | null
+    ejecutadoPor: Prisma.$UsuarioPayload<ExtArgs>
+    usuarioAfectado: Prisma.$UsuarioPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     organizacionId: string
-    clerkSessionId: string | null
+    sesionId: string | null
     ejecutadoPorId: string
     usuarioAfectadoId: string | null
     accion: string
@@ -994,6 +1405,9 @@ readonly fields: RegistroAuditoriaFieldRefs;
 export interface Prisma__RegistroAuditoriaClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   organizacion<T extends Prisma.OrganizacionDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizacionDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizacionClient<runtime.Types.Result.GetResult<Prisma.$OrganizacionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  sesion<T extends Prisma.RegistroAuditoria$sesionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RegistroAuditoria$sesionArgs<ExtArgs>>): Prisma.Prisma__SesionClient<runtime.Types.Result.GetResult<Prisma.$SesionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  ejecutadoPor<T extends Prisma.UsuarioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UsuarioDefaultArgs<ExtArgs>>): Prisma.Prisma__UsuarioClient<runtime.Types.Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  usuarioAfectado<T extends Prisma.RegistroAuditoria$usuarioAfectadoArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RegistroAuditoria$usuarioAfectadoArgs<ExtArgs>>): Prisma.Prisma__UsuarioClient<runtime.Types.Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1025,7 +1439,7 @@ export interface Prisma__RegistroAuditoriaClient<T, Null = never, ExtArgs extend
 export interface RegistroAuditoriaFieldRefs {
   readonly id: Prisma.FieldRef<"RegistroAuditoria", 'String'>
   readonly organizacionId: Prisma.FieldRef<"RegistroAuditoria", 'String'>
-  readonly clerkSessionId: Prisma.FieldRef<"RegistroAuditoria", 'String'>
+  readonly sesionId: Prisma.FieldRef<"RegistroAuditoria", 'String'>
   readonly ejecutadoPorId: Prisma.FieldRef<"RegistroAuditoria", 'String'>
   readonly usuarioAfectadoId: Prisma.FieldRef<"RegistroAuditoria", 'String'>
   readonly accion: Prisma.FieldRef<"RegistroAuditoria", 'String'>
@@ -1424,6 +1838,44 @@ export type RegistroAuditoriaDeleteManyArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many RegistroAuditorias to delete.
    */
   limit?: number
+}
+
+/**
+ * RegistroAuditoria.sesion
+ */
+export type RegistroAuditoria$sesionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Sesion
+   */
+  select?: Prisma.SesionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Sesion
+   */
+  omit?: Prisma.SesionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SesionInclude<ExtArgs> | null
+  where?: Prisma.SesionWhereInput
+}
+
+/**
+ * RegistroAuditoria.usuarioAfectado
+ */
+export type RegistroAuditoria$usuarioAfectadoArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Usuario
+   */
+  select?: Prisma.UsuarioSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Usuario
+   */
+  omit?: Prisma.UsuarioOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
+  where?: Prisma.UsuarioWhereInput
 }
 
 /**

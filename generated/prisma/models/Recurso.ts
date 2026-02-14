@@ -188,6 +188,7 @@ export type RecursoWhereInput = {
   vencimiento?: Prisma.XOR<Prisma.VencimientoNullableScalarRelationFilter, Prisma.VencimientoWhereInput> | null
   refColor?: Prisma.XOR<Prisma.RefColorNullableScalarRelationFilter, Prisma.RefColorWhereInput> | null
   recursoRef?: Prisma.XOR<Prisma.RecursoRefNullableScalarRelationFilter, Prisma.RecursoRefWhereInput> | null
+  permisos?: Prisma.PermisoListRelationFilter
 }
 
 export type RecursoOrderByWithRelationInput = {
@@ -202,6 +203,7 @@ export type RecursoOrderByWithRelationInput = {
   vencimiento?: Prisma.VencimientoOrderByWithRelationInput
   refColor?: Prisma.RefColorOrderByWithRelationInput
   recursoRef?: Prisma.RecursoRefOrderByWithRelationInput
+  permisos?: Prisma.PermisoOrderByRelationAggregateInput
 }
 
 export type RecursoWhereUniqueInput = Prisma.AtLeast<{
@@ -219,6 +221,7 @@ export type RecursoWhereUniqueInput = Prisma.AtLeast<{
   vencimiento?: Prisma.XOR<Prisma.VencimientoNullableScalarRelationFilter, Prisma.VencimientoWhereInput> | null
   refColor?: Prisma.XOR<Prisma.RefColorNullableScalarRelationFilter, Prisma.RefColorWhereInput> | null
   recursoRef?: Prisma.XOR<Prisma.RecursoRefNullableScalarRelationFilter, Prisma.RecursoRefWhereInput> | null
+  permisos?: Prisma.PermisoListRelationFilter
 }, "id">
 
 export type RecursoOrderByWithAggregationInput = {
@@ -254,6 +257,7 @@ export type RecursoCreateInput = {
   vencimiento?: Prisma.VencimientoCreateNestedOneWithoutRecursoInput
   refColor?: Prisma.RefColorCreateNestedOneWithoutRecursoInput
   recursoRef?: Prisma.RecursoRefCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoUncheckedCreateInput = {
@@ -267,6 +271,7 @@ export type RecursoUncheckedCreateInput = {
   vencimiento?: Prisma.VencimientoUncheckedCreateNestedOneWithoutRecursoInput
   refColor?: Prisma.RefColorUncheckedCreateNestedOneWithoutRecursoInput
   recursoRef?: Prisma.RecursoRefUncheckedCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoUncheckedCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoUpdateInput = {
@@ -280,6 +285,7 @@ export type RecursoUpdateInput = {
   vencimiento?: Prisma.VencimientoUpdateOneWithoutRecursoNestedInput
   refColor?: Prisma.RefColorUpdateOneWithoutRecursoNestedInput
   recursoRef?: Prisma.RecursoRefUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoUncheckedUpdateInput = {
@@ -293,6 +299,7 @@ export type RecursoUncheckedUpdateInput = {
   vencimiento?: Prisma.VencimientoUncheckedUpdateOneWithoutRecursoNestedInput
   refColor?: Prisma.RefColorUncheckedUpdateOneWithoutRecursoNestedInput
   recursoRef?: Prisma.RecursoRefUncheckedUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUncheckedUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoCreateManyInput = {
@@ -328,6 +335,11 @@ export type RecursoOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type RecursoScalarRelationFilter = {
+  is?: Prisma.RecursoWhereInput
+  isNot?: Prisma.RecursoWhereInput
+}
+
 export type RecursoCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   organizacionId?: Prisma.SortOrder
@@ -350,11 +362,6 @@ export type RecursoMinOrderByAggregateInput = {
   nombre?: Prisma.SortOrder
   descripcion?: Prisma.SortOrder
   tipoRecurso?: Prisma.SortOrder
-}
-
-export type RecursoScalarRelationFilter = {
-  is?: Prisma.RecursoWhereInput
-  isNot?: Prisma.RecursoWhereInput
 }
 
 export type RecursoCreateNestedManyWithoutOrganizacionInput = {
@@ -397,6 +404,20 @@ export type RecursoUncheckedUpdateManyWithoutOrganizacionNestedInput = {
   update?: Prisma.RecursoUpdateWithWhereUniqueWithoutOrganizacionInput | Prisma.RecursoUpdateWithWhereUniqueWithoutOrganizacionInput[]
   updateMany?: Prisma.RecursoUpdateManyWithWhereWithoutOrganizacionInput | Prisma.RecursoUpdateManyWithWhereWithoutOrganizacionInput[]
   deleteMany?: Prisma.RecursoScalarWhereInput | Prisma.RecursoScalarWhereInput[]
+}
+
+export type RecursoCreateNestedOneWithoutPermisosInput = {
+  create?: Prisma.XOR<Prisma.RecursoCreateWithoutPermisosInput, Prisma.RecursoUncheckedCreateWithoutPermisosInput>
+  connectOrCreate?: Prisma.RecursoCreateOrConnectWithoutPermisosInput
+  connect?: Prisma.RecursoWhereUniqueInput
+}
+
+export type RecursoUpdateOneRequiredWithoutPermisosNestedInput = {
+  create?: Prisma.XOR<Prisma.RecursoCreateWithoutPermisosInput, Prisma.RecursoUncheckedCreateWithoutPermisosInput>
+  connectOrCreate?: Prisma.RecursoCreateOrConnectWithoutPermisosInput
+  upsert?: Prisma.RecursoUpsertWithoutPermisosInput
+  connect?: Prisma.RecursoWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RecursoUpdateToOneWithWhereWithoutPermisosInput, Prisma.RecursoUpdateWithoutPermisosInput>, Prisma.RecursoUncheckedUpdateWithoutPermisosInput>
 }
 
 export type RecursoCreateNestedOneWithoutRecursoRefInput = {
@@ -479,6 +500,7 @@ export type RecursoCreateWithoutOrganizacionInput = {
   vencimiento?: Prisma.VencimientoCreateNestedOneWithoutRecursoInput
   refColor?: Prisma.RefColorCreateNestedOneWithoutRecursoInput
   recursoRef?: Prisma.RecursoRefCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoUncheckedCreateWithoutOrganizacionInput = {
@@ -491,6 +513,7 @@ export type RecursoUncheckedCreateWithoutOrganizacionInput = {
   vencimiento?: Prisma.VencimientoUncheckedCreateNestedOneWithoutRecursoInput
   refColor?: Prisma.RefColorUncheckedCreateNestedOneWithoutRecursoInput
   recursoRef?: Prisma.RecursoRefUncheckedCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoUncheckedCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoCreateOrConnectWithoutOrganizacionInput = {
@@ -530,6 +553,74 @@ export type RecursoScalarWhereInput = {
   tipoRecurso?: Prisma.StringFilter<"Recurso"> | string
 }
 
+export type RecursoCreateWithoutPermisosInput = {
+  id?: string
+  nombre: string
+  descripcion?: string | null
+  tipoRecurso: string
+  organizacion: Prisma.OrganizacionCreateNestedOneWithoutRecursosInput
+  cliente?: Prisma.ClienteCreateNestedOneWithoutRecursoInput
+  tarea?: Prisma.TareaCreateNestedOneWithoutRecursoInput
+  vencimiento?: Prisma.VencimientoCreateNestedOneWithoutRecursoInput
+  refColor?: Prisma.RefColorCreateNestedOneWithoutRecursoInput
+  recursoRef?: Prisma.RecursoRefCreateNestedOneWithoutRecursoInput
+}
+
+export type RecursoUncheckedCreateWithoutPermisosInput = {
+  id?: string
+  organizacionId: string
+  nombre: string
+  descripcion?: string | null
+  tipoRecurso: string
+  cliente?: Prisma.ClienteUncheckedCreateNestedOneWithoutRecursoInput
+  tarea?: Prisma.TareaUncheckedCreateNestedOneWithoutRecursoInput
+  vencimiento?: Prisma.VencimientoUncheckedCreateNestedOneWithoutRecursoInput
+  refColor?: Prisma.RefColorUncheckedCreateNestedOneWithoutRecursoInput
+  recursoRef?: Prisma.RecursoRefUncheckedCreateNestedOneWithoutRecursoInput
+}
+
+export type RecursoCreateOrConnectWithoutPermisosInput = {
+  where: Prisma.RecursoWhereUniqueInput
+  create: Prisma.XOR<Prisma.RecursoCreateWithoutPermisosInput, Prisma.RecursoUncheckedCreateWithoutPermisosInput>
+}
+
+export type RecursoUpsertWithoutPermisosInput = {
+  update: Prisma.XOR<Prisma.RecursoUpdateWithoutPermisosInput, Prisma.RecursoUncheckedUpdateWithoutPermisosInput>
+  create: Prisma.XOR<Prisma.RecursoCreateWithoutPermisosInput, Prisma.RecursoUncheckedCreateWithoutPermisosInput>
+  where?: Prisma.RecursoWhereInput
+}
+
+export type RecursoUpdateToOneWithWhereWithoutPermisosInput = {
+  where?: Prisma.RecursoWhereInput
+  data: Prisma.XOR<Prisma.RecursoUpdateWithoutPermisosInput, Prisma.RecursoUncheckedUpdateWithoutPermisosInput>
+}
+
+export type RecursoUpdateWithoutPermisosInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tipoRecurso?: Prisma.StringFieldUpdateOperationsInput | string
+  organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutRecursosNestedInput
+  cliente?: Prisma.ClienteUpdateOneWithoutRecursoNestedInput
+  tarea?: Prisma.TareaUpdateOneWithoutRecursoNestedInput
+  vencimiento?: Prisma.VencimientoUpdateOneWithoutRecursoNestedInput
+  refColor?: Prisma.RefColorUpdateOneWithoutRecursoNestedInput
+  recursoRef?: Prisma.RecursoRefUpdateOneWithoutRecursoNestedInput
+}
+
+export type RecursoUncheckedUpdateWithoutPermisosInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tipoRecurso?: Prisma.StringFieldUpdateOperationsInput | string
+  cliente?: Prisma.ClienteUncheckedUpdateOneWithoutRecursoNestedInput
+  tarea?: Prisma.TareaUncheckedUpdateOneWithoutRecursoNestedInput
+  vencimiento?: Prisma.VencimientoUncheckedUpdateOneWithoutRecursoNestedInput
+  refColor?: Prisma.RefColorUncheckedUpdateOneWithoutRecursoNestedInput
+  recursoRef?: Prisma.RecursoRefUncheckedUpdateOneWithoutRecursoNestedInput
+}
+
 export type RecursoCreateWithoutRecursoRefInput = {
   id?: string
   nombre: string
@@ -540,6 +631,7 @@ export type RecursoCreateWithoutRecursoRefInput = {
   tarea?: Prisma.TareaCreateNestedOneWithoutRecursoInput
   vencimiento?: Prisma.VencimientoCreateNestedOneWithoutRecursoInput
   refColor?: Prisma.RefColorCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoUncheckedCreateWithoutRecursoRefInput = {
@@ -552,6 +644,7 @@ export type RecursoUncheckedCreateWithoutRecursoRefInput = {
   tarea?: Prisma.TareaUncheckedCreateNestedOneWithoutRecursoInput
   vencimiento?: Prisma.VencimientoUncheckedCreateNestedOneWithoutRecursoInput
   refColor?: Prisma.RefColorUncheckedCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoUncheckedCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoCreateOrConnectWithoutRecursoRefInput = {
@@ -580,6 +673,7 @@ export type RecursoUpdateWithoutRecursoRefInput = {
   tarea?: Prisma.TareaUpdateOneWithoutRecursoNestedInput
   vencimiento?: Prisma.VencimientoUpdateOneWithoutRecursoNestedInput
   refColor?: Prisma.RefColorUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoUncheckedUpdateWithoutRecursoRefInput = {
@@ -592,6 +686,7 @@ export type RecursoUncheckedUpdateWithoutRecursoRefInput = {
   tarea?: Prisma.TareaUncheckedUpdateOneWithoutRecursoNestedInput
   vencimiento?: Prisma.VencimientoUncheckedUpdateOneWithoutRecursoNestedInput
   refColor?: Prisma.RefColorUncheckedUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUncheckedUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoCreateWithoutRefColorInput = {
@@ -604,6 +699,7 @@ export type RecursoCreateWithoutRefColorInput = {
   tarea?: Prisma.TareaCreateNestedOneWithoutRecursoInput
   vencimiento?: Prisma.VencimientoCreateNestedOneWithoutRecursoInput
   recursoRef?: Prisma.RecursoRefCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoUncheckedCreateWithoutRefColorInput = {
@@ -616,6 +712,7 @@ export type RecursoUncheckedCreateWithoutRefColorInput = {
   tarea?: Prisma.TareaUncheckedCreateNestedOneWithoutRecursoInput
   vencimiento?: Prisma.VencimientoUncheckedCreateNestedOneWithoutRecursoInput
   recursoRef?: Prisma.RecursoRefUncheckedCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoUncheckedCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoCreateOrConnectWithoutRefColorInput = {
@@ -644,6 +741,7 @@ export type RecursoUpdateWithoutRefColorInput = {
   tarea?: Prisma.TareaUpdateOneWithoutRecursoNestedInput
   vencimiento?: Prisma.VencimientoUpdateOneWithoutRecursoNestedInput
   recursoRef?: Prisma.RecursoRefUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoUncheckedUpdateWithoutRefColorInput = {
@@ -656,6 +754,7 @@ export type RecursoUncheckedUpdateWithoutRefColorInput = {
   tarea?: Prisma.TareaUncheckedUpdateOneWithoutRecursoNestedInput
   vencimiento?: Prisma.VencimientoUncheckedUpdateOneWithoutRecursoNestedInput
   recursoRef?: Prisma.RecursoRefUncheckedUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUncheckedUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoCreateWithoutClienteInput = {
@@ -668,6 +767,7 @@ export type RecursoCreateWithoutClienteInput = {
   vencimiento?: Prisma.VencimientoCreateNestedOneWithoutRecursoInput
   refColor?: Prisma.RefColorCreateNestedOneWithoutRecursoInput
   recursoRef?: Prisma.RecursoRefCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoUncheckedCreateWithoutClienteInput = {
@@ -680,6 +780,7 @@ export type RecursoUncheckedCreateWithoutClienteInput = {
   vencimiento?: Prisma.VencimientoUncheckedCreateNestedOneWithoutRecursoInput
   refColor?: Prisma.RefColorUncheckedCreateNestedOneWithoutRecursoInput
   recursoRef?: Prisma.RecursoRefUncheckedCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoUncheckedCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoCreateOrConnectWithoutClienteInput = {
@@ -708,6 +809,7 @@ export type RecursoUpdateWithoutClienteInput = {
   vencimiento?: Prisma.VencimientoUpdateOneWithoutRecursoNestedInput
   refColor?: Prisma.RefColorUpdateOneWithoutRecursoNestedInput
   recursoRef?: Prisma.RecursoRefUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoUncheckedUpdateWithoutClienteInput = {
@@ -720,6 +822,7 @@ export type RecursoUncheckedUpdateWithoutClienteInput = {
   vencimiento?: Prisma.VencimientoUncheckedUpdateOneWithoutRecursoNestedInput
   refColor?: Prisma.RefColorUncheckedUpdateOneWithoutRecursoNestedInput
   recursoRef?: Prisma.RecursoRefUncheckedUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUncheckedUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoCreateWithoutTareaInput = {
@@ -732,6 +835,7 @@ export type RecursoCreateWithoutTareaInput = {
   vencimiento?: Prisma.VencimientoCreateNestedOneWithoutRecursoInput
   refColor?: Prisma.RefColorCreateNestedOneWithoutRecursoInput
   recursoRef?: Prisma.RecursoRefCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoUncheckedCreateWithoutTareaInput = {
@@ -744,6 +848,7 @@ export type RecursoUncheckedCreateWithoutTareaInput = {
   vencimiento?: Prisma.VencimientoUncheckedCreateNestedOneWithoutRecursoInput
   refColor?: Prisma.RefColorUncheckedCreateNestedOneWithoutRecursoInput
   recursoRef?: Prisma.RecursoRefUncheckedCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoUncheckedCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoCreateOrConnectWithoutTareaInput = {
@@ -772,6 +877,7 @@ export type RecursoUpdateWithoutTareaInput = {
   vencimiento?: Prisma.VencimientoUpdateOneWithoutRecursoNestedInput
   refColor?: Prisma.RefColorUpdateOneWithoutRecursoNestedInput
   recursoRef?: Prisma.RecursoRefUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoUncheckedUpdateWithoutTareaInput = {
@@ -784,6 +890,7 @@ export type RecursoUncheckedUpdateWithoutTareaInput = {
   vencimiento?: Prisma.VencimientoUncheckedUpdateOneWithoutRecursoNestedInput
   refColor?: Prisma.RefColorUncheckedUpdateOneWithoutRecursoNestedInput
   recursoRef?: Prisma.RecursoRefUncheckedUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUncheckedUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoCreateWithoutVencimientoInput = {
@@ -796,6 +903,7 @@ export type RecursoCreateWithoutVencimientoInput = {
   tarea?: Prisma.TareaCreateNestedOneWithoutRecursoInput
   refColor?: Prisma.RefColorCreateNestedOneWithoutRecursoInput
   recursoRef?: Prisma.RecursoRefCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoUncheckedCreateWithoutVencimientoInput = {
@@ -808,6 +916,7 @@ export type RecursoUncheckedCreateWithoutVencimientoInput = {
   tarea?: Prisma.TareaUncheckedCreateNestedOneWithoutRecursoInput
   refColor?: Prisma.RefColorUncheckedCreateNestedOneWithoutRecursoInput
   recursoRef?: Prisma.RecursoRefUncheckedCreateNestedOneWithoutRecursoInput
+  permisos?: Prisma.PermisoUncheckedCreateNestedManyWithoutRecursoInput
 }
 
 export type RecursoCreateOrConnectWithoutVencimientoInput = {
@@ -836,6 +945,7 @@ export type RecursoUpdateWithoutVencimientoInput = {
   tarea?: Prisma.TareaUpdateOneWithoutRecursoNestedInput
   refColor?: Prisma.RefColorUpdateOneWithoutRecursoNestedInput
   recursoRef?: Prisma.RecursoRefUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoUncheckedUpdateWithoutVencimientoInput = {
@@ -848,6 +958,7 @@ export type RecursoUncheckedUpdateWithoutVencimientoInput = {
   tarea?: Prisma.TareaUncheckedUpdateOneWithoutRecursoNestedInput
   refColor?: Prisma.RefColorUncheckedUpdateOneWithoutRecursoNestedInput
   recursoRef?: Prisma.RecursoRefUncheckedUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUncheckedUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoCreateManyOrganizacionInput = {
@@ -867,6 +978,7 @@ export type RecursoUpdateWithoutOrganizacionInput = {
   vencimiento?: Prisma.VencimientoUpdateOneWithoutRecursoNestedInput
   refColor?: Prisma.RefColorUpdateOneWithoutRecursoNestedInput
   recursoRef?: Prisma.RecursoRefUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoUncheckedUpdateWithoutOrganizacionInput = {
@@ -879,6 +991,7 @@ export type RecursoUncheckedUpdateWithoutOrganizacionInput = {
   vencimiento?: Prisma.VencimientoUncheckedUpdateOneWithoutRecursoNestedInput
   refColor?: Prisma.RefColorUncheckedUpdateOneWithoutRecursoNestedInput
   recursoRef?: Prisma.RecursoRefUncheckedUpdateOneWithoutRecursoNestedInput
+  permisos?: Prisma.PermisoUncheckedUpdateManyWithoutRecursoNestedInput
 }
 
 export type RecursoUncheckedUpdateManyWithoutOrganizacionInput = {
@@ -888,6 +1001,35 @@ export type RecursoUncheckedUpdateManyWithoutOrganizacionInput = {
   tipoRecurso?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
+
+/**
+ * Count Type RecursoCountOutputType
+ */
+
+export type RecursoCountOutputType = {
+  permisos: number
+}
+
+export type RecursoCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  permisos?: boolean | RecursoCountOutputTypeCountPermisosArgs
+}
+
+/**
+ * RecursoCountOutputType without action
+ */
+export type RecursoCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RecursoCountOutputType
+   */
+  select?: Prisma.RecursoCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * RecursoCountOutputType without action
+ */
+export type RecursoCountOutputTypeCountPermisosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PermisoWhereInput
+}
 
 
 export type RecursoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -902,6 +1044,8 @@ export type RecursoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   vencimiento?: boolean | Prisma.Recurso$vencimientoArgs<ExtArgs>
   refColor?: boolean | Prisma.Recurso$refColorArgs<ExtArgs>
   recursoRef?: boolean | Prisma.Recurso$recursoRefArgs<ExtArgs>
+  permisos?: boolean | Prisma.Recurso$permisosArgs<ExtArgs>
+  _count?: boolean | Prisma.RecursoCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["recurso"]>
 
 export type RecursoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -938,6 +1082,8 @@ export type RecursoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   vencimiento?: boolean | Prisma.Recurso$vencimientoArgs<ExtArgs>
   refColor?: boolean | Prisma.Recurso$refColorArgs<ExtArgs>
   recursoRef?: boolean | Prisma.Recurso$recursoRefArgs<ExtArgs>
+  permisos?: boolean | Prisma.Recurso$permisosArgs<ExtArgs>
+  _count?: boolean | Prisma.RecursoCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RecursoIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organizacion?: boolean | Prisma.OrganizacionDefaultArgs<ExtArgs>
@@ -955,6 +1101,7 @@ export type $RecursoPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     vencimiento: Prisma.$VencimientoPayload<ExtArgs> | null
     refColor: Prisma.$RefColorPayload<ExtArgs> | null
     recursoRef: Prisma.$RecursoRefPayload<ExtArgs> | null
+    permisos: Prisma.$PermisoPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1362,6 +1509,7 @@ export interface Prisma__RecursoClient<T, Null = never, ExtArgs extends runtime.
   vencimiento<T extends Prisma.Recurso$vencimientoArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Recurso$vencimientoArgs<ExtArgs>>): Prisma.Prisma__VencimientoClient<runtime.Types.Result.GetResult<Prisma.$VencimientoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   refColor<T extends Prisma.Recurso$refColorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Recurso$refColorArgs<ExtArgs>>): Prisma.Prisma__RefColorClient<runtime.Types.Result.GetResult<Prisma.$RefColorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   recursoRef<T extends Prisma.Recurso$recursoRefArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Recurso$recursoRefArgs<ExtArgs>>): Prisma.Prisma__RecursoRefClient<runtime.Types.Result.GetResult<Prisma.$RecursoRefPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  permisos<T extends Prisma.Recurso$permisosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Recurso$permisosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PermisoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1884,6 +2032,30 @@ export type Recurso$recursoRefArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   include?: Prisma.RecursoRefInclude<ExtArgs> | null
   where?: Prisma.RecursoRefWhereInput
+}
+
+/**
+ * Recurso.permisos
+ */
+export type Recurso$permisosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Permiso
+   */
+  select?: Prisma.PermisoSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Permiso
+   */
+  omit?: Prisma.PermisoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PermisoInclude<ExtArgs> | null
+  where?: Prisma.PermisoWhereInput
+  orderBy?: Prisma.PermisoOrderByWithRelationInput | Prisma.PermisoOrderByWithRelationInput[]
+  cursor?: Prisma.PermisoWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PermisoScalarFieldEnum | Prisma.PermisoScalarFieldEnum[]
 }
 
 /**

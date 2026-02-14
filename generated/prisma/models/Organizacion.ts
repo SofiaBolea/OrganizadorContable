@@ -27,8 +27,10 @@ export type AggregateOrganizacion = {
 export type OrganizacionMinAggregateOutputType = {
   id: string | null
   clerkOrganizationId: string | null
+  nombre: string | null
   razonSocial: string | null
   cuit: string | null
+  logoUrl: string | null
   emailContacto: string | null
   telefonoContacto: string | null
   direccion: string | null
@@ -39,8 +41,10 @@ export type OrganizacionMinAggregateOutputType = {
 export type OrganizacionMaxAggregateOutputType = {
   id: string | null
   clerkOrganizationId: string | null
+  nombre: string | null
   razonSocial: string | null
   cuit: string | null
+  logoUrl: string | null
   emailContacto: string | null
   telefonoContacto: string | null
   direccion: string | null
@@ -51,8 +55,10 @@ export type OrganizacionMaxAggregateOutputType = {
 export type OrganizacionCountAggregateOutputType = {
   id: number
   clerkOrganizationId: number
+  nombre: number
   razonSocial: number
   cuit: number
+  logoUrl: number
   emailContacto: number
   telefonoContacto: number
   direccion: number
@@ -65,8 +71,10 @@ export type OrganizacionCountAggregateOutputType = {
 export type OrganizacionMinAggregateInputType = {
   id?: true
   clerkOrganizationId?: true
+  nombre?: true
   razonSocial?: true
   cuit?: true
+  logoUrl?: true
   emailContacto?: true
   telefonoContacto?: true
   direccion?: true
@@ -77,8 +85,10 @@ export type OrganizacionMinAggregateInputType = {
 export type OrganizacionMaxAggregateInputType = {
   id?: true
   clerkOrganizationId?: true
+  nombre?: true
   razonSocial?: true
   cuit?: true
+  logoUrl?: true
   emailContacto?: true
   telefonoContacto?: true
   direccion?: true
@@ -89,8 +99,10 @@ export type OrganizacionMaxAggregateInputType = {
 export type OrganizacionCountAggregateInputType = {
   id?: true
   clerkOrganizationId?: true
+  nombre?: true
   razonSocial?: true
   cuit?: true
+  logoUrl?: true
   emailContacto?: true
   telefonoContacto?: true
   direccion?: true
@@ -174,8 +186,10 @@ export type OrganizacionGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 export type OrganizacionGroupByOutputType = {
   id: string
   clerkOrganizationId: string
+  nombre: string
   razonSocial: string | null
   cuit: string | null
+  logoUrl: string | null
   emailContacto: string | null
   telefonoContacto: string | null
   direccion: string | null
@@ -207,13 +221,18 @@ export type OrganizacionWhereInput = {
   NOT?: Prisma.OrganizacionWhereInput | Prisma.OrganizacionWhereInput[]
   id?: Prisma.StringFilter<"Organizacion"> | string
   clerkOrganizationId?: Prisma.StringFilter<"Organizacion"> | string
+  nombre?: Prisma.StringFilter<"Organizacion"> | string
   razonSocial?: Prisma.StringNullableFilter<"Organizacion"> | string | null
   cuit?: Prisma.StringNullableFilter<"Organizacion"> | string | null
+  logoUrl?: Prisma.StringNullableFilter<"Organizacion"> | string | null
   emailContacto?: Prisma.StringNullableFilter<"Organizacion"> | string | null
   telefonoContacto?: Prisma.StringNullableFilter<"Organizacion"> | string | null
   direccion?: Prisma.StringNullableFilter<"Organizacion"> | string | null
   activa?: Prisma.BoolFilter<"Organizacion"> | boolean
   fechaAlta?: Prisma.DateTimeFilter<"Organizacion"> | Date | string
+  usuarios?: Prisma.UsuarioListRelationFilter
+  sesiones?: Prisma.SesionListRelationFilter
+  roles?: Prisma.RolListRelationFilter
   recursos?: Prisma.RecursoListRelationFilter
   registrosAuditoria?: Prisma.RegistroAuditoriaListRelationFilter
 }
@@ -221,13 +240,18 @@ export type OrganizacionWhereInput = {
 export type OrganizacionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   clerkOrganizationId?: Prisma.SortOrder
+  nombre?: Prisma.SortOrder
   razonSocial?: Prisma.SortOrderInput | Prisma.SortOrder
   cuit?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   emailContacto?: Prisma.SortOrderInput | Prisma.SortOrder
   telefonoContacto?: Prisma.SortOrderInput | Prisma.SortOrder
   direccion?: Prisma.SortOrderInput | Prisma.SortOrder
   activa?: Prisma.SortOrder
   fechaAlta?: Prisma.SortOrder
+  usuarios?: Prisma.UsuarioOrderByRelationAggregateInput
+  sesiones?: Prisma.SesionOrderByRelationAggregateInput
+  roles?: Prisma.RolOrderByRelationAggregateInput
   recursos?: Prisma.RecursoOrderByRelationAggregateInput
   registrosAuditoria?: Prisma.RegistroAuditoriaOrderByRelationAggregateInput
 }
@@ -238,13 +262,18 @@ export type OrganizacionWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.OrganizacionWhereInput | Prisma.OrganizacionWhereInput[]
   OR?: Prisma.OrganizacionWhereInput[]
   NOT?: Prisma.OrganizacionWhereInput | Prisma.OrganizacionWhereInput[]
+  nombre?: Prisma.StringFilter<"Organizacion"> | string
   razonSocial?: Prisma.StringNullableFilter<"Organizacion"> | string | null
   cuit?: Prisma.StringNullableFilter<"Organizacion"> | string | null
+  logoUrl?: Prisma.StringNullableFilter<"Organizacion"> | string | null
   emailContacto?: Prisma.StringNullableFilter<"Organizacion"> | string | null
   telefonoContacto?: Prisma.StringNullableFilter<"Organizacion"> | string | null
   direccion?: Prisma.StringNullableFilter<"Organizacion"> | string | null
   activa?: Prisma.BoolFilter<"Organizacion"> | boolean
   fechaAlta?: Prisma.DateTimeFilter<"Organizacion"> | Date | string
+  usuarios?: Prisma.UsuarioListRelationFilter
+  sesiones?: Prisma.SesionListRelationFilter
+  roles?: Prisma.RolListRelationFilter
   recursos?: Prisma.RecursoListRelationFilter
   registrosAuditoria?: Prisma.RegistroAuditoriaListRelationFilter
 }, "id" | "clerkOrganizationId">
@@ -252,8 +281,10 @@ export type OrganizacionWhereUniqueInput = Prisma.AtLeast<{
 export type OrganizacionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   clerkOrganizationId?: Prisma.SortOrder
+  nombre?: Prisma.SortOrder
   razonSocial?: Prisma.SortOrderInput | Prisma.SortOrder
   cuit?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   emailContacto?: Prisma.SortOrderInput | Prisma.SortOrder
   telefonoContacto?: Prisma.SortOrderInput | Prisma.SortOrder
   direccion?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -270,8 +301,10 @@ export type OrganizacionScalarWhereWithAggregatesInput = {
   NOT?: Prisma.OrganizacionScalarWhereWithAggregatesInput | Prisma.OrganizacionScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Organizacion"> | string
   clerkOrganizationId?: Prisma.StringWithAggregatesFilter<"Organizacion"> | string
+  nombre?: Prisma.StringWithAggregatesFilter<"Organizacion"> | string
   razonSocial?: Prisma.StringNullableWithAggregatesFilter<"Organizacion"> | string | null
   cuit?: Prisma.StringNullableWithAggregatesFilter<"Organizacion"> | string | null
+  logoUrl?: Prisma.StringNullableWithAggregatesFilter<"Organizacion"> | string | null
   emailContacto?: Prisma.StringNullableWithAggregatesFilter<"Organizacion"> | string | null
   telefonoContacto?: Prisma.StringNullableWithAggregatesFilter<"Organizacion"> | string | null
   direccion?: Prisma.StringNullableWithAggregatesFilter<"Organizacion"> | string | null
@@ -282,13 +315,18 @@ export type OrganizacionScalarWhereWithAggregatesInput = {
 export type OrganizacionCreateInput = {
   id?: string
   clerkOrganizationId: string
+  nombre: string
   razonSocial?: string | null
   cuit?: string | null
+  logoUrl?: string | null
   emailContacto?: string | null
   telefonoContacto?: string | null
   direccion?: string | null
   activa?: boolean
   fechaAlta?: Date | string
+  usuarios?: Prisma.UsuarioCreateNestedManyWithoutOrganizacionInput
+  sesiones?: Prisma.SesionCreateNestedManyWithoutOrganizacionInput
+  roles?: Prisma.RolCreateNestedManyWithoutOrganizacionInput
   recursos?: Prisma.RecursoCreateNestedManyWithoutOrganizacionInput
   registrosAuditoria?: Prisma.RegistroAuditoriaCreateNestedManyWithoutOrganizacionInput
 }
@@ -296,13 +334,18 @@ export type OrganizacionCreateInput = {
 export type OrganizacionUncheckedCreateInput = {
   id?: string
   clerkOrganizationId: string
+  nombre: string
   razonSocial?: string | null
   cuit?: string | null
+  logoUrl?: string | null
   emailContacto?: string | null
   telefonoContacto?: string | null
   direccion?: string | null
   activa?: boolean
   fechaAlta?: Date | string
+  usuarios?: Prisma.UsuarioUncheckedCreateNestedManyWithoutOrganizacionInput
+  sesiones?: Prisma.SesionUncheckedCreateNestedManyWithoutOrganizacionInput
+  roles?: Prisma.RolUncheckedCreateNestedManyWithoutOrganizacionInput
   recursos?: Prisma.RecursoUncheckedCreateNestedManyWithoutOrganizacionInput
   registrosAuditoria?: Prisma.RegistroAuditoriaUncheckedCreateNestedManyWithoutOrganizacionInput
 }
@@ -310,13 +353,18 @@ export type OrganizacionUncheckedCreateInput = {
 export type OrganizacionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
   razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fechaAlta?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  usuarios?: Prisma.UsuarioUpdateManyWithoutOrganizacionNestedInput
+  sesiones?: Prisma.SesionUpdateManyWithoutOrganizacionNestedInput
+  roles?: Prisma.RolUpdateManyWithoutOrganizacionNestedInput
   recursos?: Prisma.RecursoUpdateManyWithoutOrganizacionNestedInput
   registrosAuditoria?: Prisma.RegistroAuditoriaUpdateManyWithoutOrganizacionNestedInput
 }
@@ -324,13 +372,18 @@ export type OrganizacionUpdateInput = {
 export type OrganizacionUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
   razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fechaAlta?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  usuarios?: Prisma.UsuarioUncheckedUpdateManyWithoutOrganizacionNestedInput
+  sesiones?: Prisma.SesionUncheckedUpdateManyWithoutOrganizacionNestedInput
+  roles?: Prisma.RolUncheckedUpdateManyWithoutOrganizacionNestedInput
   recursos?: Prisma.RecursoUncheckedUpdateManyWithoutOrganizacionNestedInput
   registrosAuditoria?: Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutOrganizacionNestedInput
 }
@@ -338,8 +391,10 @@ export type OrganizacionUncheckedUpdateInput = {
 export type OrganizacionCreateManyInput = {
   id?: string
   clerkOrganizationId: string
+  nombre: string
   razonSocial?: string | null
   cuit?: string | null
+  logoUrl?: string | null
   emailContacto?: string | null
   telefonoContacto?: string | null
   direccion?: string | null
@@ -350,8 +405,10 @@ export type OrganizacionCreateManyInput = {
 export type OrganizacionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
   razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -362,8 +419,10 @@ export type OrganizacionUpdateManyMutationInput = {
 export type OrganizacionUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
   razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -374,8 +433,10 @@ export type OrganizacionUncheckedUpdateManyInput = {
 export type OrganizacionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   clerkOrganizationId?: Prisma.SortOrder
+  nombre?: Prisma.SortOrder
   razonSocial?: Prisma.SortOrder
   cuit?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrder
   emailContacto?: Prisma.SortOrder
   telefonoContacto?: Prisma.SortOrder
   direccion?: Prisma.SortOrder
@@ -386,8 +447,10 @@ export type OrganizacionCountOrderByAggregateInput = {
 export type OrganizacionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   clerkOrganizationId?: Prisma.SortOrder
+  nombre?: Prisma.SortOrder
   razonSocial?: Prisma.SortOrder
   cuit?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrder
   emailContacto?: Prisma.SortOrder
   telefonoContacto?: Prisma.SortOrder
   direccion?: Prisma.SortOrder
@@ -398,13 +461,20 @@ export type OrganizacionMaxOrderByAggregateInput = {
 export type OrganizacionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   clerkOrganizationId?: Prisma.SortOrder
+  nombre?: Prisma.SortOrder
   razonSocial?: Prisma.SortOrder
   cuit?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrder
   emailContacto?: Prisma.SortOrder
   telefonoContacto?: Prisma.SortOrder
   direccion?: Prisma.SortOrder
   activa?: Prisma.SortOrder
   fechaAlta?: Prisma.SortOrder
+}
+
+export type OrganizacionNullableScalarRelationFilter = {
+  is?: Prisma.OrganizacionWhereInput | null
+  isNot?: Prisma.OrganizacionWhereInput | null
 }
 
 export type OrganizacionScalarRelationFilter = {
@@ -426,6 +496,50 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type OrganizacionCreateNestedOneWithoutUsuariosInput = {
+  create?: Prisma.XOR<Prisma.OrganizacionCreateWithoutUsuariosInput, Prisma.OrganizacionUncheckedCreateWithoutUsuariosInput>
+  connectOrCreate?: Prisma.OrganizacionCreateOrConnectWithoutUsuariosInput
+  connect?: Prisma.OrganizacionWhereUniqueInput
+}
+
+export type OrganizacionUpdateOneWithoutUsuariosNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizacionCreateWithoutUsuariosInput, Prisma.OrganizacionUncheckedCreateWithoutUsuariosInput>
+  connectOrCreate?: Prisma.OrganizacionCreateOrConnectWithoutUsuariosInput
+  upsert?: Prisma.OrganizacionUpsertWithoutUsuariosInput
+  disconnect?: Prisma.OrganizacionWhereInput | boolean
+  delete?: Prisma.OrganizacionWhereInput | boolean
+  connect?: Prisma.OrganizacionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizacionUpdateToOneWithWhereWithoutUsuariosInput, Prisma.OrganizacionUpdateWithoutUsuariosInput>, Prisma.OrganizacionUncheckedUpdateWithoutUsuariosInput>
+}
+
+export type OrganizacionCreateNestedOneWithoutSesionesInput = {
+  create?: Prisma.XOR<Prisma.OrganizacionCreateWithoutSesionesInput, Prisma.OrganizacionUncheckedCreateWithoutSesionesInput>
+  connectOrCreate?: Prisma.OrganizacionCreateOrConnectWithoutSesionesInput
+  connect?: Prisma.OrganizacionWhereUniqueInput
+}
+
+export type OrganizacionUpdateOneRequiredWithoutSesionesNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizacionCreateWithoutSesionesInput, Prisma.OrganizacionUncheckedCreateWithoutSesionesInput>
+  connectOrCreate?: Prisma.OrganizacionCreateOrConnectWithoutSesionesInput
+  upsert?: Prisma.OrganizacionUpsertWithoutSesionesInput
+  connect?: Prisma.OrganizacionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizacionUpdateToOneWithWhereWithoutSesionesInput, Prisma.OrganizacionUpdateWithoutSesionesInput>, Prisma.OrganizacionUncheckedUpdateWithoutSesionesInput>
+}
+
+export type OrganizacionCreateNestedOneWithoutRolesInput = {
+  create?: Prisma.XOR<Prisma.OrganizacionCreateWithoutRolesInput, Prisma.OrganizacionUncheckedCreateWithoutRolesInput>
+  connectOrCreate?: Prisma.OrganizacionCreateOrConnectWithoutRolesInput
+  connect?: Prisma.OrganizacionWhereUniqueInput
+}
+
+export type OrganizacionUpdateOneRequiredWithoutRolesNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizacionCreateWithoutRolesInput, Prisma.OrganizacionUncheckedCreateWithoutRolesInput>
+  connectOrCreate?: Prisma.OrganizacionCreateOrConnectWithoutRolesInput
+  upsert?: Prisma.OrganizacionUpsertWithoutRolesInput
+  connect?: Prisma.OrganizacionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizacionUpdateToOneWithWhereWithoutRolesInput, Prisma.OrganizacionUpdateWithoutRolesInput>, Prisma.OrganizacionUncheckedUpdateWithoutRolesInput>
 }
 
 export type OrganizacionCreateNestedOneWithoutRegistrosAuditoriaInput = {
@@ -456,29 +570,303 @@ export type OrganizacionUpdateOneRequiredWithoutRecursosNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizacionUpdateToOneWithWhereWithoutRecursosInput, Prisma.OrganizacionUpdateWithoutRecursosInput>, Prisma.OrganizacionUncheckedUpdateWithoutRecursosInput>
 }
 
-export type OrganizacionCreateWithoutRegistrosAuditoriaInput = {
+export type OrganizacionCreateWithoutUsuariosInput = {
   id?: string
   clerkOrganizationId: string
+  nombre: string
   razonSocial?: string | null
   cuit?: string | null
+  logoUrl?: string | null
   emailContacto?: string | null
   telefonoContacto?: string | null
   direccion?: string | null
   activa?: boolean
   fechaAlta?: Date | string
+  sesiones?: Prisma.SesionCreateNestedManyWithoutOrganizacionInput
+  roles?: Prisma.RolCreateNestedManyWithoutOrganizacionInput
+  recursos?: Prisma.RecursoCreateNestedManyWithoutOrganizacionInput
+  registrosAuditoria?: Prisma.RegistroAuditoriaCreateNestedManyWithoutOrganizacionInput
+}
+
+export type OrganizacionUncheckedCreateWithoutUsuariosInput = {
+  id?: string
+  clerkOrganizationId: string
+  nombre: string
+  razonSocial?: string | null
+  cuit?: string | null
+  logoUrl?: string | null
+  emailContacto?: string | null
+  telefonoContacto?: string | null
+  direccion?: string | null
+  activa?: boolean
+  fechaAlta?: Date | string
+  sesiones?: Prisma.SesionUncheckedCreateNestedManyWithoutOrganizacionInput
+  roles?: Prisma.RolUncheckedCreateNestedManyWithoutOrganizacionInput
+  recursos?: Prisma.RecursoUncheckedCreateNestedManyWithoutOrganizacionInput
+  registrosAuditoria?: Prisma.RegistroAuditoriaUncheckedCreateNestedManyWithoutOrganizacionInput
+}
+
+export type OrganizacionCreateOrConnectWithoutUsuariosInput = {
+  where: Prisma.OrganizacionWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizacionCreateWithoutUsuariosInput, Prisma.OrganizacionUncheckedCreateWithoutUsuariosInput>
+}
+
+export type OrganizacionUpsertWithoutUsuariosInput = {
+  update: Prisma.XOR<Prisma.OrganizacionUpdateWithoutUsuariosInput, Prisma.OrganizacionUncheckedUpdateWithoutUsuariosInput>
+  create: Prisma.XOR<Prisma.OrganizacionCreateWithoutUsuariosInput, Prisma.OrganizacionUncheckedCreateWithoutUsuariosInput>
+  where?: Prisma.OrganizacionWhereInput
+}
+
+export type OrganizacionUpdateToOneWithWhereWithoutUsuariosInput = {
+  where?: Prisma.OrganizacionWhereInput
+  data: Prisma.XOR<Prisma.OrganizacionUpdateWithoutUsuariosInput, Prisma.OrganizacionUncheckedUpdateWithoutUsuariosInput>
+}
+
+export type OrganizacionUpdateWithoutUsuariosInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activa?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fechaAlta?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sesiones?: Prisma.SesionUpdateManyWithoutOrganizacionNestedInput
+  roles?: Prisma.RolUpdateManyWithoutOrganizacionNestedInput
+  recursos?: Prisma.RecursoUpdateManyWithoutOrganizacionNestedInput
+  registrosAuditoria?: Prisma.RegistroAuditoriaUpdateManyWithoutOrganizacionNestedInput
+}
+
+export type OrganizacionUncheckedUpdateWithoutUsuariosInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activa?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fechaAlta?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sesiones?: Prisma.SesionUncheckedUpdateManyWithoutOrganizacionNestedInput
+  roles?: Prisma.RolUncheckedUpdateManyWithoutOrganizacionNestedInput
+  recursos?: Prisma.RecursoUncheckedUpdateManyWithoutOrganizacionNestedInput
+  registrosAuditoria?: Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutOrganizacionNestedInput
+}
+
+export type OrganizacionCreateWithoutSesionesInput = {
+  id?: string
+  clerkOrganizationId: string
+  nombre: string
+  razonSocial?: string | null
+  cuit?: string | null
+  logoUrl?: string | null
+  emailContacto?: string | null
+  telefonoContacto?: string | null
+  direccion?: string | null
+  activa?: boolean
+  fechaAlta?: Date | string
+  usuarios?: Prisma.UsuarioCreateNestedManyWithoutOrganizacionInput
+  roles?: Prisma.RolCreateNestedManyWithoutOrganizacionInput
+  recursos?: Prisma.RecursoCreateNestedManyWithoutOrganizacionInput
+  registrosAuditoria?: Prisma.RegistroAuditoriaCreateNestedManyWithoutOrganizacionInput
+}
+
+export type OrganizacionUncheckedCreateWithoutSesionesInput = {
+  id?: string
+  clerkOrganizationId: string
+  nombre: string
+  razonSocial?: string | null
+  cuit?: string | null
+  logoUrl?: string | null
+  emailContacto?: string | null
+  telefonoContacto?: string | null
+  direccion?: string | null
+  activa?: boolean
+  fechaAlta?: Date | string
+  usuarios?: Prisma.UsuarioUncheckedCreateNestedManyWithoutOrganizacionInput
+  roles?: Prisma.RolUncheckedCreateNestedManyWithoutOrganizacionInput
+  recursos?: Prisma.RecursoUncheckedCreateNestedManyWithoutOrganizacionInput
+  registrosAuditoria?: Prisma.RegistroAuditoriaUncheckedCreateNestedManyWithoutOrganizacionInput
+}
+
+export type OrganizacionCreateOrConnectWithoutSesionesInput = {
+  where: Prisma.OrganizacionWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizacionCreateWithoutSesionesInput, Prisma.OrganizacionUncheckedCreateWithoutSesionesInput>
+}
+
+export type OrganizacionUpsertWithoutSesionesInput = {
+  update: Prisma.XOR<Prisma.OrganizacionUpdateWithoutSesionesInput, Prisma.OrganizacionUncheckedUpdateWithoutSesionesInput>
+  create: Prisma.XOR<Prisma.OrganizacionCreateWithoutSesionesInput, Prisma.OrganizacionUncheckedCreateWithoutSesionesInput>
+  where?: Prisma.OrganizacionWhereInput
+}
+
+export type OrganizacionUpdateToOneWithWhereWithoutSesionesInput = {
+  where?: Prisma.OrganizacionWhereInput
+  data: Prisma.XOR<Prisma.OrganizacionUpdateWithoutSesionesInput, Prisma.OrganizacionUncheckedUpdateWithoutSesionesInput>
+}
+
+export type OrganizacionUpdateWithoutSesionesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activa?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fechaAlta?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  usuarios?: Prisma.UsuarioUpdateManyWithoutOrganizacionNestedInput
+  roles?: Prisma.RolUpdateManyWithoutOrganizacionNestedInput
+  recursos?: Prisma.RecursoUpdateManyWithoutOrganizacionNestedInput
+  registrosAuditoria?: Prisma.RegistroAuditoriaUpdateManyWithoutOrganizacionNestedInput
+}
+
+export type OrganizacionUncheckedUpdateWithoutSesionesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activa?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fechaAlta?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  usuarios?: Prisma.UsuarioUncheckedUpdateManyWithoutOrganizacionNestedInput
+  roles?: Prisma.RolUncheckedUpdateManyWithoutOrganizacionNestedInput
+  recursos?: Prisma.RecursoUncheckedUpdateManyWithoutOrganizacionNestedInput
+  registrosAuditoria?: Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutOrganizacionNestedInput
+}
+
+export type OrganizacionCreateWithoutRolesInput = {
+  id?: string
+  clerkOrganizationId: string
+  nombre: string
+  razonSocial?: string | null
+  cuit?: string | null
+  logoUrl?: string | null
+  emailContacto?: string | null
+  telefonoContacto?: string | null
+  direccion?: string | null
+  activa?: boolean
+  fechaAlta?: Date | string
+  usuarios?: Prisma.UsuarioCreateNestedManyWithoutOrganizacionInput
+  sesiones?: Prisma.SesionCreateNestedManyWithoutOrganizacionInput
+  recursos?: Prisma.RecursoCreateNestedManyWithoutOrganizacionInput
+  registrosAuditoria?: Prisma.RegistroAuditoriaCreateNestedManyWithoutOrganizacionInput
+}
+
+export type OrganizacionUncheckedCreateWithoutRolesInput = {
+  id?: string
+  clerkOrganizationId: string
+  nombre: string
+  razonSocial?: string | null
+  cuit?: string | null
+  logoUrl?: string | null
+  emailContacto?: string | null
+  telefonoContacto?: string | null
+  direccion?: string | null
+  activa?: boolean
+  fechaAlta?: Date | string
+  usuarios?: Prisma.UsuarioUncheckedCreateNestedManyWithoutOrganizacionInput
+  sesiones?: Prisma.SesionUncheckedCreateNestedManyWithoutOrganizacionInput
+  recursos?: Prisma.RecursoUncheckedCreateNestedManyWithoutOrganizacionInput
+  registrosAuditoria?: Prisma.RegistroAuditoriaUncheckedCreateNestedManyWithoutOrganizacionInput
+}
+
+export type OrganizacionCreateOrConnectWithoutRolesInput = {
+  where: Prisma.OrganizacionWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizacionCreateWithoutRolesInput, Prisma.OrganizacionUncheckedCreateWithoutRolesInput>
+}
+
+export type OrganizacionUpsertWithoutRolesInput = {
+  update: Prisma.XOR<Prisma.OrganizacionUpdateWithoutRolesInput, Prisma.OrganizacionUncheckedUpdateWithoutRolesInput>
+  create: Prisma.XOR<Prisma.OrganizacionCreateWithoutRolesInput, Prisma.OrganizacionUncheckedCreateWithoutRolesInput>
+  where?: Prisma.OrganizacionWhereInput
+}
+
+export type OrganizacionUpdateToOneWithWhereWithoutRolesInput = {
+  where?: Prisma.OrganizacionWhereInput
+  data: Prisma.XOR<Prisma.OrganizacionUpdateWithoutRolesInput, Prisma.OrganizacionUncheckedUpdateWithoutRolesInput>
+}
+
+export type OrganizacionUpdateWithoutRolesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activa?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fechaAlta?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  usuarios?: Prisma.UsuarioUpdateManyWithoutOrganizacionNestedInput
+  sesiones?: Prisma.SesionUpdateManyWithoutOrganizacionNestedInput
+  recursos?: Prisma.RecursoUpdateManyWithoutOrganizacionNestedInput
+  registrosAuditoria?: Prisma.RegistroAuditoriaUpdateManyWithoutOrganizacionNestedInput
+}
+
+export type OrganizacionUncheckedUpdateWithoutRolesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activa?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fechaAlta?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  usuarios?: Prisma.UsuarioUncheckedUpdateManyWithoutOrganizacionNestedInput
+  sesiones?: Prisma.SesionUncheckedUpdateManyWithoutOrganizacionNestedInput
+  recursos?: Prisma.RecursoUncheckedUpdateManyWithoutOrganizacionNestedInput
+  registrosAuditoria?: Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutOrganizacionNestedInput
+}
+
+export type OrganizacionCreateWithoutRegistrosAuditoriaInput = {
+  id?: string
+  clerkOrganizationId: string
+  nombre: string
+  razonSocial?: string | null
+  cuit?: string | null
+  logoUrl?: string | null
+  emailContacto?: string | null
+  telefonoContacto?: string | null
+  direccion?: string | null
+  activa?: boolean
+  fechaAlta?: Date | string
+  usuarios?: Prisma.UsuarioCreateNestedManyWithoutOrganizacionInput
+  sesiones?: Prisma.SesionCreateNestedManyWithoutOrganizacionInput
+  roles?: Prisma.RolCreateNestedManyWithoutOrganizacionInput
   recursos?: Prisma.RecursoCreateNestedManyWithoutOrganizacionInput
 }
 
 export type OrganizacionUncheckedCreateWithoutRegistrosAuditoriaInput = {
   id?: string
   clerkOrganizationId: string
+  nombre: string
   razonSocial?: string | null
   cuit?: string | null
+  logoUrl?: string | null
   emailContacto?: string | null
   telefonoContacto?: string | null
   direccion?: string | null
   activa?: boolean
   fechaAlta?: Date | string
+  usuarios?: Prisma.UsuarioUncheckedCreateNestedManyWithoutOrganizacionInput
+  sesiones?: Prisma.SesionUncheckedCreateNestedManyWithoutOrganizacionInput
+  roles?: Prisma.RolUncheckedCreateNestedManyWithoutOrganizacionInput
   recursos?: Prisma.RecursoUncheckedCreateNestedManyWithoutOrganizacionInput
 }
 
@@ -501,52 +889,72 @@ export type OrganizacionUpdateToOneWithWhereWithoutRegistrosAuditoriaInput = {
 export type OrganizacionUpdateWithoutRegistrosAuditoriaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
   razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fechaAlta?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  usuarios?: Prisma.UsuarioUpdateManyWithoutOrganizacionNestedInput
+  sesiones?: Prisma.SesionUpdateManyWithoutOrganizacionNestedInput
+  roles?: Prisma.RolUpdateManyWithoutOrganizacionNestedInput
   recursos?: Prisma.RecursoUpdateManyWithoutOrganizacionNestedInput
 }
 
 export type OrganizacionUncheckedUpdateWithoutRegistrosAuditoriaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
   razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fechaAlta?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  usuarios?: Prisma.UsuarioUncheckedUpdateManyWithoutOrganizacionNestedInput
+  sesiones?: Prisma.SesionUncheckedUpdateManyWithoutOrganizacionNestedInput
+  roles?: Prisma.RolUncheckedUpdateManyWithoutOrganizacionNestedInput
   recursos?: Prisma.RecursoUncheckedUpdateManyWithoutOrganizacionNestedInput
 }
 
 export type OrganizacionCreateWithoutRecursosInput = {
   id?: string
   clerkOrganizationId: string
+  nombre: string
   razonSocial?: string | null
   cuit?: string | null
+  logoUrl?: string | null
   emailContacto?: string | null
   telefonoContacto?: string | null
   direccion?: string | null
   activa?: boolean
   fechaAlta?: Date | string
+  usuarios?: Prisma.UsuarioCreateNestedManyWithoutOrganizacionInput
+  sesiones?: Prisma.SesionCreateNestedManyWithoutOrganizacionInput
+  roles?: Prisma.RolCreateNestedManyWithoutOrganizacionInput
   registrosAuditoria?: Prisma.RegistroAuditoriaCreateNestedManyWithoutOrganizacionInput
 }
 
 export type OrganizacionUncheckedCreateWithoutRecursosInput = {
   id?: string
   clerkOrganizationId: string
+  nombre: string
   razonSocial?: string | null
   cuit?: string | null
+  logoUrl?: string | null
   emailContacto?: string | null
   telefonoContacto?: string | null
   direccion?: string | null
   activa?: boolean
   fechaAlta?: Date | string
+  usuarios?: Prisma.UsuarioUncheckedCreateNestedManyWithoutOrganizacionInput
+  sesiones?: Prisma.SesionUncheckedCreateNestedManyWithoutOrganizacionInput
+  roles?: Prisma.RolUncheckedCreateNestedManyWithoutOrganizacionInput
   registrosAuditoria?: Prisma.RegistroAuditoriaUncheckedCreateNestedManyWithoutOrganizacionInput
 }
 
@@ -569,26 +977,36 @@ export type OrganizacionUpdateToOneWithWhereWithoutRecursosInput = {
 export type OrganizacionUpdateWithoutRecursosInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
   razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fechaAlta?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  usuarios?: Prisma.UsuarioUpdateManyWithoutOrganizacionNestedInput
+  sesiones?: Prisma.SesionUpdateManyWithoutOrganizacionNestedInput
+  roles?: Prisma.RolUpdateManyWithoutOrganizacionNestedInput
   registrosAuditoria?: Prisma.RegistroAuditoriaUpdateManyWithoutOrganizacionNestedInput
 }
 
 export type OrganizacionUncheckedUpdateWithoutRecursosInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkOrganizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
   razonSocial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cuit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telefonoContacto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activa?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fechaAlta?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  usuarios?: Prisma.UsuarioUncheckedUpdateManyWithoutOrganizacionNestedInput
+  sesiones?: Prisma.SesionUncheckedUpdateManyWithoutOrganizacionNestedInput
+  roles?: Prisma.RolUncheckedUpdateManyWithoutOrganizacionNestedInput
   registrosAuditoria?: Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutOrganizacionNestedInput
 }
 
@@ -598,11 +1016,17 @@ export type OrganizacionUncheckedUpdateWithoutRecursosInput = {
  */
 
 export type OrganizacionCountOutputType = {
+  usuarios: number
+  sesiones: number
+  roles: number
   recursos: number
   registrosAuditoria: number
 }
 
 export type OrganizacionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  usuarios?: boolean | OrganizacionCountOutputTypeCountUsuariosArgs
+  sesiones?: boolean | OrganizacionCountOutputTypeCountSesionesArgs
+  roles?: boolean | OrganizacionCountOutputTypeCountRolesArgs
   recursos?: boolean | OrganizacionCountOutputTypeCountRecursosArgs
   registrosAuditoria?: boolean | OrganizacionCountOutputTypeCountRegistrosAuditoriaArgs
 }
@@ -615,6 +1039,27 @@ export type OrganizacionCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types
    * Select specific fields to fetch from the OrganizacionCountOutputType
    */
   select?: Prisma.OrganizacionCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * OrganizacionCountOutputType without action
+ */
+export type OrganizacionCountOutputTypeCountUsuariosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UsuarioWhereInput
+}
+
+/**
+ * OrganizacionCountOutputType without action
+ */
+export type OrganizacionCountOutputTypeCountSesionesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SesionWhereInput
+}
+
+/**
+ * OrganizacionCountOutputType without action
+ */
+export type OrganizacionCountOutputTypeCountRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RolWhereInput
 }
 
 /**
@@ -635,13 +1080,18 @@ export type OrganizacionCountOutputTypeCountRegistrosAuditoriaArgs<ExtArgs exten
 export type OrganizacionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   clerkOrganizationId?: boolean
+  nombre?: boolean
   razonSocial?: boolean
   cuit?: boolean
+  logoUrl?: boolean
   emailContacto?: boolean
   telefonoContacto?: boolean
   direccion?: boolean
   activa?: boolean
   fechaAlta?: boolean
+  usuarios?: boolean | Prisma.Organizacion$usuariosArgs<ExtArgs>
+  sesiones?: boolean | Prisma.Organizacion$sesionesArgs<ExtArgs>
+  roles?: boolean | Prisma.Organizacion$rolesArgs<ExtArgs>
   recursos?: boolean | Prisma.Organizacion$recursosArgs<ExtArgs>
   registrosAuditoria?: boolean | Prisma.Organizacion$registrosAuditoriaArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizacionCountOutputTypeDefaultArgs<ExtArgs>
@@ -650,8 +1100,10 @@ export type OrganizacionSelect<ExtArgs extends runtime.Types.Extensions.Internal
 export type OrganizacionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   clerkOrganizationId?: boolean
+  nombre?: boolean
   razonSocial?: boolean
   cuit?: boolean
+  logoUrl?: boolean
   emailContacto?: boolean
   telefonoContacto?: boolean
   direccion?: boolean
@@ -662,8 +1114,10 @@ export type OrganizacionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
 export type OrganizacionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   clerkOrganizationId?: boolean
+  nombre?: boolean
   razonSocial?: boolean
   cuit?: boolean
+  logoUrl?: boolean
   emailContacto?: boolean
   telefonoContacto?: boolean
   direccion?: boolean
@@ -674,8 +1128,10 @@ export type OrganizacionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type OrganizacionSelectScalar = {
   id?: boolean
   clerkOrganizationId?: boolean
+  nombre?: boolean
   razonSocial?: boolean
   cuit?: boolean
+  logoUrl?: boolean
   emailContacto?: boolean
   telefonoContacto?: boolean
   direccion?: boolean
@@ -683,8 +1139,11 @@ export type OrganizacionSelectScalar = {
   fechaAlta?: boolean
 }
 
-export type OrganizacionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clerkOrganizationId" | "razonSocial" | "cuit" | "emailContacto" | "telefonoContacto" | "direccion" | "activa" | "fechaAlta", ExtArgs["result"]["organizacion"]>
+export type OrganizacionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clerkOrganizationId" | "nombre" | "razonSocial" | "cuit" | "logoUrl" | "emailContacto" | "telefonoContacto" | "direccion" | "activa" | "fechaAlta", ExtArgs["result"]["organizacion"]>
 export type OrganizacionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  usuarios?: boolean | Prisma.Organizacion$usuariosArgs<ExtArgs>
+  sesiones?: boolean | Prisma.Organizacion$sesionesArgs<ExtArgs>
+  roles?: boolean | Prisma.Organizacion$rolesArgs<ExtArgs>
   recursos?: boolean | Prisma.Organizacion$recursosArgs<ExtArgs>
   registrosAuditoria?: boolean | Prisma.Organizacion$registrosAuditoriaArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizacionCountOutputTypeDefaultArgs<ExtArgs>
@@ -695,14 +1154,19 @@ export type OrganizacionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types
 export type $OrganizacionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Organizacion"
   objects: {
+    usuarios: Prisma.$UsuarioPayload<ExtArgs>[]
+    sesiones: Prisma.$SesionPayload<ExtArgs>[]
+    roles: Prisma.$RolPayload<ExtArgs>[]
     recursos: Prisma.$RecursoPayload<ExtArgs>[]
     registrosAuditoria: Prisma.$RegistroAuditoriaPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     clerkOrganizationId: string
+    nombre: string
     razonSocial: string | null
     cuit: string | null
+    logoUrl: string | null
     emailContacto: string | null
     telefonoContacto: string | null
     direccion: string | null
@@ -1102,6 +1566,9 @@ readonly fields: OrganizacionFieldRefs;
  */
 export interface Prisma__OrganizacionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  usuarios<T extends Prisma.Organizacion$usuariosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organizacion$usuariosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sesiones<T extends Prisma.Organizacion$sesionesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organizacion$sesionesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SesionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  roles<T extends Prisma.Organizacion$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organizacion$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RolPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   recursos<T extends Prisma.Organizacion$recursosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organizacion$recursosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecursoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   registrosAuditoria<T extends Prisma.Organizacion$registrosAuditoriaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organizacion$registrosAuditoriaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RegistroAuditoriaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1135,8 +1602,10 @@ export interface Prisma__OrganizacionClient<T, Null = never, ExtArgs extends run
 export interface OrganizacionFieldRefs {
   readonly id: Prisma.FieldRef<"Organizacion", 'String'>
   readonly clerkOrganizationId: Prisma.FieldRef<"Organizacion", 'String'>
+  readonly nombre: Prisma.FieldRef<"Organizacion", 'String'>
   readonly razonSocial: Prisma.FieldRef<"Organizacion", 'String'>
   readonly cuit: Prisma.FieldRef<"Organizacion", 'String'>
+  readonly logoUrl: Prisma.FieldRef<"Organizacion", 'String'>
   readonly emailContacto: Prisma.FieldRef<"Organizacion", 'String'>
   readonly telefonoContacto: Prisma.FieldRef<"Organizacion", 'String'>
   readonly direccion: Prisma.FieldRef<"Organizacion", 'String'>
@@ -1527,6 +1996,78 @@ export type OrganizacionDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many Organizacions to delete.
    */
   limit?: number
+}
+
+/**
+ * Organizacion.usuarios
+ */
+export type Organizacion$usuariosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Usuario
+   */
+  select?: Prisma.UsuarioSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Usuario
+   */
+  omit?: Prisma.UsuarioOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsuarioInclude<ExtArgs> | null
+  where?: Prisma.UsuarioWhereInput
+  orderBy?: Prisma.UsuarioOrderByWithRelationInput | Prisma.UsuarioOrderByWithRelationInput[]
+  cursor?: Prisma.UsuarioWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UsuarioScalarFieldEnum | Prisma.UsuarioScalarFieldEnum[]
+}
+
+/**
+ * Organizacion.sesiones
+ */
+export type Organizacion$sesionesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Sesion
+   */
+  select?: Prisma.SesionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Sesion
+   */
+  omit?: Prisma.SesionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SesionInclude<ExtArgs> | null
+  where?: Prisma.SesionWhereInput
+  orderBy?: Prisma.SesionOrderByWithRelationInput | Prisma.SesionOrderByWithRelationInput[]
+  cursor?: Prisma.SesionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SesionScalarFieldEnum | Prisma.SesionScalarFieldEnum[]
+}
+
+/**
+ * Organizacion.roles
+ */
+export type Organizacion$rolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Rol
+   */
+  select?: Prisma.RolSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Rol
+   */
+  omit?: Prisma.RolOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RolInclude<ExtArgs> | null
+  where?: Prisma.RolWhereInput
+  orderBy?: Prisma.RolOrderByWithRelationInput | Prisma.RolOrderByWithRelationInput[]
+  cursor?: Prisma.RolWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RolScalarFieldEnum | Prisma.RolScalarFieldEnum[]
 }
 
 /**

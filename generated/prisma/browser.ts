@@ -23,6 +23,51 @@ export * from './enums';
  */
 export type Organizacion = Prisma.OrganizacionModel
 /**
+ * Model Usuario
+ * 
+ */
+export type Usuario = Prisma.UsuarioModel
+/**
+ * Model Sesion
+ * 
+ */
+export type Sesion = Prisma.SesionModel
+/**
+ * Model Rol
+ * 
+ */
+export type Rol = Prisma.RolModel
+/**
+ * Model UsuarioRol
+ * 
+ */
+export type UsuarioRol = Prisma.UsuarioRolModel
+/**
+ * Model DsdRegla
+ * 
+ */
+export type DsdRegla = Prisma.DsdReglaModel
+/**
+ * Model Operacion
+ * 
+ */
+export type Operacion = Prisma.OperacionModel
+/**
+ * Model Restriccion
+ * 
+ */
+export type Restriccion = Prisma.RestriccionModel
+/**
+ * Model Permiso
+ * 
+ */
+export type Permiso = Prisma.PermisoModel
+/**
+ * Model RolPermiso
+ * 
+ */
+export type RolPermiso = Prisma.RolPermisoModel
+/**
  * Model RegistroAuditoria
  * 
  */

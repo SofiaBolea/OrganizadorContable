@@ -200,6 +200,8 @@ export type TareaAsignacionWhereInput = {
   estado?: Prisma.StringFilter<"TareaAsignacion"> | string
   tarea?: Prisma.XOR<Prisma.TareaScalarRelationFilter, Prisma.TareaWhereInput>
   refColor?: Prisma.XOR<Prisma.RefColorNullableScalarRelationFilter, Prisma.RefColorWhereInput> | null
+  asignado?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
+  asignadoPor?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
   ocurrencias?: Prisma.OcurrenciaListRelationFilter
 }
 
@@ -213,6 +215,8 @@ export type TareaAsignacionOrderByWithRelationInput = {
   estado?: Prisma.SortOrder
   tarea?: Prisma.TareaOrderByWithRelationInput
   refColor?: Prisma.RefColorOrderByWithRelationInput
+  asignado?: Prisma.UsuarioOrderByWithRelationInput
+  asignadoPor?: Prisma.UsuarioOrderByWithRelationInput
   ocurrencias?: Prisma.OcurrenciaOrderByRelationAggregateInput
 }
 
@@ -229,6 +233,8 @@ export type TareaAsignacionWhereUniqueInput = Prisma.AtLeast<{
   estado?: Prisma.StringFilter<"TareaAsignacion"> | string
   tarea?: Prisma.XOR<Prisma.TareaScalarRelationFilter, Prisma.TareaWhereInput>
   refColor?: Prisma.XOR<Prisma.RefColorNullableScalarRelationFilter, Prisma.RefColorWhereInput> | null
+  asignado?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
+  asignadoPor?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
   ocurrencias?: Prisma.OcurrenciaListRelationFilter
 }, "id">
 
@@ -260,12 +266,12 @@ export type TareaAsignacionScalarWhereWithAggregatesInput = {
 
 export type TareaAsignacionCreateInput = {
   id?: string
-  asignadoId: string
-  asignadoPorId: string
   fechaAsignacion?: Date | string
   estado?: string
   tarea: Prisma.TareaCreateNestedOneWithoutAsignacionesInput
   refColor?: Prisma.RefColorCreateNestedOneWithoutTareasAsignadasInput
+  asignado: Prisma.UsuarioCreateNestedOneWithoutTareasAsignadasInput
+  asignadoPor: Prisma.UsuarioCreateNestedOneWithoutTareasAsignadasPorInput
   ocurrencias?: Prisma.OcurrenciaCreateNestedManyWithoutTareaAsignacionInput
 }
 
@@ -282,12 +288,12 @@ export type TareaAsignacionUncheckedCreateInput = {
 
 export type TareaAsignacionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  asignadoId?: Prisma.StringFieldUpdateOperationsInput | string
-  asignadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
   fechaAsignacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   tarea?: Prisma.TareaUpdateOneRequiredWithoutAsignacionesNestedInput
   refColor?: Prisma.RefColorUpdateOneWithoutTareasAsignadasNestedInput
+  asignado?: Prisma.UsuarioUpdateOneRequiredWithoutTareasAsignadasNestedInput
+  asignadoPor?: Prisma.UsuarioUpdateOneRequiredWithoutTareasAsignadasPorNestedInput
   ocurrencias?: Prisma.OcurrenciaUpdateManyWithoutTareaAsignacionNestedInput
 }
 
@@ -314,8 +320,6 @@ export type TareaAsignacionCreateManyInput = {
 
 export type TareaAsignacionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  asignadoId?: Prisma.StringFieldUpdateOperationsInput | string
-  asignadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
   fechaAsignacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   estado?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -373,6 +377,90 @@ export type TareaAsignacionMinOrderByAggregateInput = {
 export type TareaAsignacionScalarRelationFilter = {
   is?: Prisma.TareaAsignacionWhereInput
   isNot?: Prisma.TareaAsignacionWhereInput
+}
+
+export type TareaAsignacionCreateNestedManyWithoutAsignadoInput = {
+  create?: Prisma.XOR<Prisma.TareaAsignacionCreateWithoutAsignadoInput, Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoInput> | Prisma.TareaAsignacionCreateWithoutAsignadoInput[] | Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoInput[]
+  connectOrCreate?: Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoInput | Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoInput[]
+  createMany?: Prisma.TareaAsignacionCreateManyAsignadoInputEnvelope
+  connect?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+}
+
+export type TareaAsignacionCreateNestedManyWithoutAsignadoPorInput = {
+  create?: Prisma.XOR<Prisma.TareaAsignacionCreateWithoutAsignadoPorInput, Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoPorInput> | Prisma.TareaAsignacionCreateWithoutAsignadoPorInput[] | Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoPorInput[]
+  connectOrCreate?: Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoPorInput | Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoPorInput[]
+  createMany?: Prisma.TareaAsignacionCreateManyAsignadoPorInputEnvelope
+  connect?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+}
+
+export type TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoInput = {
+  create?: Prisma.XOR<Prisma.TareaAsignacionCreateWithoutAsignadoInput, Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoInput> | Prisma.TareaAsignacionCreateWithoutAsignadoInput[] | Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoInput[]
+  connectOrCreate?: Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoInput | Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoInput[]
+  createMany?: Prisma.TareaAsignacionCreateManyAsignadoInputEnvelope
+  connect?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+}
+
+export type TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoPorInput = {
+  create?: Prisma.XOR<Prisma.TareaAsignacionCreateWithoutAsignadoPorInput, Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoPorInput> | Prisma.TareaAsignacionCreateWithoutAsignadoPorInput[] | Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoPorInput[]
+  connectOrCreate?: Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoPorInput | Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoPorInput[]
+  createMany?: Prisma.TareaAsignacionCreateManyAsignadoPorInputEnvelope
+  connect?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+}
+
+export type TareaAsignacionUpdateManyWithoutAsignadoNestedInput = {
+  create?: Prisma.XOR<Prisma.TareaAsignacionCreateWithoutAsignadoInput, Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoInput> | Prisma.TareaAsignacionCreateWithoutAsignadoInput[] | Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoInput[]
+  connectOrCreate?: Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoInput | Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoInput[]
+  upsert?: Prisma.TareaAsignacionUpsertWithWhereUniqueWithoutAsignadoInput | Prisma.TareaAsignacionUpsertWithWhereUniqueWithoutAsignadoInput[]
+  createMany?: Prisma.TareaAsignacionCreateManyAsignadoInputEnvelope
+  set?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  disconnect?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  delete?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  connect?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  update?: Prisma.TareaAsignacionUpdateWithWhereUniqueWithoutAsignadoInput | Prisma.TareaAsignacionUpdateWithWhereUniqueWithoutAsignadoInput[]
+  updateMany?: Prisma.TareaAsignacionUpdateManyWithWhereWithoutAsignadoInput | Prisma.TareaAsignacionUpdateManyWithWhereWithoutAsignadoInput[]
+  deleteMany?: Prisma.TareaAsignacionScalarWhereInput | Prisma.TareaAsignacionScalarWhereInput[]
+}
+
+export type TareaAsignacionUpdateManyWithoutAsignadoPorNestedInput = {
+  create?: Prisma.XOR<Prisma.TareaAsignacionCreateWithoutAsignadoPorInput, Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoPorInput> | Prisma.TareaAsignacionCreateWithoutAsignadoPorInput[] | Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoPorInput[]
+  connectOrCreate?: Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoPorInput | Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoPorInput[]
+  upsert?: Prisma.TareaAsignacionUpsertWithWhereUniqueWithoutAsignadoPorInput | Prisma.TareaAsignacionUpsertWithWhereUniqueWithoutAsignadoPorInput[]
+  createMany?: Prisma.TareaAsignacionCreateManyAsignadoPorInputEnvelope
+  set?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  disconnect?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  delete?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  connect?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  update?: Prisma.TareaAsignacionUpdateWithWhereUniqueWithoutAsignadoPorInput | Prisma.TareaAsignacionUpdateWithWhereUniqueWithoutAsignadoPorInput[]
+  updateMany?: Prisma.TareaAsignacionUpdateManyWithWhereWithoutAsignadoPorInput | Prisma.TareaAsignacionUpdateManyWithWhereWithoutAsignadoPorInput[]
+  deleteMany?: Prisma.TareaAsignacionScalarWhereInput | Prisma.TareaAsignacionScalarWhereInput[]
+}
+
+export type TareaAsignacionUncheckedUpdateManyWithoutAsignadoNestedInput = {
+  create?: Prisma.XOR<Prisma.TareaAsignacionCreateWithoutAsignadoInput, Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoInput> | Prisma.TareaAsignacionCreateWithoutAsignadoInput[] | Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoInput[]
+  connectOrCreate?: Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoInput | Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoInput[]
+  upsert?: Prisma.TareaAsignacionUpsertWithWhereUniqueWithoutAsignadoInput | Prisma.TareaAsignacionUpsertWithWhereUniqueWithoutAsignadoInput[]
+  createMany?: Prisma.TareaAsignacionCreateManyAsignadoInputEnvelope
+  set?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  disconnect?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  delete?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  connect?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  update?: Prisma.TareaAsignacionUpdateWithWhereUniqueWithoutAsignadoInput | Prisma.TareaAsignacionUpdateWithWhereUniqueWithoutAsignadoInput[]
+  updateMany?: Prisma.TareaAsignacionUpdateManyWithWhereWithoutAsignadoInput | Prisma.TareaAsignacionUpdateManyWithWhereWithoutAsignadoInput[]
+  deleteMany?: Prisma.TareaAsignacionScalarWhereInput | Prisma.TareaAsignacionScalarWhereInput[]
+}
+
+export type TareaAsignacionUncheckedUpdateManyWithoutAsignadoPorNestedInput = {
+  create?: Prisma.XOR<Prisma.TareaAsignacionCreateWithoutAsignadoPorInput, Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoPorInput> | Prisma.TareaAsignacionCreateWithoutAsignadoPorInput[] | Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoPorInput[]
+  connectOrCreate?: Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoPorInput | Prisma.TareaAsignacionCreateOrConnectWithoutAsignadoPorInput[]
+  upsert?: Prisma.TareaAsignacionUpsertWithWhereUniqueWithoutAsignadoPorInput | Prisma.TareaAsignacionUpsertWithWhereUniqueWithoutAsignadoPorInput[]
+  createMany?: Prisma.TareaAsignacionCreateManyAsignadoPorInputEnvelope
+  set?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  disconnect?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  delete?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  connect?: Prisma.TareaAsignacionWhereUniqueInput | Prisma.TareaAsignacionWhereUniqueInput[]
+  update?: Prisma.TareaAsignacionUpdateWithWhereUniqueWithoutAsignadoPorInput | Prisma.TareaAsignacionUpdateWithWhereUniqueWithoutAsignadoPorInput[]
+  updateMany?: Prisma.TareaAsignacionUpdateManyWithWhereWithoutAsignadoPorInput | Prisma.TareaAsignacionUpdateManyWithWhereWithoutAsignadoPorInput[]
+  deleteMany?: Prisma.TareaAsignacionScalarWhereInput | Prisma.TareaAsignacionScalarWhereInput[]
 }
 
 export type TareaAsignacionCreateNestedManyWithoutRefColorInput = {
@@ -473,13 +561,118 @@ export type TareaAsignacionUpdateOneRequiredWithoutOcurrenciasNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TareaAsignacionUpdateToOneWithWhereWithoutOcurrenciasInput, Prisma.TareaAsignacionUpdateWithoutOcurrenciasInput>, Prisma.TareaAsignacionUncheckedUpdateWithoutOcurrenciasInput>
 }
 
-export type TareaAsignacionCreateWithoutRefColorInput = {
+export type TareaAsignacionCreateWithoutAsignadoInput = {
   id?: string
-  asignadoId: string
-  asignadoPorId: string
   fechaAsignacion?: Date | string
   estado?: string
   tarea: Prisma.TareaCreateNestedOneWithoutAsignacionesInput
+  refColor?: Prisma.RefColorCreateNestedOneWithoutTareasAsignadasInput
+  asignadoPor: Prisma.UsuarioCreateNestedOneWithoutTareasAsignadasPorInput
+  ocurrencias?: Prisma.OcurrenciaCreateNestedManyWithoutTareaAsignacionInput
+}
+
+export type TareaAsignacionUncheckedCreateWithoutAsignadoInput = {
+  id?: string
+  tareaId: string
+  refColorId?: string | null
+  asignadoPorId: string
+  fechaAsignacion?: Date | string
+  estado?: string
+  ocurrencias?: Prisma.OcurrenciaUncheckedCreateNestedManyWithoutTareaAsignacionInput
+}
+
+export type TareaAsignacionCreateOrConnectWithoutAsignadoInput = {
+  where: Prisma.TareaAsignacionWhereUniqueInput
+  create: Prisma.XOR<Prisma.TareaAsignacionCreateWithoutAsignadoInput, Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoInput>
+}
+
+export type TareaAsignacionCreateManyAsignadoInputEnvelope = {
+  data: Prisma.TareaAsignacionCreateManyAsignadoInput | Prisma.TareaAsignacionCreateManyAsignadoInput[]
+  skipDuplicates?: boolean
+}
+
+export type TareaAsignacionCreateWithoutAsignadoPorInput = {
+  id?: string
+  fechaAsignacion?: Date | string
+  estado?: string
+  tarea: Prisma.TareaCreateNestedOneWithoutAsignacionesInput
+  refColor?: Prisma.RefColorCreateNestedOneWithoutTareasAsignadasInput
+  asignado: Prisma.UsuarioCreateNestedOneWithoutTareasAsignadasInput
+  ocurrencias?: Prisma.OcurrenciaCreateNestedManyWithoutTareaAsignacionInput
+}
+
+export type TareaAsignacionUncheckedCreateWithoutAsignadoPorInput = {
+  id?: string
+  tareaId: string
+  refColorId?: string | null
+  asignadoId: string
+  fechaAsignacion?: Date | string
+  estado?: string
+  ocurrencias?: Prisma.OcurrenciaUncheckedCreateNestedManyWithoutTareaAsignacionInput
+}
+
+export type TareaAsignacionCreateOrConnectWithoutAsignadoPorInput = {
+  where: Prisma.TareaAsignacionWhereUniqueInput
+  create: Prisma.XOR<Prisma.TareaAsignacionCreateWithoutAsignadoPorInput, Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoPorInput>
+}
+
+export type TareaAsignacionCreateManyAsignadoPorInputEnvelope = {
+  data: Prisma.TareaAsignacionCreateManyAsignadoPorInput | Prisma.TareaAsignacionCreateManyAsignadoPorInput[]
+  skipDuplicates?: boolean
+}
+
+export type TareaAsignacionUpsertWithWhereUniqueWithoutAsignadoInput = {
+  where: Prisma.TareaAsignacionWhereUniqueInput
+  update: Prisma.XOR<Prisma.TareaAsignacionUpdateWithoutAsignadoInput, Prisma.TareaAsignacionUncheckedUpdateWithoutAsignadoInput>
+  create: Prisma.XOR<Prisma.TareaAsignacionCreateWithoutAsignadoInput, Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoInput>
+}
+
+export type TareaAsignacionUpdateWithWhereUniqueWithoutAsignadoInput = {
+  where: Prisma.TareaAsignacionWhereUniqueInput
+  data: Prisma.XOR<Prisma.TareaAsignacionUpdateWithoutAsignadoInput, Prisma.TareaAsignacionUncheckedUpdateWithoutAsignadoInput>
+}
+
+export type TareaAsignacionUpdateManyWithWhereWithoutAsignadoInput = {
+  where: Prisma.TareaAsignacionScalarWhereInput
+  data: Prisma.XOR<Prisma.TareaAsignacionUpdateManyMutationInput, Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoInput>
+}
+
+export type TareaAsignacionScalarWhereInput = {
+  AND?: Prisma.TareaAsignacionScalarWhereInput | Prisma.TareaAsignacionScalarWhereInput[]
+  OR?: Prisma.TareaAsignacionScalarWhereInput[]
+  NOT?: Prisma.TareaAsignacionScalarWhereInput | Prisma.TareaAsignacionScalarWhereInput[]
+  id?: Prisma.StringFilter<"TareaAsignacion"> | string
+  tareaId?: Prisma.StringFilter<"TareaAsignacion"> | string
+  refColorId?: Prisma.StringNullableFilter<"TareaAsignacion"> | string | null
+  asignadoId?: Prisma.StringFilter<"TareaAsignacion"> | string
+  asignadoPorId?: Prisma.StringFilter<"TareaAsignacion"> | string
+  fechaAsignacion?: Prisma.DateTimeFilter<"TareaAsignacion"> | Date | string
+  estado?: Prisma.StringFilter<"TareaAsignacion"> | string
+}
+
+export type TareaAsignacionUpsertWithWhereUniqueWithoutAsignadoPorInput = {
+  where: Prisma.TareaAsignacionWhereUniqueInput
+  update: Prisma.XOR<Prisma.TareaAsignacionUpdateWithoutAsignadoPorInput, Prisma.TareaAsignacionUncheckedUpdateWithoutAsignadoPorInput>
+  create: Prisma.XOR<Prisma.TareaAsignacionCreateWithoutAsignadoPorInput, Prisma.TareaAsignacionUncheckedCreateWithoutAsignadoPorInput>
+}
+
+export type TareaAsignacionUpdateWithWhereUniqueWithoutAsignadoPorInput = {
+  where: Prisma.TareaAsignacionWhereUniqueInput
+  data: Prisma.XOR<Prisma.TareaAsignacionUpdateWithoutAsignadoPorInput, Prisma.TareaAsignacionUncheckedUpdateWithoutAsignadoPorInput>
+}
+
+export type TareaAsignacionUpdateManyWithWhereWithoutAsignadoPorInput = {
+  where: Prisma.TareaAsignacionScalarWhereInput
+  data: Prisma.XOR<Prisma.TareaAsignacionUpdateManyMutationInput, Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoPorInput>
+}
+
+export type TareaAsignacionCreateWithoutRefColorInput = {
+  id?: string
+  fechaAsignacion?: Date | string
+  estado?: string
+  tarea: Prisma.TareaCreateNestedOneWithoutAsignacionesInput
+  asignado: Prisma.UsuarioCreateNestedOneWithoutTareasAsignadasInput
+  asignadoPor: Prisma.UsuarioCreateNestedOneWithoutTareasAsignadasPorInput
   ocurrencias?: Prisma.OcurrenciaCreateNestedManyWithoutTareaAsignacionInput
 }
 
@@ -519,26 +712,13 @@ export type TareaAsignacionUpdateManyWithWhereWithoutRefColorInput = {
   data: Prisma.XOR<Prisma.TareaAsignacionUpdateManyMutationInput, Prisma.TareaAsignacionUncheckedUpdateManyWithoutRefColorInput>
 }
 
-export type TareaAsignacionScalarWhereInput = {
-  AND?: Prisma.TareaAsignacionScalarWhereInput | Prisma.TareaAsignacionScalarWhereInput[]
-  OR?: Prisma.TareaAsignacionScalarWhereInput[]
-  NOT?: Prisma.TareaAsignacionScalarWhereInput | Prisma.TareaAsignacionScalarWhereInput[]
-  id?: Prisma.StringFilter<"TareaAsignacion"> | string
-  tareaId?: Prisma.StringFilter<"TareaAsignacion"> | string
-  refColorId?: Prisma.StringNullableFilter<"TareaAsignacion"> | string | null
-  asignadoId?: Prisma.StringFilter<"TareaAsignacion"> | string
-  asignadoPorId?: Prisma.StringFilter<"TareaAsignacion"> | string
-  fechaAsignacion?: Prisma.DateTimeFilter<"TareaAsignacion"> | Date | string
-  estado?: Prisma.StringFilter<"TareaAsignacion"> | string
-}
-
 export type TareaAsignacionCreateWithoutTareaInput = {
   id?: string
-  asignadoId: string
-  asignadoPorId: string
   fechaAsignacion?: Date | string
   estado?: string
   refColor?: Prisma.RefColorCreateNestedOneWithoutTareasAsignadasInput
+  asignado: Prisma.UsuarioCreateNestedOneWithoutTareasAsignadasInput
+  asignadoPor: Prisma.UsuarioCreateNestedOneWithoutTareasAsignadasPorInput
   ocurrencias?: Prisma.OcurrenciaCreateNestedManyWithoutTareaAsignacionInput
 }
 
@@ -580,12 +760,12 @@ export type TareaAsignacionUpdateManyWithWhereWithoutTareaInput = {
 
 export type TareaAsignacionCreateWithoutOcurrenciasInput = {
   id?: string
-  asignadoId: string
-  asignadoPorId: string
   fechaAsignacion?: Date | string
   estado?: string
   tarea: Prisma.TareaCreateNestedOneWithoutAsignacionesInput
   refColor?: Prisma.RefColorCreateNestedOneWithoutTareasAsignadasInput
+  asignado: Prisma.UsuarioCreateNestedOneWithoutTareasAsignadasInput
+  asignadoPor: Prisma.UsuarioCreateNestedOneWithoutTareasAsignadasPorInput
 }
 
 export type TareaAsignacionUncheckedCreateWithoutOcurrenciasInput = {
@@ -616,12 +796,12 @@ export type TareaAsignacionUpdateToOneWithWhereWithoutOcurrenciasInput = {
 
 export type TareaAsignacionUpdateWithoutOcurrenciasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  asignadoId?: Prisma.StringFieldUpdateOperationsInput | string
-  asignadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
   fechaAsignacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   tarea?: Prisma.TareaUpdateOneRequiredWithoutAsignacionesNestedInput
   refColor?: Prisma.RefColorUpdateOneWithoutTareasAsignadasNestedInput
+  asignado?: Prisma.UsuarioUpdateOneRequiredWithoutTareasAsignadasNestedInput
+  asignadoPor?: Prisma.UsuarioUpdateOneRequiredWithoutTareasAsignadasPorNestedInput
 }
 
 export type TareaAsignacionUncheckedUpdateWithoutOcurrenciasInput = {
@@ -630,6 +810,82 @@ export type TareaAsignacionUncheckedUpdateWithoutOcurrenciasInput = {
   refColorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asignadoId?: Prisma.StringFieldUpdateOperationsInput | string
   asignadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
+  fechaAsignacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  estado?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type TareaAsignacionCreateManyAsignadoInput = {
+  id?: string
+  tareaId: string
+  refColorId?: string | null
+  asignadoPorId: string
+  fechaAsignacion?: Date | string
+  estado?: string
+}
+
+export type TareaAsignacionCreateManyAsignadoPorInput = {
+  id?: string
+  tareaId: string
+  refColorId?: string | null
+  asignadoId: string
+  fechaAsignacion?: Date | string
+  estado?: string
+}
+
+export type TareaAsignacionUpdateWithoutAsignadoInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fechaAsignacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  estado?: Prisma.StringFieldUpdateOperationsInput | string
+  tarea?: Prisma.TareaUpdateOneRequiredWithoutAsignacionesNestedInput
+  refColor?: Prisma.RefColorUpdateOneWithoutTareasAsignadasNestedInput
+  asignadoPor?: Prisma.UsuarioUpdateOneRequiredWithoutTareasAsignadasPorNestedInput
+  ocurrencias?: Prisma.OcurrenciaUpdateManyWithoutTareaAsignacionNestedInput
+}
+
+export type TareaAsignacionUncheckedUpdateWithoutAsignadoInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tareaId?: Prisma.StringFieldUpdateOperationsInput | string
+  refColorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asignadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
+  fechaAsignacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  estado?: Prisma.StringFieldUpdateOperationsInput | string
+  ocurrencias?: Prisma.OcurrenciaUncheckedUpdateManyWithoutTareaAsignacionNestedInput
+}
+
+export type TareaAsignacionUncheckedUpdateManyWithoutAsignadoInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tareaId?: Prisma.StringFieldUpdateOperationsInput | string
+  refColorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asignadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
+  fechaAsignacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  estado?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type TareaAsignacionUpdateWithoutAsignadoPorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fechaAsignacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  estado?: Prisma.StringFieldUpdateOperationsInput | string
+  tarea?: Prisma.TareaUpdateOneRequiredWithoutAsignacionesNestedInput
+  refColor?: Prisma.RefColorUpdateOneWithoutTareasAsignadasNestedInput
+  asignado?: Prisma.UsuarioUpdateOneRequiredWithoutTareasAsignadasNestedInput
+  ocurrencias?: Prisma.OcurrenciaUpdateManyWithoutTareaAsignacionNestedInput
+}
+
+export type TareaAsignacionUncheckedUpdateWithoutAsignadoPorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tareaId?: Prisma.StringFieldUpdateOperationsInput | string
+  refColorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asignadoId?: Prisma.StringFieldUpdateOperationsInput | string
+  fechaAsignacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  estado?: Prisma.StringFieldUpdateOperationsInput | string
+  ocurrencias?: Prisma.OcurrenciaUncheckedUpdateManyWithoutTareaAsignacionNestedInput
+}
+
+export type TareaAsignacionUncheckedUpdateManyWithoutAsignadoPorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tareaId?: Prisma.StringFieldUpdateOperationsInput | string
+  refColorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asignadoId?: Prisma.StringFieldUpdateOperationsInput | string
   fechaAsignacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   estado?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -645,11 +901,11 @@ export type TareaAsignacionCreateManyRefColorInput = {
 
 export type TareaAsignacionUpdateWithoutRefColorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  asignadoId?: Prisma.StringFieldUpdateOperationsInput | string
-  asignadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
   fechaAsignacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   tarea?: Prisma.TareaUpdateOneRequiredWithoutAsignacionesNestedInput
+  asignado?: Prisma.UsuarioUpdateOneRequiredWithoutTareasAsignadasNestedInput
+  asignadoPor?: Prisma.UsuarioUpdateOneRequiredWithoutTareasAsignadasPorNestedInput
   ocurrencias?: Prisma.OcurrenciaUpdateManyWithoutTareaAsignacionNestedInput
 }
 
@@ -683,11 +939,11 @@ export type TareaAsignacionCreateManyTareaInput = {
 
 export type TareaAsignacionUpdateWithoutTareaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  asignadoId?: Prisma.StringFieldUpdateOperationsInput | string
-  asignadoPorId?: Prisma.StringFieldUpdateOperationsInput | string
   fechaAsignacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   refColor?: Prisma.RefColorUpdateOneWithoutTareasAsignadasNestedInput
+  asignado?: Prisma.UsuarioUpdateOneRequiredWithoutTareasAsignadasNestedInput
+  asignadoPor?: Prisma.UsuarioUpdateOneRequiredWithoutTareasAsignadasPorNestedInput
   ocurrencias?: Prisma.OcurrenciaUpdateManyWithoutTareaAsignacionNestedInput
 }
 
@@ -751,6 +1007,8 @@ export type TareaAsignacionSelect<ExtArgs extends runtime.Types.Extensions.Inter
   estado?: boolean
   tarea?: boolean | Prisma.TareaDefaultArgs<ExtArgs>
   refColor?: boolean | Prisma.TareaAsignacion$refColorArgs<ExtArgs>
+  asignado?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  asignadoPor?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
   ocurrencias?: boolean | Prisma.TareaAsignacion$ocurrenciasArgs<ExtArgs>
   _count?: boolean | Prisma.TareaAsignacionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tareaAsignacion"]>
@@ -765,6 +1023,8 @@ export type TareaAsignacionSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   estado?: boolean
   tarea?: boolean | Prisma.TareaDefaultArgs<ExtArgs>
   refColor?: boolean | Prisma.TareaAsignacion$refColorArgs<ExtArgs>
+  asignado?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  asignadoPor?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tareaAsignacion"]>
 
 export type TareaAsignacionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -777,6 +1037,8 @@ export type TareaAsignacionSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   estado?: boolean
   tarea?: boolean | Prisma.TareaDefaultArgs<ExtArgs>
   refColor?: boolean | Prisma.TareaAsignacion$refColorArgs<ExtArgs>
+  asignado?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  asignadoPor?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tareaAsignacion"]>
 
 export type TareaAsignacionSelectScalar = {
@@ -793,16 +1055,22 @@ export type TareaAsignacionOmit<ExtArgs extends runtime.Types.Extensions.Interna
 export type TareaAsignacionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tarea?: boolean | Prisma.TareaDefaultArgs<ExtArgs>
   refColor?: boolean | Prisma.TareaAsignacion$refColorArgs<ExtArgs>
+  asignado?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  asignadoPor?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
   ocurrencias?: boolean | Prisma.TareaAsignacion$ocurrenciasArgs<ExtArgs>
   _count?: boolean | Prisma.TareaAsignacionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TareaAsignacionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tarea?: boolean | Prisma.TareaDefaultArgs<ExtArgs>
   refColor?: boolean | Prisma.TareaAsignacion$refColorArgs<ExtArgs>
+  asignado?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  asignadoPor?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }
 export type TareaAsignacionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tarea?: boolean | Prisma.TareaDefaultArgs<ExtArgs>
   refColor?: boolean | Prisma.TareaAsignacion$refColorArgs<ExtArgs>
+  asignado?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
+  asignadoPor?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }
 
 export type $TareaAsignacionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -810,6 +1078,8 @@ export type $TareaAsignacionPayload<ExtArgs extends runtime.Types.Extensions.Int
   objects: {
     tarea: Prisma.$TareaPayload<ExtArgs>
     refColor: Prisma.$RefColorPayload<ExtArgs> | null
+    asignado: Prisma.$UsuarioPayload<ExtArgs>
+    asignadoPor: Prisma.$UsuarioPayload<ExtArgs>
     ocurrencias: Prisma.$OcurrenciaPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1216,6 +1486,8 @@ export interface Prisma__TareaAsignacionClient<T, Null = never, ExtArgs extends 
   readonly [Symbol.toStringTag]: "PrismaPromise"
   tarea<T extends Prisma.TareaDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TareaDefaultArgs<ExtArgs>>): Prisma.Prisma__TareaClient<runtime.Types.Result.GetResult<Prisma.$TareaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   refColor<T extends Prisma.TareaAsignacion$refColorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TareaAsignacion$refColorArgs<ExtArgs>>): Prisma.Prisma__RefColorClient<runtime.Types.Result.GetResult<Prisma.$RefColorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  asignado<T extends Prisma.UsuarioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UsuarioDefaultArgs<ExtArgs>>): Prisma.Prisma__UsuarioClient<runtime.Types.Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  asignadoPor<T extends Prisma.UsuarioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UsuarioDefaultArgs<ExtArgs>>): Prisma.Prisma__UsuarioClient<runtime.Types.Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   ocurrencias<T extends Prisma.TareaAsignacion$ocurrenciasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TareaAsignacion$ocurrenciasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OcurrenciaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
