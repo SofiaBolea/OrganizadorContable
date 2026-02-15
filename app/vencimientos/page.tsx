@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { getVencimientos } from '../../lib/data'
-import VencimientoInputs from '../components/VencimientoInputs'
+import { getVencimientosParaTabla } from '../../lib/data'
+import Link from 'next/link'
 
 export default async function VencimientosPage() {
   const { orgRole, orgId } = await auth()
@@ -10,42 +10,46 @@ export default async function VencimientosPage() {
     redirect('/')
   }
 
-  const vencimientos = await getVencimientos(orgId)
+  const ocurrencias = await getVencimientosParaTabla(orgId)
 
   return (
     <main className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-6">Vencimientos</h1>
-        <VencimientoInputs />
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Vencimientos Impositivos</h1>
+
+        <Link
+          href="/vencimientos/nuevoVencimiento"
+          className="bg-green-600 text-white px-4 py-2 rounded-md"
+        >
+          + Nuevo Vencimiento
+        </Link>
       </div>
 
-      {vencimientos.length === 0 ? (
-        <p className="text-foreground/60">No hay vencimientos cargados.</p>
+      {ocurrencias.length === 0 ? (
+        <p>No hay vencimientos cargados.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold">Título</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold">Tipo</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold">Periodicidad</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold">Jurisdicción</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold">Estado</th>
+        <table className="min-w-full border">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Tipo</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ocurrencias.map((o) => (
+              <tr key={o.id}>
+                <td>{o.vencimiento.titulo}</td>
+                <td>{o.vencimiento.tipoVencimiento}</td>
+                <td>
+                  {new Date(o.fechaVencimiento).toLocaleDateString()}
+                </td>
+                <td>{o.estado}</td>
               </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {vencimientos.map((v) => (
-                <tr key={v.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{v.titulo}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{v.tipoVencimiento}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{v.periodicidad}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{v.jurisdiccion ?? '-'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{v.estado}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       )}
     </main>
   )

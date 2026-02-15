@@ -21,3 +21,27 @@ export async function getVencimientos(orgId: string) {
     estado: r.vencimiento?.estado || "",
   }));
 }
+
+export async function getVencimientosParaTabla(orgId: string) {
+  const organizacion = await prisma.organizacion.findUnique({
+    where: { clerkOrganizationId: orgId },
+  });
+
+  if (!organizacion) return [];
+
+  return prisma.vencimientoOcurrencia.findMany({
+    where: {
+      vencimiento: {
+        recurso: {
+          organizacionId: organizacion.id,
+        },
+      },
+    },
+    include: {
+      vencimiento: true,
+    },
+    orderBy: {
+      fechaVencimiento: 'asc',
+    },
+  });
+}
