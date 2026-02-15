@@ -2042,7 +2042,9 @@ export const UsuarioScalarFieldEnum = {
   nombreCompleto: 'nombreCompleto',
   dni: 'dni',
   email: 'email',
-  telefono: 'telefono'
+  telefono: 'telefono',
+  permisoClientes: 'permisoClientes',
+  permisoVencimiento: 'permisoVencimiento'
 } as const
 
 export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeof UsuarioScalarFieldEnum]

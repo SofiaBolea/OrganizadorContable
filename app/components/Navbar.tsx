@@ -49,6 +49,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-1 ml-2">
           <NavLink href="/clientes">Clientes</NavLink>
+          <NavLink href="/asistentes">Asistentes</NavLink>
           <Protect role="org:admin">
             <NavLink href="/vencimientos">Vencimientos</NavLink>
           </Protect>
