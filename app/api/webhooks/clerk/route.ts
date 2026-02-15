@@ -28,6 +28,21 @@ export async function POST(req: NextRequest) {
       console.log(`✅ User saved:`, user);
     }
 
+    if (eventType === "organization.created") {
+      const { id, name } = evt.data;
+      console.log(`🏢 Creating organization: ${id}, name: ${name}`);
+      const org = await prisma.organizacion.upsert({
+        where: { clerkOrganizationId: id },
+        update: {},
+        create: {
+          clerkOrganizationId: id,
+          razonSocial: name,
+          activa: true,
+        },
+      });
+      console.log(`✅ Organization saved:`, org);
+    }
+
     return new Response("Webhook received", { status: 200 });
   } catch (err) {
     console.error("❌ Webhook error:", err);
