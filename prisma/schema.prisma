@@ -46,6 +46,8 @@ model Usuario {
   dni             String? @db.VarChar(20)
   email           String  @db.VarChar(100)
   telefono        String? @db.VarChar(50)
+  permisoClientes     Boolean @default(false)
+  permisoVencimiento  Boolean @default(false)
 
   // Relaciones
   sesiones                Sesion[]
@@ -85,11 +87,13 @@ model Sesion {
 // SEGURIDAD: RBAC, DSD Y AUDITORÍA
 // =======================================
 model Rol {
-  id              String  @id @default(cuid())
-  organizacionId  String
-  organizacion    Organizacion @relation(fields: [organizacionId], references: [id])
-  nombreRol       String  @db.VarChar(50)
-  descripcion     String? @db.VarChar(255)
+  id             String       @id @default(cuid())
+  organizacionId String
+  organizacion   Organizacion @relation(fields: [organizacionId], references: [id], onDelete: Cascade)
+  nombreRol      String       @db.VarChar(50)
+  descripcion    String?      @db.VarChar(200)
+
+  
 
   // Relaciones
   usuariosRol     UsuarioRol[]
@@ -98,8 +102,9 @@ model Rol {
   dsdComoActual   DsdRegla[] @relation("rolActual")
   dsdComoNegado   DsdRegla[] @relation("rolNegado")
 
-  @@index([organizacionId])
+  @@unique([organizacionId, nombreRol]) 
   @@map("roles")
+
 }
 
 model UsuarioRol {
@@ -111,9 +116,11 @@ model UsuarioRol {
   fechaAlta  DateTime  @default(now()) @db.Date
   fechaBaja  DateTime? @db.Date
 
+  @@unique(usuarioId, rolId)
   @@index([usuarioId])
   @@index([rolId])
   @@map("usuarios_roles")
+  
 }
 
 model DsdRegla {

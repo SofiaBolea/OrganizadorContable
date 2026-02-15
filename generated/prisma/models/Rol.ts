@@ -197,6 +197,7 @@ export type RolOrderByWithRelationInput = {
 
 export type RolWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  organizacionId_nombreRol?: Prisma.RolOrganizacionIdNombreRolCompoundUniqueInput
   AND?: Prisma.RolWhereInput | Prisma.RolWhereInput[]
   OR?: Prisma.RolWhereInput[]
   NOT?: Prisma.RolWhereInput | Prisma.RolWhereInput[]
@@ -209,7 +210,7 @@ export type RolWhereUniqueInput = Prisma.AtLeast<{
   sesionesActivas?: Prisma.SesionListRelationFilter
   dsdComoActual?: Prisma.DsdReglaListRelationFilter
   dsdComoNegado?: Prisma.DsdReglaListRelationFilter
-}, "id">
+}, "id" | "organizacionId_nombreRol">
 
 export type RolOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -312,6 +313,11 @@ export type RolOrderByRelationAggregateInput = {
 export type RolNullableScalarRelationFilter = {
   is?: Prisma.RolWhereInput | null
   isNot?: Prisma.RolWhereInput | null
+}
+
+export type RolOrganizacionIdNombreRolCompoundUniqueInput = {
+  organizacionId: string
+  nombreRol: string
 }
 
 export type RolCountOrderByAggregateInput = {
