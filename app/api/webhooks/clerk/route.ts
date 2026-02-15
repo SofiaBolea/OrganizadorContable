@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
+  console.log("🔔 Webhook received!");
   try {
     const evt = await verifyWebhook(req);
     const { id } = evt.data;
@@ -24,27 +25,12 @@ export async function POST(req: NextRequest) {
           nombreUsuario: username ?? email_addresses[0].email_address,
         },
       });
-  
-    }
-
-    if (eventType === "organization.created") {
-      const { id, name } = evt.data;
-      console.log(`🏢 Creating organization: ${id}, name: ${name}`);
-      const org = await prisma.organizacion.upsert({
-        where: { clerkOrganizationId: id },
-        update: {},
-        create: {
-          clerkOrganizationId: id,
-          razonSocial: name,
-          activa: true,
-        },
-      });
-      console.log(`✅ Organization saved:`, org);
+      console.log(`✅ User saved:`, user);
     }
 
     return new Response("Webhook received", { status: 200 });
   } catch (err) {
-    
+    console.error("❌ Webhook error:", err);
     return new Response("Error verifying webhook", { status: 400 });
   }
 }
