@@ -14,6 +14,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Buscar organización interna con el clerkOrganizationId que te da Clerk
+    const organizacion = await prisma.organizacion.findUnique({
+      where: {
+        clerkOrganizationId: orgId,
+      },
+    });
+
+    if (!organizacion) {
+      return NextResponse.json(
+        { error: "Organización no encontrada en DB" },
+        { status: 400 }
+      );
+}
+
     // Obtener datos del request
     const { vencimientoId, fechas } = await request.json();
 
@@ -30,7 +44,7 @@ export async function POST(request: NextRequest) {
       where: {
         id: vencimientoId,
         recurso: {
-          organizacionId: orgId,
+          organizacionId: organizacion.id, // ✅ usar ID interno
         },
       },
     });

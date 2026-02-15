@@ -25,15 +25,43 @@ export async function POST(request: NextRequest) {
     const { titulo, tipoVencimiento, periodicidad, jurisdiccion } =
       await request.json();
 
-    // Crear el Recurso y Vencimiento dentro de una transacción
+    // 🔹 1️⃣ Buscar organización por clerkOrganizationId
+    const organizacion = await prisma.organizacion.findUnique({
+      where: {
+        clerkOrganizationId: orgId,
+      },
+    });
+
+    if (!organizacion) {
+      return NextResponse.json(
+        { error: "Organización no encontrada en DB" },
+        { status: 400 }
+      );
+    }
+
+    // 🔹 2️⃣ Buscar usuario por clerkId
+    const usuario = await prisma.usuario.findUnique({
+      where: {
+        clerkId: userId,
+      },
+    });
+
+    if (!usuario) {
+      return NextResponse.json(
+        { error: "Usuario no encontrado en DB" },
+        { status: 400 }
+      );
+    }
+
+    // 🔹 3️⃣ Crear recurso usando IDs internos
     const recurso = await prisma.recurso.create({
       data: {
-        organizacionId: orgId,
+        organizacionId: organizacion.id, // ✅ ID interno
         tipoRecurso: "VENCIMIENTO",
         nombre: titulo,
         vencimiento: {
           create: {
-            usuarioCreadorId: userId,
+            usuarioCreadorId: usuario.id, // ✅ ID interno
             tipoVencimiento,
             periodicidad,
             jurisdiccion: jurisdiccion || null,
@@ -47,10 +75,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // No crear ocurrencias aquí - el usuario las agregará después
     return NextResponse.json(
       {
-        message: "Vencimiento creado exitosamente. Ahora agrega las fechas de vencimiento.",
+        message:
+          "Vencimiento creado exitosamente. Ahora agrega las fechas de vencimiento.",
         data: recurso,
       },
       { status: 201 }
