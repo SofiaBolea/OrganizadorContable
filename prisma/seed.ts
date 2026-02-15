@@ -1,20 +1,13 @@
 import 'dotenv/config';
 import { createClerkClient } from '@clerk/clerk-sdk-node';
-// Importamos la clase generada
 import prisma from '@/lib/prisma';
 
 const clerkClient = createClerkClient({ 
   secretKey: process.env.CLERK_SECRET_KEY 
 });
 
-const clerkRoles = [
-  { nombreRol: "org:admin", descripcion: "Administrador de la organización" },
-  { nombreRol: "org:member", descripcion: "Miembro estándar de la organización" },
-  { nombreRol: "org:viewer", descripcion: "Solo lectura" },
-];
-
 async function main() {
-  console.log("🚀 Iniciando sincronización Clerk -> Supabase...");
+  console.log("🚀 Iniciando sincronización Clerk (Orgs + Roles + Members) -> Supabase...");
 
   try {
     const response = await clerkClient.organizations.getOrganizationList();
@@ -26,9 +19,10 @@ async function main() {
     }
 
     for (const clerkOrg of clerkOrgs) {
-      console.log(`\n📦 Procesando: ${clerkOrg.name}`);
+      console.log(`\n🏢 Procesando Organización: ${clerkOrg.name} (${clerkOrg.id})`);
+      const estaActivaEnClerk = clerkOrg.publicMetadata?.status !== 'disabled';
 
-      // CORRECCIÓN: El modelo se llama 'organizacion' en singular (definido en el schema)
+      // 1. Upsert de la Organización
       const org = await prisma.organizacion.upsert({
         where: { clerkOrganizationId: clerkOrg.id },
         update: {
@@ -39,46 +33,98 @@ async function main() {
           clerkOrganizationId: clerkOrg.id,
           nombre: clerkOrg.name,
           logoUrl: clerkOrg.imageUrl,
-          razonSocial: "",
-          cuit: "",
-          emailContacto: "",
-          telefonoContacto: "",
-          direccion: "",
-          activa: true,
+          activa: estaActivaEnClerk
         },
       });
 
-      for (const rol of clerkRoles) {
+      // ==========================================================
+      // NUEVO PASO: SINCRONIZAR DEFINICIONES DE ROLES
+      // ==========================================================
+      // Nota: Clerk no tiene un endpoint "listRolesByOrg", ya que los roles 
+      // son a nivel de instancia, pero podemos obtener los roles permitidos.
+      // Si usas roles personalizados, lo ideal es tener un array de referencia 
+      // o extraerlos de la respuesta de membresías.
+      
+      // Obtenemos los roles que existen actualmente en los miembros para asegurar consistencia
+      const memberships = await clerkClient.organizations.getOrganizationMembershipList({ 
+        organizationId: clerkOrg.id 
+      });
+
+      // Extraemos roles únicos presentes en Clerk para esta org
+      const rolesEnClerk = [...new Set(memberships.data.map(m => m.role))];
+
+      console.log(`🛠️  Sincronizando ${rolesEnClerk.length} definiciones de roles...`);
+
+      for (const roleName of rolesEnClerk) {
         await prisma.rol.upsert({
           where: {
             organizacionId_nombreRol: {
               organizacionId: org.id,
-              nombreRol: rol.nombreRol,
+              nombreRol: roleName,
             },
           },
-          update: {},
+          update: {}, // No sobreescribimos si ya existe
           create: {
             organizacionId: org.id,
-            nombreRol: rol.nombreRol,
-            descripcion: rol.descripcion,
+            nombreRol: roleName,
+            descripcion: `Rol ${roleName} detectado desde Clerk`,
           },
         });
       }
-      console.log(`✅ Sincronizado: ${clerkOrg.name}`);
+      // ==========================================================
+
+      console.log(`👥 Sincronizando ${memberships.data.length} miembros...`);
+
+      for (const membership of memberships.data) {
+        const clerkUserId = membership.publicUserData?.userId;
+        const clerkRoleName = membership.role;
+
+        if (!clerkUserId) continue;
+
+        const usuarioLocal = await prisma.usuario.findUnique({
+          where: { clerkId: clerkUserId }
+        });
+
+        if (!usuarioLocal) {
+          console.warn(`  ⚠️ Usuario ${clerkUserId} no encontrado en DB local. Saltando...`);
+          continue;
+        }
+
+        // Buscamos el ID del rol que acabamos de asegurar arriba
+        const rolLocal = await prisma.rol.findUnique({
+          where: {
+            organizacionId_nombreRol: {
+              organizacionId: org.id,
+              nombreRol: clerkRoleName,
+            },
+          },
+        });
+
+        if (rolLocal) {
+          await prisma.usuarioRol.upsert({
+            where: {
+              usuarioId_rolId: {
+                usuarioId: usuarioLocal.id,
+                rolId: rolLocal.id,
+              },
+            },
+            update: { fechaBaja: null },
+            create: {
+              usuarioId: usuarioLocal.id,
+              rolId: rolLocal.id,
+              fechaAlta: new Date(),
+            },
+          });
+        }
+      }
+      console.log(`✅ Organización ${clerkOrg.name} sincronizada exitosamente.`);
     }
-    console.log("\n✨ Proceso finalizado.");
+
+    console.log("\n✨ Proceso de sincronización finalizado con éxito.");
   } catch (error) {
-    console.error("❌ Error detallado:", error);
+    console.error("❌ Error crítico durante la sincronización:", error);
     process.exit(1);
   }
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    // Cerramos la conexión correctamente
-    await prisma.$disconnect();
-  });
+main().finally(async () => await prisma.$disconnect());
