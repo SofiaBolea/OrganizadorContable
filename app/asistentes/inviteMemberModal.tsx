@@ -19,7 +19,6 @@ export function InviteMemberModal() {
       if (result.success) {
         setIsOpen(false);
         setEmail("");
-        alert("Invitación enviada con éxito.");
       } else {
         setError(result.error || "Error desconocido");
       }
