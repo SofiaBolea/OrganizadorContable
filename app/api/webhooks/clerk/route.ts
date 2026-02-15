@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { WebhookEvent } from "@clerk/nextjs/server";
 
 export async function POST(req: NextRequest) {
+  console.log("🔔 Webhook received!");
   try {
     const evt = (await verifyWebhook(req)) as WebhookEvent;
     const eventType = evt.type;
@@ -160,7 +161,7 @@ export async function POST(req: NextRequest) {
 
     return new Response("Evento no manejado", { status: 200 });
   } catch (err) {
-    console.error("❌ Error Crítico:", err);
-    return new Response("Error", { status: 400 });
+    console.error("❌ Webhook error:", err);
+    return new Response("Error verifying webhook", { status: 400 });
   }
 }
