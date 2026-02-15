@@ -9,6 +9,15 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Organizacion'
+export type * from './models/Usuario'
+export type * from './models/Sesion'
+export type * from './models/Rol'
+export type * from './models/UsuarioRol'
+export type * from './models/DsdRegla'
+export type * from './models/Operacion'
+export type * from './models/Restriccion'
+export type * from './models/Permiso'
+export type * from './models/RolPermiso'
 export type * from './models/RegistroAuditoria'
 export type * from './models/Recurso'
 export type * from './models/RecursoRef'

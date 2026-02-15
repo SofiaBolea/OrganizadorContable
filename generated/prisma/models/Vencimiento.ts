@@ -199,6 +199,7 @@ export type VencimientoWhereInput = {
   periodicidad?: Prisma.StringFilter<"Vencimiento"> | string
   estado?: Prisma.StringFilter<"Vencimiento"> | string
   recurso?: Prisma.XOR<Prisma.RecursoScalarRelationFilter, Prisma.RecursoWhereInput>
+  usuarioCreador?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
   ocurrencias?: Prisma.VencimientoOcurrenciaListRelationFilter
 }
 
@@ -211,6 +212,7 @@ export type VencimientoOrderByWithRelationInput = {
   periodicidad?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   recurso?: Prisma.RecursoOrderByWithRelationInput
+  usuarioCreador?: Prisma.UsuarioOrderByWithRelationInput
   ocurrencias?: Prisma.VencimientoOcurrenciaOrderByRelationAggregateInput
 }
 
@@ -226,6 +228,7 @@ export type VencimientoWhereUniqueInput = Prisma.AtLeast<{
   periodicidad?: Prisma.StringFilter<"Vencimiento"> | string
   estado?: Prisma.StringFilter<"Vencimiento"> | string
   recurso?: Prisma.XOR<Prisma.RecursoScalarRelationFilter, Prisma.RecursoWhereInput>
+  usuarioCreador?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
   ocurrencias?: Prisma.VencimientoOcurrenciaListRelationFilter
 }, "id">
 
@@ -256,13 +259,13 @@ export type VencimientoScalarWhereWithAggregatesInput = {
 }
 
 export type VencimientoCreateInput = {
-  usuarioCreadorId: string
   tipoVencimiento: string
   jurisdiccion?: string | null
   titulo: string
   periodicidad: string
   estado?: string
   recurso: Prisma.RecursoCreateNestedOneWithoutVencimientoInput
+  usuarioCreador: Prisma.UsuarioCreateNestedOneWithoutVencimientosCreadosInput
   ocurrencias?: Prisma.VencimientoOcurrenciaCreateNestedManyWithoutVencimientoInput
 }
 
@@ -278,13 +281,13 @@ export type VencimientoUncheckedCreateInput = {
 }
 
 export type VencimientoUpdateInput = {
-  usuarioCreadorId?: Prisma.StringFieldUpdateOperationsInput | string
   tipoVencimiento?: Prisma.StringFieldUpdateOperationsInput | string
   jurisdiccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   periodicidad?: Prisma.StringFieldUpdateOperationsInput | string
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   recurso?: Prisma.RecursoUpdateOneRequiredWithoutVencimientoNestedInput
+  usuarioCreador?: Prisma.UsuarioUpdateOneRequiredWithoutVencimientosCreadosNestedInput
   ocurrencias?: Prisma.VencimientoOcurrenciaUpdateManyWithoutVencimientoNestedInput
 }
 
@@ -310,7 +313,6 @@ export type VencimientoCreateManyInput = {
 }
 
 export type VencimientoUpdateManyMutationInput = {
-  usuarioCreadorId?: Prisma.StringFieldUpdateOperationsInput | string
   tipoVencimiento?: Prisma.StringFieldUpdateOperationsInput | string
   jurisdiccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
@@ -326,6 +328,16 @@ export type VencimientoUncheckedUpdateManyInput = {
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   periodicidad?: Prisma.StringFieldUpdateOperationsInput | string
   estado?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type VencimientoListRelationFilter = {
+  every?: Prisma.VencimientoWhereInput
+  some?: Prisma.VencimientoWhereInput
+  none?: Prisma.VencimientoWhereInput
+}
+
+export type VencimientoOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type VencimientoNullableScalarRelationFilter = {
@@ -366,6 +378,48 @@ export type VencimientoMinOrderByAggregateInput = {
 export type VencimientoScalarRelationFilter = {
   is?: Prisma.VencimientoWhereInput
   isNot?: Prisma.VencimientoWhereInput
+}
+
+export type VencimientoCreateNestedManyWithoutUsuarioCreadorInput = {
+  create?: Prisma.XOR<Prisma.VencimientoCreateWithoutUsuarioCreadorInput, Prisma.VencimientoUncheckedCreateWithoutUsuarioCreadorInput> | Prisma.VencimientoCreateWithoutUsuarioCreadorInput[] | Prisma.VencimientoUncheckedCreateWithoutUsuarioCreadorInput[]
+  connectOrCreate?: Prisma.VencimientoCreateOrConnectWithoutUsuarioCreadorInput | Prisma.VencimientoCreateOrConnectWithoutUsuarioCreadorInput[]
+  createMany?: Prisma.VencimientoCreateManyUsuarioCreadorInputEnvelope
+  connect?: Prisma.VencimientoWhereUniqueInput | Prisma.VencimientoWhereUniqueInput[]
+}
+
+export type VencimientoUncheckedCreateNestedManyWithoutUsuarioCreadorInput = {
+  create?: Prisma.XOR<Prisma.VencimientoCreateWithoutUsuarioCreadorInput, Prisma.VencimientoUncheckedCreateWithoutUsuarioCreadorInput> | Prisma.VencimientoCreateWithoutUsuarioCreadorInput[] | Prisma.VencimientoUncheckedCreateWithoutUsuarioCreadorInput[]
+  connectOrCreate?: Prisma.VencimientoCreateOrConnectWithoutUsuarioCreadorInput | Prisma.VencimientoCreateOrConnectWithoutUsuarioCreadorInput[]
+  createMany?: Prisma.VencimientoCreateManyUsuarioCreadorInputEnvelope
+  connect?: Prisma.VencimientoWhereUniqueInput | Prisma.VencimientoWhereUniqueInput[]
+}
+
+export type VencimientoUpdateManyWithoutUsuarioCreadorNestedInput = {
+  create?: Prisma.XOR<Prisma.VencimientoCreateWithoutUsuarioCreadorInput, Prisma.VencimientoUncheckedCreateWithoutUsuarioCreadorInput> | Prisma.VencimientoCreateWithoutUsuarioCreadorInput[] | Prisma.VencimientoUncheckedCreateWithoutUsuarioCreadorInput[]
+  connectOrCreate?: Prisma.VencimientoCreateOrConnectWithoutUsuarioCreadorInput | Prisma.VencimientoCreateOrConnectWithoutUsuarioCreadorInput[]
+  upsert?: Prisma.VencimientoUpsertWithWhereUniqueWithoutUsuarioCreadorInput | Prisma.VencimientoUpsertWithWhereUniqueWithoutUsuarioCreadorInput[]
+  createMany?: Prisma.VencimientoCreateManyUsuarioCreadorInputEnvelope
+  set?: Prisma.VencimientoWhereUniqueInput | Prisma.VencimientoWhereUniqueInput[]
+  disconnect?: Prisma.VencimientoWhereUniqueInput | Prisma.VencimientoWhereUniqueInput[]
+  delete?: Prisma.VencimientoWhereUniqueInput | Prisma.VencimientoWhereUniqueInput[]
+  connect?: Prisma.VencimientoWhereUniqueInput | Prisma.VencimientoWhereUniqueInput[]
+  update?: Prisma.VencimientoUpdateWithWhereUniqueWithoutUsuarioCreadorInput | Prisma.VencimientoUpdateWithWhereUniqueWithoutUsuarioCreadorInput[]
+  updateMany?: Prisma.VencimientoUpdateManyWithWhereWithoutUsuarioCreadorInput | Prisma.VencimientoUpdateManyWithWhereWithoutUsuarioCreadorInput[]
+  deleteMany?: Prisma.VencimientoScalarWhereInput | Prisma.VencimientoScalarWhereInput[]
+}
+
+export type VencimientoUncheckedUpdateManyWithoutUsuarioCreadorNestedInput = {
+  create?: Prisma.XOR<Prisma.VencimientoCreateWithoutUsuarioCreadorInput, Prisma.VencimientoUncheckedCreateWithoutUsuarioCreadorInput> | Prisma.VencimientoCreateWithoutUsuarioCreadorInput[] | Prisma.VencimientoUncheckedCreateWithoutUsuarioCreadorInput[]
+  connectOrCreate?: Prisma.VencimientoCreateOrConnectWithoutUsuarioCreadorInput | Prisma.VencimientoCreateOrConnectWithoutUsuarioCreadorInput[]
+  upsert?: Prisma.VencimientoUpsertWithWhereUniqueWithoutUsuarioCreadorInput | Prisma.VencimientoUpsertWithWhereUniqueWithoutUsuarioCreadorInput[]
+  createMany?: Prisma.VencimientoCreateManyUsuarioCreadorInputEnvelope
+  set?: Prisma.VencimientoWhereUniqueInput | Prisma.VencimientoWhereUniqueInput[]
+  disconnect?: Prisma.VencimientoWhereUniqueInput | Prisma.VencimientoWhereUniqueInput[]
+  delete?: Prisma.VencimientoWhereUniqueInput | Prisma.VencimientoWhereUniqueInput[]
+  connect?: Prisma.VencimientoWhereUniqueInput | Prisma.VencimientoWhereUniqueInput[]
+  update?: Prisma.VencimientoUpdateWithWhereUniqueWithoutUsuarioCreadorInput | Prisma.VencimientoUpdateWithWhereUniqueWithoutUsuarioCreadorInput[]
+  updateMany?: Prisma.VencimientoUpdateManyWithWhereWithoutUsuarioCreadorInput | Prisma.VencimientoUpdateManyWithWhereWithoutUsuarioCreadorInput[]
+  deleteMany?: Prisma.VencimientoScalarWhereInput | Prisma.VencimientoScalarWhereInput[]
 }
 
 export type VencimientoCreateNestedOneWithoutRecursoInput = {
@@ -414,13 +468,72 @@ export type VencimientoUpdateOneRequiredWithoutOcurrenciasNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.VencimientoUpdateToOneWithWhereWithoutOcurrenciasInput, Prisma.VencimientoUpdateWithoutOcurrenciasInput>, Prisma.VencimientoUncheckedUpdateWithoutOcurrenciasInput>
 }
 
-export type VencimientoCreateWithoutRecursoInput = {
-  usuarioCreadorId: string
+export type VencimientoCreateWithoutUsuarioCreadorInput = {
   tipoVencimiento: string
   jurisdiccion?: string | null
   titulo: string
   periodicidad: string
   estado?: string
+  recurso: Prisma.RecursoCreateNestedOneWithoutVencimientoInput
+  ocurrencias?: Prisma.VencimientoOcurrenciaCreateNestedManyWithoutVencimientoInput
+}
+
+export type VencimientoUncheckedCreateWithoutUsuarioCreadorInput = {
+  id: string
+  tipoVencimiento: string
+  jurisdiccion?: string | null
+  titulo: string
+  periodicidad: string
+  estado?: string
+  ocurrencias?: Prisma.VencimientoOcurrenciaUncheckedCreateNestedManyWithoutVencimientoInput
+}
+
+export type VencimientoCreateOrConnectWithoutUsuarioCreadorInput = {
+  where: Prisma.VencimientoWhereUniqueInput
+  create: Prisma.XOR<Prisma.VencimientoCreateWithoutUsuarioCreadorInput, Prisma.VencimientoUncheckedCreateWithoutUsuarioCreadorInput>
+}
+
+export type VencimientoCreateManyUsuarioCreadorInputEnvelope = {
+  data: Prisma.VencimientoCreateManyUsuarioCreadorInput | Prisma.VencimientoCreateManyUsuarioCreadorInput[]
+  skipDuplicates?: boolean
+}
+
+export type VencimientoUpsertWithWhereUniqueWithoutUsuarioCreadorInput = {
+  where: Prisma.VencimientoWhereUniqueInput
+  update: Prisma.XOR<Prisma.VencimientoUpdateWithoutUsuarioCreadorInput, Prisma.VencimientoUncheckedUpdateWithoutUsuarioCreadorInput>
+  create: Prisma.XOR<Prisma.VencimientoCreateWithoutUsuarioCreadorInput, Prisma.VencimientoUncheckedCreateWithoutUsuarioCreadorInput>
+}
+
+export type VencimientoUpdateWithWhereUniqueWithoutUsuarioCreadorInput = {
+  where: Prisma.VencimientoWhereUniqueInput
+  data: Prisma.XOR<Prisma.VencimientoUpdateWithoutUsuarioCreadorInput, Prisma.VencimientoUncheckedUpdateWithoutUsuarioCreadorInput>
+}
+
+export type VencimientoUpdateManyWithWhereWithoutUsuarioCreadorInput = {
+  where: Prisma.VencimientoScalarWhereInput
+  data: Prisma.XOR<Prisma.VencimientoUpdateManyMutationInput, Prisma.VencimientoUncheckedUpdateManyWithoutUsuarioCreadorInput>
+}
+
+export type VencimientoScalarWhereInput = {
+  AND?: Prisma.VencimientoScalarWhereInput | Prisma.VencimientoScalarWhereInput[]
+  OR?: Prisma.VencimientoScalarWhereInput[]
+  NOT?: Prisma.VencimientoScalarWhereInput | Prisma.VencimientoScalarWhereInput[]
+  id?: Prisma.StringFilter<"Vencimiento"> | string
+  usuarioCreadorId?: Prisma.StringFilter<"Vencimiento"> | string
+  tipoVencimiento?: Prisma.StringFilter<"Vencimiento"> | string
+  jurisdiccion?: Prisma.StringNullableFilter<"Vencimiento"> | string | null
+  titulo?: Prisma.StringFilter<"Vencimiento"> | string
+  periodicidad?: Prisma.StringFilter<"Vencimiento"> | string
+  estado?: Prisma.StringFilter<"Vencimiento"> | string
+}
+
+export type VencimientoCreateWithoutRecursoInput = {
+  tipoVencimiento: string
+  jurisdiccion?: string | null
+  titulo: string
+  periodicidad: string
+  estado?: string
+  usuarioCreador: Prisma.UsuarioCreateNestedOneWithoutVencimientosCreadosInput
   ocurrencias?: Prisma.VencimientoOcurrenciaCreateNestedManyWithoutVencimientoInput
 }
 
@@ -451,12 +564,12 @@ export type VencimientoUpdateToOneWithWhereWithoutRecursoInput = {
 }
 
 export type VencimientoUpdateWithoutRecursoInput = {
-  usuarioCreadorId?: Prisma.StringFieldUpdateOperationsInput | string
   tipoVencimiento?: Prisma.StringFieldUpdateOperationsInput | string
   jurisdiccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   periodicidad?: Prisma.StringFieldUpdateOperationsInput | string
   estado?: Prisma.StringFieldUpdateOperationsInput | string
+  usuarioCreador?: Prisma.UsuarioUpdateOneRequiredWithoutVencimientosCreadosNestedInput
   ocurrencias?: Prisma.VencimientoOcurrenciaUpdateManyWithoutVencimientoNestedInput
 }
 
@@ -471,13 +584,13 @@ export type VencimientoUncheckedUpdateWithoutRecursoInput = {
 }
 
 export type VencimientoCreateWithoutOcurrenciasInput = {
-  usuarioCreadorId: string
   tipoVencimiento: string
   jurisdiccion?: string | null
   titulo: string
   periodicidad: string
   estado?: string
   recurso: Prisma.RecursoCreateNestedOneWithoutVencimientoInput
+  usuarioCreador: Prisma.UsuarioCreateNestedOneWithoutVencimientosCreadosInput
 }
 
 export type VencimientoUncheckedCreateWithoutOcurrenciasInput = {
@@ -507,18 +620,56 @@ export type VencimientoUpdateToOneWithWhereWithoutOcurrenciasInput = {
 }
 
 export type VencimientoUpdateWithoutOcurrenciasInput = {
-  usuarioCreadorId?: Prisma.StringFieldUpdateOperationsInput | string
   tipoVencimiento?: Prisma.StringFieldUpdateOperationsInput | string
   jurisdiccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   periodicidad?: Prisma.StringFieldUpdateOperationsInput | string
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   recurso?: Prisma.RecursoUpdateOneRequiredWithoutVencimientoNestedInput
+  usuarioCreador?: Prisma.UsuarioUpdateOneRequiredWithoutVencimientosCreadosNestedInput
 }
 
 export type VencimientoUncheckedUpdateWithoutOcurrenciasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   usuarioCreadorId?: Prisma.StringFieldUpdateOperationsInput | string
+  tipoVencimiento?: Prisma.StringFieldUpdateOperationsInput | string
+  jurisdiccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titulo?: Prisma.StringFieldUpdateOperationsInput | string
+  periodicidad?: Prisma.StringFieldUpdateOperationsInput | string
+  estado?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type VencimientoCreateManyUsuarioCreadorInput = {
+  id: string
+  tipoVencimiento: string
+  jurisdiccion?: string | null
+  titulo: string
+  periodicidad: string
+  estado?: string
+}
+
+export type VencimientoUpdateWithoutUsuarioCreadorInput = {
+  tipoVencimiento?: Prisma.StringFieldUpdateOperationsInput | string
+  jurisdiccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titulo?: Prisma.StringFieldUpdateOperationsInput | string
+  periodicidad?: Prisma.StringFieldUpdateOperationsInput | string
+  estado?: Prisma.StringFieldUpdateOperationsInput | string
+  recurso?: Prisma.RecursoUpdateOneRequiredWithoutVencimientoNestedInput
+  ocurrencias?: Prisma.VencimientoOcurrenciaUpdateManyWithoutVencimientoNestedInput
+}
+
+export type VencimientoUncheckedUpdateWithoutUsuarioCreadorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tipoVencimiento?: Prisma.StringFieldUpdateOperationsInput | string
+  jurisdiccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titulo?: Prisma.StringFieldUpdateOperationsInput | string
+  periodicidad?: Prisma.StringFieldUpdateOperationsInput | string
+  estado?: Prisma.StringFieldUpdateOperationsInput | string
+  ocurrencias?: Prisma.VencimientoOcurrenciaUncheckedUpdateManyWithoutVencimientoNestedInput
+}
+
+export type VencimientoUncheckedUpdateManyWithoutUsuarioCreadorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   tipoVencimiento?: Prisma.StringFieldUpdateOperationsInput | string
   jurisdiccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
@@ -566,6 +717,7 @@ export type VencimientoSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   periodicidad?: boolean
   estado?: boolean
   recurso?: boolean | Prisma.RecursoDefaultArgs<ExtArgs>
+  usuarioCreador?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
   ocurrencias?: boolean | Prisma.Vencimiento$ocurrenciasArgs<ExtArgs>
   _count?: boolean | Prisma.VencimientoCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vencimiento"]>
@@ -579,6 +731,7 @@ export type VencimientoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   periodicidad?: boolean
   estado?: boolean
   recurso?: boolean | Prisma.RecursoDefaultArgs<ExtArgs>
+  usuarioCreador?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vencimiento"]>
 
 export type VencimientoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -590,6 +743,7 @@ export type VencimientoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   periodicidad?: boolean
   estado?: boolean
   recurso?: boolean | Prisma.RecursoDefaultArgs<ExtArgs>
+  usuarioCreador?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vencimiento"]>
 
 export type VencimientoSelectScalar = {
@@ -605,20 +759,24 @@ export type VencimientoSelectScalar = {
 export type VencimientoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "usuarioCreadorId" | "tipoVencimiento" | "jurisdiccion" | "titulo" | "periodicidad" | "estado", ExtArgs["result"]["vencimiento"]>
 export type VencimientoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recurso?: boolean | Prisma.RecursoDefaultArgs<ExtArgs>
+  usuarioCreador?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
   ocurrencias?: boolean | Prisma.Vencimiento$ocurrenciasArgs<ExtArgs>
   _count?: boolean | Prisma.VencimientoCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type VencimientoIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recurso?: boolean | Prisma.RecursoDefaultArgs<ExtArgs>
+  usuarioCreador?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }
 export type VencimientoIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recurso?: boolean | Prisma.RecursoDefaultArgs<ExtArgs>
+  usuarioCreador?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }
 
 export type $VencimientoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Vencimiento"
   objects: {
     recurso: Prisma.$RecursoPayload<ExtArgs>
+    usuarioCreador: Prisma.$UsuarioPayload<ExtArgs>
     ocurrencias: Prisma.$VencimientoOcurrenciaPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1024,6 +1182,7 @@ readonly fields: VencimientoFieldRefs;
 export interface Prisma__VencimientoClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   recurso<T extends Prisma.RecursoDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RecursoDefaultArgs<ExtArgs>>): Prisma.Prisma__RecursoClient<runtime.Types.Result.GetResult<Prisma.$RecursoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  usuarioCreador<T extends Prisma.UsuarioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UsuarioDefaultArgs<ExtArgs>>): Prisma.Prisma__UsuarioClient<runtime.Types.Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   ocurrencias<T extends Prisma.Vencimiento$ocurrenciasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vencimiento$ocurrenciasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VencimientoOcurrenciaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.

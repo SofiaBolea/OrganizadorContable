@@ -363,10 +363,6 @@ export type TareaUncheckedUpdateOneWithoutRecursoNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TareaUpdateToOneWithWhereWithoutRecursoInput, Prisma.TareaUpdateWithoutRecursoInput>, Prisma.TareaUncheckedUpdateWithoutRecursoInput>
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type TareaCreateNestedOneWithoutRecurrenciaInput = {
   create?: Prisma.XOR<Prisma.TareaCreateWithoutRecurrenciaInput, Prisma.TareaUncheckedCreateWithoutRecurrenciaInput>
   connectOrCreate?: Prisma.TareaCreateOrConnectWithoutRecurrenciaInput

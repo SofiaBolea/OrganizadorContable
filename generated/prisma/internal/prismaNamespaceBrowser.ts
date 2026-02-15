@@ -52,6 +52,15 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Organizacion: 'Organizacion',
+  Usuario: 'Usuario',
+  Sesion: 'Sesion',
+  Rol: 'Rol',
+  UsuarioRol: 'UsuarioRol',
+  DsdRegla: 'DsdRegla',
+  Operacion: 'Operacion',
+  Restriccion: 'Restriccion',
+  Permiso: 'Permiso',
+  RolPermiso: 'RolPermiso',
   RegistroAuditoria: 'RegistroAuditoria',
   Recurso: 'Recurso',
   RecursoRef: 'RecursoRef',
@@ -84,8 +93,10 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const OrganizacionScalarFieldEnum = {
   id: 'id',
   clerkOrganizationId: 'clerkOrganizationId',
+  nombre: 'nombre',
   razonSocial: 'razonSocial',
   cuit: 'cuit',
+  logoUrl: 'logoUrl',
   emailContacto: 'emailContacto',
   telefonoContacto: 'telefonoContacto',
   direccion: 'direccion',
@@ -96,10 +107,107 @@ export const OrganizacionScalarFieldEnum = {
 export type OrganizacionScalarFieldEnum = (typeof OrganizacionScalarFieldEnum)[keyof typeof OrganizacionScalarFieldEnum]
 
 
+export const UsuarioScalarFieldEnum = {
+  id: 'id',
+  clerkId: 'clerkId',
+  organizacionId: 'organizacionId',
+  nombreUsuario: 'nombreUsuario',
+  nombreCompleto: 'nombreCompleto',
+  dni: 'dni',
+  email: 'email',
+  telefono: 'telefono'
+} as const
+
+export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeof UsuarioScalarFieldEnum]
+
+
+export const SesionScalarFieldEnum = {
+  id: 'id',
+  usuarioId: 'usuarioId',
+  organizacionId: 'organizacionId',
+  rolActivoId: 'rolActivoId',
+  fechaInicio: 'fechaInicio',
+  fechaFin: 'fechaFin',
+  ipOrigen: 'ipOrigen',
+  activa: 'activa'
+} as const
+
+export type SesionScalarFieldEnum = (typeof SesionScalarFieldEnum)[keyof typeof SesionScalarFieldEnum]
+
+
+export const RolScalarFieldEnum = {
+  id: 'id',
+  organizacionId: 'organizacionId',
+  nombreRol: 'nombreRol',
+  descripcion: 'descripcion'
+} as const
+
+export type RolScalarFieldEnum = (typeof RolScalarFieldEnum)[keyof typeof RolScalarFieldEnum]
+
+
+export const UsuarioRolScalarFieldEnum = {
+  id: 'id',
+  usuarioId: 'usuarioId',
+  rolId: 'rolId',
+  fechaAlta: 'fechaAlta',
+  fechaBaja: 'fechaBaja'
+} as const
+
+export type UsuarioRolScalarFieldEnum = (typeof UsuarioRolScalarFieldEnum)[keyof typeof UsuarioRolScalarFieldEnum]
+
+
+export const DsdReglaScalarFieldEnum = {
+  id: 'id',
+  rolActualId: 'rolActualId',
+  rolNegadoId: 'rolNegadoId',
+  descripcionConflicto: 'descripcionConflicto'
+} as const
+
+export type DsdReglaScalarFieldEnum = (typeof DsdReglaScalarFieldEnum)[keyof typeof DsdReglaScalarFieldEnum]
+
+
+export const OperacionScalarFieldEnum = {
+  id: 'id',
+  nombreOperacion: 'nombreOperacion',
+  descripcion: 'descripcion'
+} as const
+
+export type OperacionScalarFieldEnum = (typeof OperacionScalarFieldEnum)[keyof typeof OperacionScalarFieldEnum]
+
+
+export const RestriccionScalarFieldEnum = {
+  id: 'id',
+  nombreRestriccion: 'nombreRestriccion',
+  descripcion: 'descripcion'
+} as const
+
+export type RestriccionScalarFieldEnum = (typeof RestriccionScalarFieldEnum)[keyof typeof RestriccionScalarFieldEnum]
+
+
+export const PermisoScalarFieldEnum = {
+  id: 'id',
+  recursoId: 'recursoId',
+  operacionId: 'operacionId',
+  tipoPermiso: 'tipoPermiso',
+  restriccionId: 'restriccionId'
+} as const
+
+export type PermisoScalarFieldEnum = (typeof PermisoScalarFieldEnum)[keyof typeof PermisoScalarFieldEnum]
+
+
+export const RolPermisoScalarFieldEnum = {
+  id: 'id',
+  rolId: 'rolId',
+  permisoId: 'permisoId'
+} as const
+
+export type RolPermisoScalarFieldEnum = (typeof RolPermisoScalarFieldEnum)[keyof typeof RolPermisoScalarFieldEnum]
+
+
 export const RegistroAuditoriaScalarFieldEnum = {
   id: 'id',
   organizacionId: 'organizacionId',
-  clerkSessionId: 'clerkSessionId',
+  sesionId: 'sesionId',
   ejecutadoPorId: 'ejecutadoPorId',
   usuarioAfectadoId: 'usuarioAfectadoId',
   accion: 'accion',

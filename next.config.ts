@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  allowedDevOrigins: [
+    "https://tensive-parthenia-unpeevishly.ngrok-free.dev",
+  ],
 };
 
 export default nextConfig;

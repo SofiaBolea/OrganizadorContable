@@ -1,5 +1,5 @@
 import { ClerkProvider, SignedIn } from '@clerk/nextjs'
-import { Header } from './components/Header'
+import { Navbar } from './components/Navbar'
 import './globals.css'
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
       <html lang="es">
         <body>
           <SignedIn>
-            <Header />
+            <Navbar />
           </SignedIn>
           {children}
         </body>
