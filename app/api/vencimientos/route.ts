@@ -39,12 +39,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 🔹 2️⃣ Buscar usuario por clerkId
+    // 🔹 2️⃣ Buscar usuario por clerkId_organizacionId (Ahora es uni) 
     const usuario = await prisma.usuario.findUnique({
-      where: {
-        clerkId: userId,
-      },
-    });
+  where: {
+    clerkId_organizacionId: {
+      clerkId: userId,
+      organizacionId: organizacion.id, // 👈 ID interno
+    },
+  },
+});
 
     if (!usuario) {
       return NextResponse.json(
