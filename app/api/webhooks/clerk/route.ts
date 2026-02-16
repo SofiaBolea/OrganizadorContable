@@ -75,7 +75,7 @@ export async function POST(req: Request) {
         },
         update: {
           nombreCompleto: `${first_name ?? ""} ${last_name ?? ""}`.trim(),
-          permisoClientes: esAdmin, 
+          permisoClientes: esAdmin,
           permisoVencimiento: esAdmin,
         },
         create: {
@@ -113,7 +113,7 @@ export async function POST(req: Request) {
   // ==========================================================
   if (eventType === "organizationMembership.deleted") {
     const { organization, public_user_data } = evt.data;
-    
+
     await prisma.$transaction(async (tx) => {
       const org = await tx.organizacion.findUnique({ where: { clerkOrganizationId: organization.id } });
       if (!org) return;
@@ -131,6 +131,53 @@ export async function POST(req: Request) {
       }
     });
     return new Response('Baja procesada', { status: 200 });
+  }
+  // --- DENTRO DEL POST ---
+  if (eventType === "user.updated") {
+    const { id, first_name, last_name, email_addresses } = evt.data;
+    const email = email_addresses[0].email_address;
+    const nombre = `${first_name ?? ""} ${last_name ?? ""}`.trim();
+
+    await prisma.usuario.updateMany({
+      where: { clerkId: id },
+      data: {
+        nombreCompleto: nombre,
+        email: email,
+      },
+    });
+    console.log(`👤 Datos de usuario actualizados: ${nombre}`);
+    return new Response('Usuario actualizado', { status: 200 });
+  }
+  if (eventType === "organization.updated") {
+    const { id, name } = evt.data;
+
+    await prisma.organizacion.update({
+      where: { clerkOrganizationId: id },
+      data: { nombre: name },
+    });
+    console.log(`🏢 Organización actualizada: ${name}`);
+    return new Response('Org actualizada', { status: 200 });
+  }
+
+  if (eventType === "organizationMembership.updated") {
+    const { organization, public_user_data, role } = evt.data;
+    const esAdmin = role === "org:admin" || role === "admin";
+
+    await prisma.usuario.update({
+      where: {
+        clerkId_organizacionId: {
+          clerkId: public_user_data.user_id,
+          organizacionId: (await prisma.organizacion.findUnique({
+            where: { clerkOrganizationId: organization.id }
+          }))?.id || ""
+        }
+      },
+      data: {
+        permisoClientes: esAdmin,
+        permisoVencimiento: esAdmin
+      }
+    });
+    return new Response('Rol actualizado', { status: 200 });
   }
 
   return new Response('Evento recibido', { status: 200 });
