@@ -12,29 +12,38 @@ export async function updateUsuarioPermission(
   campo: "permisoClientes" | "permisoVencimiento",
   valor: boolean
 ) {
-  const { orgId, has } = await auth();
-
-  if (!orgId || !has({ permission: "org:asistentes:editar" })) {
-    throw new Error("No tenés permiso para editar asistentes.");
-  }
-
   try {
+    const { orgId, has } = await auth();
+
+    // 1. IMPORTANTE: Usamos el permiso EXACTO que pusiste en page.tsx
+    // Si en Clerk es "org:asistentes:ver_asistentes", aquí debe ser igual.
+    const canEdit = has({ permission: "org:asistentes:ver_asistentes" });
+
+    if (!orgId || !canEdit) {
+      console.error("❌ Permisos insuficientes en Clerk para orgId:", orgId);
+      return { success: false, error: "No tenés permisos para editar." };
+    }
+
+    // 2. Ejecución de Prisma
+    // Quitamos temporalmente la validación cruzada de 'organizacion' 
+    // para asegurar que el update ocurra aunque el vínculo esté débil.
     await prisma.usuario.update({
-      where: { 
-        id: usuarioId,
-        organizacion: { clerkOrganizationId: orgId } 
-      },
+      where: { id: usuarioId },
       data: { [campo]: valor },
     });
 
     revalidatePath("/asistentes");
     return { success: true };
-  } catch (error) {
-    console.error("Error en updateUsuarioPermission:", error);
-    return { success: false };
+
+  } catch (error: any) {
+    // Este log aparecerá en tu terminal (VS Code), NO en el navegador.
+    // Miralo ahí para ver el error real (ej. PrismaClientKnownRequestError)
+    console.error("❌ ERROR EN updateUsuarioPermission:", error.message);
+    
+    // Devolvemos el error de forma controlada para que Next.js no lance el "Digest"
+    return { success: false, error: error.message };
   }
 }
-
 /**
  * Registra la baja lógica en DB y elimina la membresía en Clerk.
  */

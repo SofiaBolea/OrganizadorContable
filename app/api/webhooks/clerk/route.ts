@@ -9,159 +9,82 @@ export async function POST(req: NextRequest) {
     const evt = (await verifyWebhook(req)) as WebhookEvent;
     const eventType = evt.type;
 
-    console.log(`🚀 Webhook procesando: ${eventType}`);
+    console.log(`🚀 Procesando: ${eventType}`);
 
-    // ==========================================================
-    // 1. EL ADMIN CREA SU CUENTA (Único momento de creación de Org)
-    // ==========================================================
-    if (eventType === "user.created") {
-      const { id, email_addresses, first_name, last_name, username } = evt.data;
-      const email = email_addresses[0]?.email_address;
-      const nombreCompleto = `${first_name ?? ""} ${last_name ?? ""}`.trim();
-
-      await prisma.$transaction(async (tx) => {
-        // CREACIÓN DE ORGANIZACIÓN (Solo aquí se permite)
-        const org = await tx.organizacion.create({
-          data: {
-            nombre: `Estudio de ${nombreCompleto || email}`,
-            clerkOrganizationId: `OWNER_${id}`, // Usamos un ID rastreable inicialmente
-            activa: true,
-          },
-        });
-
-        const usuario = await tx.usuario.create({
-          data: {
-            clerkId: id,
-            email: email,
-            nombreCompleto: nombreCompleto,
-            nombreUsuario: username ?? email.split("@")[0],
-            organizacionId: org.id,
-            permisoClientes: true,     // Admin = true
-            permisoVencimiento: true,  // Admin = true
-          },
-        });
-
-        // Crear el rol administrativo para esta organización
-        const rol = await tx.rol.create({
-          data: {
-            nombreRol: "org:admin",
-            organizacionId: org.id,
-          },
-        });
-
-        await tx.usuarioRol.create({
-          data: {
-            usuarioId: usuario.id,
-            rolId: rol.id,
-            fechaAlta: new Date(),
-          },
-        });
+    // --- 1. ORGANIZACIÓN ---
+    if (eventType === "organization.created") {
+      const { id, name } = evt.data;
+      await prisma.organizacion.upsert({
+        where: { clerkOrganizationId: id },
+        update: { nombre: name },
+        create: { clerkOrganizationId: id, nombre: name, activa: true },
       });
-      return new Response("Admin y Org creados", { status: 200 });
+      return new Response("Org Sincronizada", { status: 200 });
     }
 
-    // ==========================================================
-    // 2. ASISTENTE SE UNE (Vinculación estricta a Org existente)
-    // ==========================================================
+    // --- 2. MEMBRESÍA (EL PUNTO DE FALLO) ---
     if (eventType === "organizationMembership.created") {
       const { organization, public_user_data, role } = evt.data;
       const { user_id, identifier, first_name, last_name } = public_user_data;
+      const esAdmin = role.includes("admin");
 
-      await prisma.$transaction(async (tx) => {
-        // A. BUSCAR ORGANIZACIÓN (Intentar por ID real de Clerk)
-        let org = await tx.organizacion.findUnique({
+      return await prisma.$transaction(async (tx) => {
+        // BUSQUEDA CRÍTICA
+        const org = await tx.organizacion.findUnique({
           where: { clerkOrganizationId: organization.id },
         });
 
-        // B. SI NO EXISTE: Buscamos si el Admin la creó (usando created_by de tu JSON)
         if (!org) {
-          const ownerId = (organization as any).created_by;
-          org = await tx.organizacion.findUnique({
-            where: { clerkOrganizationId: `OWNER_${ownerId}` },
-          });
-
-          if (org) {
-            // "CURACIÓN": Actualizamos el ID temporal al ID real org_... que envió Clerk
-            org = await tx.organizacion.update({
-              where: { id: org.id },
-              data: { clerkOrganizationId: organization.id }
-            });
-            console.log("✅ ID de Organización sincronizado con Clerk");
-          }
+          console.error(`❌ ERROR: La Org ${organization.id} no existe en DB. ¿Corriste el seed?`);
+          return new Response("Organización no encontrada", { status: 400 });
         }
 
-        if (!org) throw new Error("La organización no existe en la DB");
+        console.log(`🔗 Vinculando usuario ${identifier} a la Org interna: ${org.id}`);
 
-        // C. CREAR O ACTUALIZAR USUARIO (Asistente)
         const usuario = await tx.usuario.upsert({
-          where: { clerkId: user_id },
-          update: { 
-            organizacionId: org.id,
-            permisoClientes: false, 
-            permisoVencimiento: false 
+          where: {
+            clerkId_organizacionId: {
+              clerkId: user_id,
+              organizacionId: org.id,
+            },
+          },
+          update: {
+            nombreCompleto: `${first_name ?? ""} ${last_name ?? ""}`.trim(),
+            permisoClientes: esAdmin,
+            permisoVencimiento: esAdmin,
           },
           create: {
             clerkId: user_id,
+            organizacionId: org.id,
             email: identifier,
             nombreCompleto: `${first_name ?? ""} ${last_name ?? ""}`.trim(),
             nombreUsuario: identifier.split("@")[0],
-            organizacionId: org.id,
-            permisoClientes: false,
-            permisoVencimiento: false,
+            permisoClientes: esAdmin,
+            permisoVencimiento: esAdmin,
           },
         });
 
-        // D. BUSCAR O CREAR ROL
-        let rol = await tx.rol.findFirst({
-          where: { nombreRol: role, organizacionId: org.id },
+        // Sincronización de Rol
+        const rolDB = await tx.rol.upsert({
+          where: { organizacionId_nombreRol: { organizacionId: org.id, nombreRol: role } },
+          update: {},
+          create: { nombreRol: role, organizacionId: org.id },
         });
 
-        if (!rol) {
-          rol = await tx.rol.create({
-            data: { nombreRol: role, organizacionId: org.id },
-          });
-        }
-
-        // E. VINCULAR EN USUARIOROL (Usando ID compuesto de tu schema)
         await tx.usuarioRol.upsert({
-          where: {
-            usuarioId_rolId: { usuarioId: usuario.id, rolId: rol.id },
-          },
+          where: { usuarioId_rolId: { usuarioId: usuario.id, rolId: rolDB.id } },
           update: { fechaBaja: null },
-          create: { usuarioId: usuario.id, rolId: rol.id, fechaAlta: new Date() },
+          create: { usuarioId: usuario.id, rolId: rolDB.id, fechaAlta: new Date() },
         });
+
+        console.log(`✅ ÉXITO: Usuario ${usuario.email} guardado con ID ${usuario.id}`);
+        return new Response("OK", { status: 200 });
       });
-      return new Response("Miembro vinculado", { status: 200 });
     }
 
-    // ==========================================================
-    // 3. BAJA DE MIEMBRO (Actualiza fechaBaja)
-    // ==========================================================
-    if (eventType === "organizationMembership.deleted") {
-      const { organization, public_user_data } = evt.data;
-
-      await prisma.$transaction(async (tx) => {
-        const usuario = await tx.usuario.findUnique({ where: { clerkId: public_user_data.user_id } });
-        const org = await tx.organizacion.findUnique({ where: { clerkOrganizationId: organization.id } });
-
-        if (usuario && org) {
-          await tx.usuarioRol.updateMany({
-            where: {
-              usuarioId: usuario.id,
-              rol: { organizacionId: org.id },
-              fechaBaja: null,
-            },
-            data: { fechaBaja: new Date() },
-          });
-          console.log(`🗑️ Fecha de baja aplicada a ${public_user_data.identifier}`);
-        }
-      });
-      return new Response("Baja procesada", { status: 200 });
-    }
-
-    return new Response("Evento no manejado", { status: 200 });
-  } catch (err) {
-    console.error("❌ Webhook error:", err);
-    return new Response("Error verifying webhook", { status: 400 });
+    return new Response("Evento recibido", { status: 200 });
+  } catch (err: any) {
+    console.error("🔥 WEBHOOK CRITICAL ERROR:", err.message);
+    return new Response(`Error: ${err.message}`, { status: 400 });
   }
 }

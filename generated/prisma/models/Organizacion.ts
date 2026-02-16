@@ -472,11 +472,6 @@ export type OrganizacionMinOrderByAggregateInput = {
   fechaAlta?: Prisma.SortOrder
 }
 
-export type OrganizacionNullableScalarRelationFilter = {
-  is?: Prisma.OrganizacionWhereInput | null
-  isNot?: Prisma.OrganizacionWhereInput | null
-}
-
 export type OrganizacionScalarRelationFilter = {
   is?: Prisma.OrganizacionWhereInput
   isNot?: Prisma.OrganizacionWhereInput
@@ -504,12 +499,10 @@ export type OrganizacionCreateNestedOneWithoutUsuariosInput = {
   connect?: Prisma.OrganizacionWhereUniqueInput
 }
 
-export type OrganizacionUpdateOneWithoutUsuariosNestedInput = {
+export type OrganizacionUpdateOneRequiredWithoutUsuariosNestedInput = {
   create?: Prisma.XOR<Prisma.OrganizacionCreateWithoutUsuariosInput, Prisma.OrganizacionUncheckedCreateWithoutUsuariosInput>
   connectOrCreate?: Prisma.OrganizacionCreateOrConnectWithoutUsuariosInput
   upsert?: Prisma.OrganizacionUpsertWithoutUsuariosInput
-  disconnect?: Prisma.OrganizacionWhereInput | boolean
-  delete?: Prisma.OrganizacionWhereInput | boolean
   connect?: Prisma.OrganizacionWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizacionUpdateToOneWithWhereWithoutUsuariosInput, Prisma.OrganizacionUpdateWithoutUsuariosInput>, Prisma.OrganizacionUncheckedUpdateWithoutUsuariosInput>
 }
