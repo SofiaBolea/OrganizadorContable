@@ -37,11 +37,11 @@ export async function POST(req: Request) {
   // 1. ORGANIZACIÓN CREADA
   // ==========================================================
   if (eventType === "organization.created") {
-    const { id, name } = evt.data;
+    const { id, name, image_url } = evt.data;
     await prisma.organizacion.upsert({
       where: { clerkOrganizationId: id },
-      update: { nombre: name },
-      create: { clerkOrganizationId: id, nombre: name, activa: true },
+      update: { nombre: name, logoUrl: image_url },
+      create: { clerkOrganizationId: id, nombre: name, activa: true, logoUrl: image_url },
     });
     console.log(`🏢 Organización creada: ${name}`);
     return new Response('Org Creada', { status: 200 });
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
   // ==========================================================
   if (eventType === "organizationMembership.created") {
     const { organization, public_user_data, role } = evt.data;
-    const { user_id, identifier, first_name, last_name } = public_user_data;
+    const { user_id, identifier, first_name, last_name, image_url } = public_user_data;
 
     // Lógica de permisos: Si el rol es admin, activamos todo por defecto
     const esAdmin = role === "org:admin" || role === "admin";
