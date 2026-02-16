@@ -1,76 +1,58 @@
 "use client"
 
-import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { useState } from "react"
-import { Menu } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { Protect } from "@clerk/nextjs"
 
-const links = [
-  { name: "Tablero", href: "/" },
-  { name: "Equipo", href: "/equipo" },
-  { name: "Clientes", href: "/clientes" },
-  { name: "Vencimientos", href: "/vencimientos" },
-]
-
-export default function Sidebar() {
+function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   const pathname = usePathname()
-  const [isOpen, setIsOpen] = useState(false)
+  const isActive = pathname.startsWith(href)
 
   return (
-    <>
-      {/* Overlay mobile */}
-      {isOpen && (
-        <div
-          onClick={() => setIsOpen(false)}
-          className="fixed inset-0 bg-black/40 z-40 md:hidden"
-        />
-      )}
+    <Link
+      href={href}
+      className={`
+        px-4 py-2 rounded-md text-sm transition-colors
+        ${
+          isActive
+            ? "bg-white text-[#2C2C2C] font-semibold"
+            : "text-white/70 hover:bg-white/10 hover:text-white"
+        }
+      `}
+    >
+      {children}
+    </Link>
+  )
+}
 
-      {/* Sidebar */}
-      <aside
-        className={`
-          fixed md:static top-0 left-0 h-full w-64
-          bg-[#2C2C2C] text-white p-6
-          transform transition-transform duration-300 z-50
-          ${isOpen ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
-        `}
-      >
-        <div className="mb-10">
-          <h2 className="text-lg font-semibold">Estudio Contable</h2>
-        </div>
+export default function Sidebar() {
+  return (
+    <aside className="w-64 bg-[#2C2C2C] text-white p-6 flex flex-col">
 
-        <nav className="space-y-4">
-          {links.map(link => {
-            const isActive = pathname === link.href
+      <h2 className="text-lg font-semibold mb-8">
+        Organizador Contable
+      </h2>
 
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsOpen(false)}
-                className={`
-                  block px-4 py-2 rounded-lg transition
-                  ${isActive
-                    ? "bg-white text-[#2C2C2C] font-semibold"
-                    : "hover:bg-gray-700"
-                  }
-                `}
-              >
-                {link.name}
-              </Link>
-            )
-          })}
-        </nav>
-      </aside>
+      <nav className="flex flex-col gap-2">
 
-      {/* Botón hamburguesa SOLO mobile */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed top-5 left-5 z-50 md:hidden"
-      >
-        <Menu size={28} />
-      </button>
-    </>
+        <NavLink href="/clientes">Clientes</NavLink>
+
+        <NavLink href="/asistentes">Asistentes</NavLink>
+
+        <NavLink href="/organizacion">Organización</NavLink>
+
+        {/* SOLO ADMIN */}
+        <Protect
+          role="org:admin"
+          fallback={null} // importante
+        >
+          <NavLink href="/vencimientos">
+            Vencimientos
+          </NavLink>
+        </Protect>
+
+      </nav>
+
+    </aside>
   )
 }
