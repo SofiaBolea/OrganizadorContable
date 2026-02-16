@@ -48,7 +48,7 @@ export function FormularioEditarCliente({ cliente, asistentes, onClose }: Formul
     }
   };
 
-  async function handleOnSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleOnSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
 

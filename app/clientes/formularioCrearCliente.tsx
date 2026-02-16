@@ -37,7 +37,7 @@ export function FormularioCrearCliente({ asistentes }: { asistentes: any[] }) {
     }
   };
 
-  async function handleOnSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleOnSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget; 
     setLoading(true);
