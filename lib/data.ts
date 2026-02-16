@@ -1,47 +1,50 @@
 import prisma from "./prisma";
 
-export async function getVencimientos(orgId: string) {
-  const recursos = await prisma.recurso.findMany({
-    where: {
-      organizacionId: orgId,
-      tipoRecurso: "VENCIMIENTO",
-    },
-    include: {
-      vencimiento: true,
-    },
+// Verifica si el usuario tiene permiso directo para trabajar con vencimientos (crear, modificar, eliminar)
+export async function usuarioPuedeTrabajarConVencimientos(clerkId: string, clerkOrganizationId: string) {
+  const organizacion = await prisma.organizacion.findUnique({
+    where: { clerkOrganizationId }
   });
 
-  // Mapeamos a un formato más fácil de usar en la tabla
-  return recursos.map((r) => ({
-    id: r.id,
-    titulo: r.vencimiento?.titulo || "",
-    tipoVencimiento: r.vencimiento?.tipoVencimiento || "",
-    jurisdiccion: r.vencimiento?.jurisdiccion || null,
-    periodicidad: r.vencimiento?.periodicidad || "",
-    estado: r.vencimiento?.estado || "",
-  }));
+  if (!organizacion) return false;
+
+  const usuario = await prisma.usuario.findUnique({
+    where: { clerkId_organizacionId: { clerkId, organizacionId: organizacion.id } },
+    select: { permisoVencimiento: true }
+  });
+  return !!usuario?.permisoVencimiento;
 }
 
 export async function getVencimientosParaTabla(orgId: string) {
-  const organizacion = await prisma.organizacion.findUnique({
-    where: { clerkOrganizationId: orgId },
-  });
+  try {
+    // orgId es el clerkOrganizationId, lo usamos directamente
+    // Primero buscamos la organización en la BD
+    const organizacion = await prisma.organizacion.findUnique({
+      where: { clerkOrganizationId: orgId },
+    });
 
-  if (!organizacion) return [];
+    if (!organizacion) {
+      console.warn(`Organización no encontrada para clerkOrganizationId: ${orgId}`);
+      return [];
+    }
 
-  return prisma.vencimientoOcurrencia.findMany({
-    where: {
-      vencimiento: {
-        recurso: {
-          organizacionId: organizacion.id,
+    return await prisma.vencimientoOcurrencia.findMany({
+      where: {
+        vencimiento: {
+          recurso: {
+            organizacionId: organizacion.id,
+          },
         },
       },
-    },
-    include: {
-      vencimiento: true,
-    },
-    orderBy: {
-      fechaVencimiento: 'asc',
-    },
-  });
+      include: {
+        vencimiento: true,
+      },
+      orderBy: {
+        fechaVencimiento: 'asc',
+      },
+    });
+  } catch (error) {
+    console.error("Error en getVencimientosParaTabla:", error);
+    return [];
+  }
 }

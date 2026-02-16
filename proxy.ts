@@ -7,7 +7,8 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 const isAdminRoute = createRouteMatcher([
-  '/vencimientos(.*)',
+  '/vencimientos$',
+  '/vencimientos/(.*)',
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
@@ -15,7 +16,8 @@ export default clerkMiddleware(async (auth, request) => {
     await auth.protect();
   }
 
-  if (isAdminRoute(request)) {
+  // Solo proteger rutas de página con rol admin, NO rutas de API
+  if (isAdminRoute(request) && !request.nextUrl.pathname.startsWith('/api')) {
     await auth.protect({ role: 'org:admin' });
   }
 });

@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Obtener datos del request
-    const { titulo, tipoVencimiento, periodicidad, jurisdiccion } =
+    const { titulo, tipoVencimiento, periodicidad, jurisdiccion, fechas } =
       await request.json();
 
     // 🔹 1️⃣ Buscar organización por clerkOrganizationId
@@ -70,18 +70,32 @@ export async function POST(request: NextRequest) {
             jurisdiccion: jurisdiccion || null,
             estado: "ACTIVO",
             titulo,
+            // Crear ocurrencias si se proporcionan fechas
+            ...(fechas && fechas.length > 0 && {
+              ocurrencias: {
+                create: fechas.map((fecha: string) => ({
+                  fechaVencimiento: new Date(fecha),
+                  estado: "PENDIENTE",
+                })),
+              },
+            }),
           },
         },
       },
       include: {
-        vencimiento: true,
+        vencimiento: {
+          include: {
+            ocurrencias: true,
+          },
+        },
       },
     });
 
     return NextResponse.json(
       {
-        message:
-          "Vencimiento creado exitosamente. Ahora agrega las fechas de vencimiento.",
+        message: fechas && fechas.length > 0
+          ? `Vencimiento creado exitosamente con ${fechas.length} fecha(s).`
+          : "Vencimiento creado exitosamente.",
         data: recurso,
       },
       { status: 201 }
