@@ -8,159 +8,133 @@ export async function POST(req: NextRequest) {
     const evt = (await verifyWebhook(req)) as WebhookEvent;
     const eventType = evt.type;
 
-    console.log(`🚀 Webhook procesando: ${eventType}`);
+    console.log(`🚀 Webhook recibido: ${eventType}`);
 
     // ==========================================================
-    // 1. EL ADMIN CREA SU CUENTA (Único momento de creación de Org)
+    // 1. ORGANIZACIÓN CREADA (El contenedor debe existir primero)
     // ==========================================================
-    if (eventType === "user.created") {
-      const { id, email_addresses, first_name, last_name, username } = evt.data;
-      const email = email_addresses[0]?.email_address;
-      const nombreCompleto = `${first_name ?? ""} ${last_name ?? ""}`.trim();
-
-      await prisma.$transaction(async (tx) => {
-        // CREACIÓN DE ORGANIZACIÓN (Solo aquí se permite)
-        const org = await tx.organizacion.create({
-          data: {
-            nombre: `Estudio de ${nombreCompleto || email}`,
-            clerkOrganizationId: `OWNER_${id}`, // Usamos un ID rastreable inicialmente
-            activa: true,
-          },
-        });
-
-        const usuario = await tx.usuario.create({
-          data: {
-            clerkId: id,
-            email: email,
-            nombreCompleto: nombreCompleto,
-            nombreUsuario: username ?? email.split("@")[0],
-            organizacionId: org.id,
-            permisoClientes: true,     // Admin = true
-            permisoVencimiento: true,  // Admin = true
-          },
-        });
-
-        // Crear el rol administrativo para esta organización
-        const rol = await tx.rol.create({
-          data: {
-            nombreRol: "org:admin",
-            organizacionId: org.id,
-          },
-        });
-
-        await tx.usuarioRol.create({
-          data: {
-            usuarioId: usuario.id,
-            rolId: rol.id,
-            fechaAlta: new Date(),
-          },
-        });
+    if (eventType === "organization.created") {
+      const { id, name } = evt.data;
+      await prisma.organizacion.upsert({
+        where: { clerkOrganizationId: id },
+        update: { nombre: name },
+        create: {
+          clerkOrganizationId: id,
+          nombre: name,
+          activa: true,
+        },
       });
-      return new Response("Admin y Org creados", { status: 200 });
+      return new Response("Organización creada", { status: 200 });
     }
 
     // ==========================================================
-    // 2. ASISTENTE SE UNE (Vinculación estricta a Org existente)
+    // 2. MEMBRESÍA CREADA (El motor de creación de usuarios)
     // ==========================================================
     if (eventType === "organizationMembership.created") {
       const { organization, public_user_data, role } = evt.data;
       const { user_id, identifier, first_name, last_name } = public_user_data;
+      
+      const esAdmin = role === "org:admin";
 
-      await prisma.$transaction(async (tx) => {
-        // A. BUSCAR ORGANIZACIÓN (Intentar por ID real de Clerk)
-        let org = await tx.organizacion.findUnique({
+      return await prisma.$transaction(async (tx) => {
+        // A. Buscamos la Org interna
+        const org = await tx.organizacion.findUnique({
           where: { clerkOrganizationId: organization.id },
         });
 
-        // B. SI NO EXISTE: Buscamos si el Admin la creó (usando created_by de tu JSON)
-        if (!org) {
-          const ownerId = (organization as any).created_by;
-          org = await tx.organizacion.findUnique({
-            where: { clerkOrganizationId: `OWNER_${ownerId}` },
-          });
+        if (!org) throw new Error(`Org ${organization.id} no encontrada en DB`);
 
-          if (org) {
-            // "CURACIÓN": Actualizamos el ID temporal al ID real org_... que envió Clerk
-            org = await tx.organizacion.update({
-              where: { id: org.id },
-              data: { clerkOrganizationId: organization.id }
-            });
-            console.log("✅ ID de Organización sincronizado con Clerk");
-          }
-        }
-
-        if (!org) throw new Error("La organización no existe en la DB");
-
-        // C. CREAR O ACTUALIZAR USUARIO (Asistente)
+        // B. CREACIÓN/ACTUALIZACIÓN DE LA FILA DE USUARIO PARA ESTA ORG
         const usuario = await tx.usuario.upsert({
-          where: { clerkId: user_id },
-          update: { 
-            organizacionId: org.id,
-            permisoClientes: false, 
-            permisoVencimiento: false 
+          where: {
+            clerkId_organizacionId: {
+              clerkId: user_id,
+              organizacionId: org.id,
+            },
+          },
+          update: {
+            nombreCompleto: `${first_name ?? ""} ${last_name ?? ""}`.trim(),
+            email: identifier,
+            permisoClientes: esAdmin,
+            permisoVencimiento: esAdmin,
           },
           create: {
             clerkId: user_id,
+            organizacionId: org.id,
             email: identifier,
             nombreCompleto: `${first_name ?? ""} ${last_name ?? ""}`.trim(),
             nombreUsuario: identifier.split("@")[0],
-            organizacionId: org.id,
-            permisoClientes: false,
-            permisoVencimiento: false,
+            permisoClientes: esAdmin,
+            permisoVencimiento: esAdmin,
           },
         });
 
-        // D. BUSCAR O CREAR ROL
-        let rol = await tx.rol.findFirst({
-          where: { nombreRol: role, organizacionId: org.id },
+        // C. Sincronizar el Rol
+        const rolDB = await tx.rol.upsert({
+          where: {
+            organizacionId_nombreRol: {
+              organizacionId: org.id,
+              nombreRol: role,
+            },
+          },
+          update: {},
+          create: {
+            nombreRol: role,
+            organizacionId: org.id,
+            descripcion: `Rol ${role} autogenerado`,
+          },
         });
 
-        if (!rol) {
-          rol = await tx.rol.create({
-            data: { nombreRol: role, organizacionId: org.id },
-          });
-        }
-
-        // E. VINCULAR EN USUARIOROL (Usando ID compuesto de tu schema)
+        // D. Vincular en la tabla intermedia (RBAC)
         await tx.usuarioRol.upsert({
           where: {
-            usuarioId_rolId: { usuarioId: usuario.id, rolId: rol.id },
+            usuarioId_rolId: { usuarioId: usuario.id, rolId: rolDB.id },
           },
           update: { fechaBaja: null },
-          create: { usuarioId: usuario.id, rolId: rol.id, fechaAlta: new Date() },
+          create: { usuarioId: usuario.id, rolId: rolDB.id, fechaAlta: new Date() },
         });
+
+        console.log(`✅ [${org.nombre}] Usuario ${usuario.email} sincronizado.`);
+        return new Response("OK", { status: 200 });
       });
-      return new Response("Miembro vinculado", { status: 200 });
     }
 
     // ==========================================================
-    // 3. BAJA DE MIEMBRO (Actualiza fechaBaja)
+    // 3. BAJA DE MIEMBRO (Limpieza específica)
     // ==========================================================
     if (eventType === "organizationMembership.deleted") {
       const { organization, public_user_data } = evt.data;
 
       await prisma.$transaction(async (tx) => {
-        const usuario = await tx.usuario.findUnique({ where: { clerkId: public_user_data.user_id } });
-        const org = await tx.organizacion.findUnique({ where: { clerkOrganizationId: organization.id } });
+        const org = await tx.organizacion.findUnique({ 
+          where: { clerkOrganizationId: organization.id } 
+        });
 
-        if (usuario && org) {
-          await tx.usuarioRol.updateMany({
+        if (org) {
+          const usuario = await tx.usuario.findUnique({
             where: {
-              usuarioId: usuario.id,
-              rol: { organizacionId: org.id },
-              fechaBaja: null,
+              clerkId_organizacionId: {
+                clerkId: public_user_data.user_id,
+                organizacionId: org.id,
+              },
             },
-            data: { fechaBaja: new Date() },
           });
-          console.log(`🗑️ Fecha de baja aplicada a ${public_user_data.identifier}`);
+
+          if (usuario) {
+            await tx.usuarioRol.updateMany({
+              where: { usuarioId: usuario.id, rol: { organizacionId: org.id } },
+              data: { fechaBaja: new Date() },
+            });
+            console.log(`🗑️ Usuario ${usuario.email} dado de baja en ${org.nombre}`);
+          }
         }
       });
-      return new Response("Baja procesada", { status: 200 });
+      return new Response("Baja OK", { status: 200 });
     }
 
-    return new Response("Evento no manejado", { status: 200 });
-  } catch (err) {
-    console.error("❌ Error Crítico:", err);
+    return new Response("Evento ignorado", { status: 200 });
+  } catch (err: any) {
+    console.error("❌ Webhook Error:", err.message);
     return new Response("Error", { status: 400 });
   }
 }
