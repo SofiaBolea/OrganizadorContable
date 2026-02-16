@@ -4,108 +4,194 @@ import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
-// Definimos la interfaz para los datos que recibimos del formulario
-interface CrearClienteInput {
+// --- INTERFACES ---
+interface ClienteInput {
   nombreCompleto: string;
   cuit?: string;
   email?: string;
   telefono?: string;
-  asistentesIds: string[]; // IDs internos de nuestra DB (CUIDs)
+  asistentesIds: string[];
 }
 
-export async function crearClienteAction(data: CrearClienteInput) {
-  const { orgId, has } = await auth();
+// --- UTILIDADES DE VALIDACIÓN Y LIMPIEZA ---
 
-  // 1. Verificación de Seguridad (Clerk)
-  // Validamos que el usuario esté en una organización y tenga el permiso específico
-  if (!orgId || !has({ permission: "org:clientes:crear_cliente" })) {
-    return { 
-      success: false, 
-      error: "No tienes los permisos necesarios para realizar esta acción." 
-    };
+/**
+ * Valida los datos según las reglas de negocio:
+ * 1. Nombre obligatorio (max 255)
+ * 2. CUIT exacto 11 dígitos si se provee.
+ * 3. Formato de Email válido si se provee.
+ */
+function validarYLimpiarDatos(data: ClienteInput) {
+  const errores: string[] = [];
+
+  // Limpieza de strings
+  const nombreLimpio = data.nombreCompleto?.trim() || "";
+  const cuitLimpio = data.cuit?.replace(/\D/g, "") || null; // Solo números
+  const emailLimpio = data.email?.trim().toLowerCase() || null;
+  const telefonoLimpio = data.telefono?.trim() || null;
+
+  // Validación de Nombre
+  if (nombreLimpio.length === 0) {
+    errores.push("El nombre completo es obligatorio.");
+  } else if (nombreLimpio.length > 255) {
+    errores.push("El nombre no puede superar los 255 caracteres.");
   }
 
-  // 2. Validación básica de campos obligatorios (Caso de Uso Paso 4)
-  if (!data.nombreCompleto || data.nombreCompleto.trim().length === 0) {
-    return { success: false, error: "El nombre completo es obligatorio." };
+  // Validación de CUIT
+  if (cuitLimpio && cuitLimpio.length !== 11) {
+    errores.push("El CUIT debe tener exactamente 11 dígitos numéricos.");
   }
 
-  if (data.nombreCompleto.length > 255) {
-    return { success: false, error: "El nombre no puede superar los 255 caracteres." };
+  // Validación de Email
+  if (emailLimpio) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailLimpio)) {
+      errores.push("El formato del correo electrónico es inválido.");
+    }
   }
+
+  return {
+    esValido: errores.length === 0,
+    errorMsg: errores.join(" "),
+    datos: {
+      nombreCompleto: nombreLimpio,
+      cuit: cuitLimpio,
+      email: emailLimpio,
+      telefono: telefonoLimpio,
+      asistentesIds: data.asistentesIds
+    }
+  };
+}
+
+/**
+ * Valida permisos: Admin de Clerk o Booleano en DB
+ */
+async function validarPoderGestionar(permisoClerk: string) {
+  const { userId, orgId, has } = await auth();
+  if (!userId || !orgId) return { autorizado: false };
+
+  const esAdmin = has({ role: "org:admin" });
+  const tienePermisoClerk = has({ permission: permisoClerk });
+  
+  const usuarioDB = await prisma.usuario.findFirst({
+    where: { clerkId: userId, organizacionId: { not: "" } },
+    select: { id: true, permisoClientes: true }
+  });
+
+  const autorizado = esAdmin || (usuarioDB?.permisoClientes === true && tienePermisoClerk);
+
+  return { autorizado, orgId, userIdDB: usuarioDB?.id };
+}
+
+// --- ACCIONES ---
+
+export async function crearClienteAction(rawInput: ClienteInput) {
+  const { autorizado, orgId } = await validarPoderGestionar("org:clientes:crear_cliente");
+  if (!autorizado) return { success: false, error: "No tienes permisos para crear clientes." };
+
+  const { esValido, errorMsg, datos } = validarYLimpiarDatos(rawInput);
+  if (!esValido) return { success: false, error: errorMsg };
 
   try {
-    // 3. Buscar el ID interno de la Organización en nuestra DB
     const orgLocal = await prisma.organizacion.findUnique({
-      where: { clerkOrganizationId: orgId },
+      where: { clerkOrganizationId: orgId! },
       select: { id: true }
     });
 
-    if (!orgLocal) {
-      return { success: false, error: "La organización no está sincronizada localmente." };
-    }
+    if (!orgLocal) throw new Error("Organización no encontrada.");
 
-    // 4. Iniciar Transacción Atómica (Paso 5 del Caso de Uso)
-    // Usamos $transaction para que si algo falla, no se cree nada a medias
-    const nuevoCliente = await prisma.$transaction(async (tx) => {
-      
-      // A. Crear el Recurso base (TPT)
+    await prisma.$transaction(async (tx) => {
       const recurso = await tx.recurso.create({
         data: {
           organizacionId: orgLocal.id,
-          nombre: data.nombreCompleto,
+          nombre: datos.nombreCompleto,
           tipoRecurso: "CLIENTE",
-          descripcion: `Recurso cliente creado para ${data.nombreCompleto}`
         },
       });
 
-      // B. Crear el Cliente vinculado al Recurso
-      // Usamos el mismo ID que el recurso para mantener la relación 1:1 (TPT)
-      const cliente = await tx.cliente.create({
+      await tx.cliente.create({
         data: {
           id: recurso.id,
-          nombreCompleto: data.nombreCompleto,
-          cuit: data.cuit || null,
-          email: data.email || null,
-          telefono: data.telefono || null,
+          nombreCompleto: datos.nombreCompleto,
+          cuit: datos.cuit,
+          email: datos.email,
+          telefono: datos.telefono,
           estado: "ACTIVO",
+          asignaciones: {
+            create: datos.asistentesIds.map(uId => ({ usuarioId: uId }))
+          }
         },
       });
-
-      // C. Registrar asignaciones a asistentes (Si hay seleccionados)
-      if (data.asistentesIds.length > 0) {
-        // En tu esquema actual no estaba la tabla intermedia, 
-        // asumimos la creación según el caso de uso
-        await tx.clienteAsignacion.createMany({
-          data: data.asistentesIds.map((asistenteId) => ({
-            clienteId: cliente.id,
-            usuarioId: asistenteId,
-          })),
-        });
-      }
-
-      return cliente;
     });
 
-    // 5. Revalidar la ruta para que los cambios aparezcan al instante
     revalidatePath("/clientes");
-
-    return { 
-      success: true, 
-      data: { id: nuevoCliente.id, nombre: nuevoCliente.nombreCompleto } 
-    };
-
+    return { success: true };
   } catch (error: any) {
-    console.error("Error en crearClienteAction:", error);
-    
-    // Manejo de errores de base de datos (ej: CUIT duplicado)
-    if (error.code === 'P2002') {
-      return { success: false, error: "Ya existe un cliente con ese CUIT registrado." };
-    }
+    if (error.code === 'P2002') return { success: false, error: "Ya existe un cliente con ese CUIT." };
+    console.error(error);
+    return { success: false, error: "Error interno al procesar el registro." };
+  }
+}
 
-    return { 
-      success: false, 
-      error: "Ocurrió un error inesperado al registrar el cliente." 
-    };
+export async function modificarClienteAction(id: string, rawInput: ClienteInput) {
+  const { autorizado } = await validarPoderGestionar("org:clientes:modificar_cliente");
+  if (!autorizado) return { success: false, error: "No tienes permisos para modificar." };
+
+  const { esValido, errorMsg, datos } = validarYLimpiarDatos(rawInput);
+  if (!esValido) return { success: false, error: errorMsg };
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Sincronizar Recurso
+      await tx.recurso.update({
+        where: { id },
+        data: { nombre: datos.nombreCompleto }
+      });
+
+      // Sincronizar Cliente
+      await tx.cliente.update({
+        where: { id },
+        data: {
+          nombreCompleto: datos.nombreCompleto,
+          cuit: datos.cuit,
+          email: datos.email,
+          telefono: datos.telefono,
+        }
+      });
+
+      // Sincronizar Asistentes
+      await tx.clienteAsignacion.deleteMany({ where: { clienteId: id } });
+      if (datos.asistentesIds.length > 0) {
+        await tx.clienteAsignacion.createMany({
+          data: datos.asistentesIds.map(uId => ({
+            clienteId: id,
+            usuarioId: uId
+          }))
+        });
+      }
+    });
+
+    revalidatePath("/clientes");
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: "Error al actualizar los datos." };
+  }
+}
+
+export async function eliminarClienteAction(id: string) {
+  const { autorizado } = await validarPoderGestionar("org:clientes:eliminar_cliente");
+  if (!autorizado) return { success: false, error: "No tienes permisos para eliminar." };
+
+  try {
+    // BAJA LÓGICA
+    await prisma.cliente.update({
+      where: { id },
+      data: { estado: "INACTIVO" }
+    });
+
+    revalidatePath("/clientes");
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: "Error al procesar la baja." };
   }
 }
