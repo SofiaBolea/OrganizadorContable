@@ -180,7 +180,7 @@ export type UsuarioGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type UsuarioGroupByOutputType = {
   id: string
   clerkId: string
-  organizacionId: string | null
+  organizacionId: string
   nombreUsuario: string
   nombreCompleto: string
   dni: string | null
@@ -214,7 +214,7 @@ export type UsuarioWhereInput = {
   NOT?: Prisma.UsuarioWhereInput | Prisma.UsuarioWhereInput[]
   id?: Prisma.StringFilter<"Usuario"> | string
   clerkId?: Prisma.StringFilter<"Usuario"> | string
-  organizacionId?: Prisma.StringNullableFilter<"Usuario"> | string | null
+  organizacionId?: Prisma.StringFilter<"Usuario"> | string
   nombreUsuario?: Prisma.StringFilter<"Usuario"> | string
   nombreCompleto?: Prisma.StringFilter<"Usuario"> | string
   dni?: Prisma.StringNullableFilter<"Usuario"> | string | null
@@ -222,7 +222,7 @@ export type UsuarioWhereInput = {
   telefono?: Prisma.StringNullableFilter<"Usuario"> | string | null
   permisoClientes?: Prisma.BoolFilter<"Usuario"> | boolean
   permisoVencimiento?: Prisma.BoolFilter<"Usuario"> | boolean
-  organizacion?: Prisma.XOR<Prisma.OrganizacionNullableScalarRelationFilter, Prisma.OrganizacionWhereInput> | null
+  organizacion?: Prisma.XOR<Prisma.OrganizacionScalarRelationFilter, Prisma.OrganizacionWhereInput>
   sesiones?: Prisma.SesionListRelationFilter
   roles?: Prisma.UsuarioRolListRelationFilter
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaListRelationFilter
@@ -235,7 +235,7 @@ export type UsuarioWhereInput = {
 export type UsuarioOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   clerkId?: Prisma.SortOrder
-  organizacionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  organizacionId?: Prisma.SortOrder
   nombreUsuario?: Prisma.SortOrder
   nombreCompleto?: Prisma.SortOrder
   dni?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -255,11 +255,12 @@ export type UsuarioOrderByWithRelationInput = {
 
 export type UsuarioWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  clerkId?: string
+  clerkId_organizacionId?: Prisma.UsuarioClerkIdOrganizacionIdCompoundUniqueInput
   AND?: Prisma.UsuarioWhereInput | Prisma.UsuarioWhereInput[]
   OR?: Prisma.UsuarioWhereInput[]
   NOT?: Prisma.UsuarioWhereInput | Prisma.UsuarioWhereInput[]
-  organizacionId?: Prisma.StringNullableFilter<"Usuario"> | string | null
+  clerkId?: Prisma.StringFilter<"Usuario"> | string
+  organizacionId?: Prisma.StringFilter<"Usuario"> | string
   nombreUsuario?: Prisma.StringFilter<"Usuario"> | string
   nombreCompleto?: Prisma.StringFilter<"Usuario"> | string
   dni?: Prisma.StringNullableFilter<"Usuario"> | string | null
@@ -267,7 +268,7 @@ export type UsuarioWhereUniqueInput = Prisma.AtLeast<{
   telefono?: Prisma.StringNullableFilter<"Usuario"> | string | null
   permisoClientes?: Prisma.BoolFilter<"Usuario"> | boolean
   permisoVencimiento?: Prisma.BoolFilter<"Usuario"> | boolean
-  organizacion?: Prisma.XOR<Prisma.OrganizacionNullableScalarRelationFilter, Prisma.OrganizacionWhereInput> | null
+  organizacion?: Prisma.XOR<Prisma.OrganizacionScalarRelationFilter, Prisma.OrganizacionWhereInput>
   sesiones?: Prisma.SesionListRelationFilter
   roles?: Prisma.UsuarioRolListRelationFilter
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaListRelationFilter
@@ -275,12 +276,12 @@ export type UsuarioWhereUniqueInput = Prisma.AtLeast<{
   tareasAsignadas?: Prisma.TareaAsignacionListRelationFilter
   tareasAsignadasPor?: Prisma.TareaAsignacionListRelationFilter
   vencimientosCreados?: Prisma.VencimientoListRelationFilter
-}, "id" | "clerkId">
+}, "id" | "clerkId_organizacionId">
 
 export type UsuarioOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   clerkId?: Prisma.SortOrder
-  organizacionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  organizacionId?: Prisma.SortOrder
   nombreUsuario?: Prisma.SortOrder
   nombreCompleto?: Prisma.SortOrder
   dni?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -299,7 +300,7 @@ export type UsuarioScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UsuarioScalarWhereWithAggregatesInput | Prisma.UsuarioScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Usuario"> | string
   clerkId?: Prisma.StringWithAggregatesFilter<"Usuario"> | string
-  organizacionId?: Prisma.StringNullableWithAggregatesFilter<"Usuario"> | string | null
+  organizacionId?: Prisma.StringWithAggregatesFilter<"Usuario"> | string
   nombreUsuario?: Prisma.StringWithAggregatesFilter<"Usuario"> | string
   nombreCompleto?: Prisma.StringWithAggregatesFilter<"Usuario"> | string
   dni?: Prisma.StringNullableWithAggregatesFilter<"Usuario"> | string | null
@@ -319,7 +320,7 @@ export type UsuarioCreateInput = {
   telefono?: string | null
   permisoClientes?: boolean
   permisoVencimiento?: boolean
-  organizacion?: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
+  organizacion: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
   sesiones?: Prisma.SesionCreateNestedManyWithoutUsuarioInput
   roles?: Prisma.UsuarioRolCreateNestedManyWithoutUsuarioInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutEjecutadoPorInput
@@ -332,7 +333,7 @@ export type UsuarioCreateInput = {
 export type UsuarioUncheckedCreateInput = {
   id?: string
   clerkId: string
-  organizacionId?: string | null
+  organizacionId: string
   nombreUsuario: string
   nombreCompleto: string
   dni?: string | null
@@ -359,7 +360,7 @@ export type UsuarioUpdateInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   permisoClientes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   permisoVencimiento?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  organizacion?: Prisma.OrganizacionUpdateOneWithoutUsuariosNestedInput
+  organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutUsuariosNestedInput
   sesiones?: Prisma.SesionUpdateManyWithoutUsuarioNestedInput
   roles?: Prisma.UsuarioRolUpdateManyWithoutUsuarioNestedInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaUpdateManyWithoutEjecutadoPorNestedInput
@@ -372,7 +373,7 @@ export type UsuarioUpdateInput = {
 export type UsuarioUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkId?: Prisma.StringFieldUpdateOperationsInput | string
-  organizacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
   nombreUsuario?: Prisma.StringFieldUpdateOperationsInput | string
   nombreCompleto?: Prisma.StringFieldUpdateOperationsInput | string
   dni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -392,7 +393,7 @@ export type UsuarioUncheckedUpdateInput = {
 export type UsuarioCreateManyInput = {
   id?: string
   clerkId: string
-  organizacionId?: string | null
+  organizacionId: string
   nombreUsuario: string
   nombreCompleto: string
   dni?: string | null
@@ -417,7 +418,7 @@ export type UsuarioUpdateManyMutationInput = {
 export type UsuarioUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkId?: Prisma.StringFieldUpdateOperationsInput | string
-  organizacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
   nombreUsuario?: Prisma.StringFieldUpdateOperationsInput | string
   nombreCompleto?: Prisma.StringFieldUpdateOperationsInput | string
   dni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -435,6 +436,11 @@ export type UsuarioListRelationFilter = {
 
 export type UsuarioOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type UsuarioClerkIdOrganizacionIdCompoundUniqueInput = {
+  clerkId: string
+  organizacionId: string
 }
 
 export type UsuarioCountOrderByAggregateInput = {
@@ -698,7 +704,7 @@ export type UsuarioScalarWhereInput = {
   NOT?: Prisma.UsuarioScalarWhereInput | Prisma.UsuarioScalarWhereInput[]
   id?: Prisma.StringFilter<"Usuario"> | string
   clerkId?: Prisma.StringFilter<"Usuario"> | string
-  organizacionId?: Prisma.StringNullableFilter<"Usuario"> | string | null
+  organizacionId?: Prisma.StringFilter<"Usuario"> | string
   nombreUsuario?: Prisma.StringFilter<"Usuario"> | string
   nombreCompleto?: Prisma.StringFilter<"Usuario"> | string
   dni?: Prisma.StringNullableFilter<"Usuario"> | string | null
@@ -718,7 +724,7 @@ export type UsuarioCreateWithoutSesionesInput = {
   telefono?: string | null
   permisoClientes?: boolean
   permisoVencimiento?: boolean
-  organizacion?: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
+  organizacion: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
   roles?: Prisma.UsuarioRolCreateNestedManyWithoutUsuarioInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutEjecutadoPorInput
   auditoriasAfectadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutUsuarioAfectadoInput
@@ -730,7 +736,7 @@ export type UsuarioCreateWithoutSesionesInput = {
 export type UsuarioUncheckedCreateWithoutSesionesInput = {
   id?: string
   clerkId: string
-  organizacionId?: string | null
+  organizacionId: string
   nombreUsuario: string
   nombreCompleto: string
   dni?: string | null
@@ -772,7 +778,7 @@ export type UsuarioUpdateWithoutSesionesInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   permisoClientes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   permisoVencimiento?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  organizacion?: Prisma.OrganizacionUpdateOneWithoutUsuariosNestedInput
+  organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutUsuariosNestedInput
   roles?: Prisma.UsuarioRolUpdateManyWithoutUsuarioNestedInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaUpdateManyWithoutEjecutadoPorNestedInput
   auditoriasAfectadas?: Prisma.RegistroAuditoriaUpdateManyWithoutUsuarioAfectadoNestedInput
@@ -784,7 +790,7 @@ export type UsuarioUpdateWithoutSesionesInput = {
 export type UsuarioUncheckedUpdateWithoutSesionesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkId?: Prisma.StringFieldUpdateOperationsInput | string
-  organizacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
   nombreUsuario?: Prisma.StringFieldUpdateOperationsInput | string
   nombreCompleto?: Prisma.StringFieldUpdateOperationsInput | string
   dni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -810,7 +816,7 @@ export type UsuarioCreateWithoutRolesInput = {
   telefono?: string | null
   permisoClientes?: boolean
   permisoVencimiento?: boolean
-  organizacion?: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
+  organizacion: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
   sesiones?: Prisma.SesionCreateNestedManyWithoutUsuarioInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutEjecutadoPorInput
   auditoriasAfectadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutUsuarioAfectadoInput
@@ -822,7 +828,7 @@ export type UsuarioCreateWithoutRolesInput = {
 export type UsuarioUncheckedCreateWithoutRolesInput = {
   id?: string
   clerkId: string
-  organizacionId?: string | null
+  organizacionId: string
   nombreUsuario: string
   nombreCompleto: string
   dni?: string | null
@@ -864,7 +870,7 @@ export type UsuarioUpdateWithoutRolesInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   permisoClientes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   permisoVencimiento?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  organizacion?: Prisma.OrganizacionUpdateOneWithoutUsuariosNestedInput
+  organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutUsuariosNestedInput
   sesiones?: Prisma.SesionUpdateManyWithoutUsuarioNestedInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaUpdateManyWithoutEjecutadoPorNestedInput
   auditoriasAfectadas?: Prisma.RegistroAuditoriaUpdateManyWithoutUsuarioAfectadoNestedInput
@@ -876,7 +882,7 @@ export type UsuarioUpdateWithoutRolesInput = {
 export type UsuarioUncheckedUpdateWithoutRolesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkId?: Prisma.StringFieldUpdateOperationsInput | string
-  organizacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
   nombreUsuario?: Prisma.StringFieldUpdateOperationsInput | string
   nombreCompleto?: Prisma.StringFieldUpdateOperationsInput | string
   dni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -902,7 +908,7 @@ export type UsuarioCreateWithoutAuditoriasEjecutadasInput = {
   telefono?: string | null
   permisoClientes?: boolean
   permisoVencimiento?: boolean
-  organizacion?: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
+  organizacion: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
   sesiones?: Prisma.SesionCreateNestedManyWithoutUsuarioInput
   roles?: Prisma.UsuarioRolCreateNestedManyWithoutUsuarioInput
   auditoriasAfectadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutUsuarioAfectadoInput
@@ -914,7 +920,7 @@ export type UsuarioCreateWithoutAuditoriasEjecutadasInput = {
 export type UsuarioUncheckedCreateWithoutAuditoriasEjecutadasInput = {
   id?: string
   clerkId: string
-  organizacionId?: string | null
+  organizacionId: string
   nombreUsuario: string
   nombreCompleto: string
   dni?: string | null
@@ -945,7 +951,7 @@ export type UsuarioCreateWithoutAuditoriasAfectadasInput = {
   telefono?: string | null
   permisoClientes?: boolean
   permisoVencimiento?: boolean
-  organizacion?: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
+  organizacion: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
   sesiones?: Prisma.SesionCreateNestedManyWithoutUsuarioInput
   roles?: Prisma.UsuarioRolCreateNestedManyWithoutUsuarioInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutEjecutadoPorInput
@@ -957,7 +963,7 @@ export type UsuarioCreateWithoutAuditoriasAfectadasInput = {
 export type UsuarioUncheckedCreateWithoutAuditoriasAfectadasInput = {
   id?: string
   clerkId: string
-  organizacionId?: string | null
+  organizacionId: string
   nombreUsuario: string
   nombreCompleto: string
   dni?: string | null
@@ -999,7 +1005,7 @@ export type UsuarioUpdateWithoutAuditoriasEjecutadasInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   permisoClientes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   permisoVencimiento?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  organizacion?: Prisma.OrganizacionUpdateOneWithoutUsuariosNestedInput
+  organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutUsuariosNestedInput
   sesiones?: Prisma.SesionUpdateManyWithoutUsuarioNestedInput
   roles?: Prisma.UsuarioRolUpdateManyWithoutUsuarioNestedInput
   auditoriasAfectadas?: Prisma.RegistroAuditoriaUpdateManyWithoutUsuarioAfectadoNestedInput
@@ -1011,7 +1017,7 @@ export type UsuarioUpdateWithoutAuditoriasEjecutadasInput = {
 export type UsuarioUncheckedUpdateWithoutAuditoriasEjecutadasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkId?: Prisma.StringFieldUpdateOperationsInput | string
-  organizacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
   nombreUsuario?: Prisma.StringFieldUpdateOperationsInput | string
   nombreCompleto?: Prisma.StringFieldUpdateOperationsInput | string
   dni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1048,7 +1054,7 @@ export type UsuarioUpdateWithoutAuditoriasAfectadasInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   permisoClientes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   permisoVencimiento?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  organizacion?: Prisma.OrganizacionUpdateOneWithoutUsuariosNestedInput
+  organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutUsuariosNestedInput
   sesiones?: Prisma.SesionUpdateManyWithoutUsuarioNestedInput
   roles?: Prisma.UsuarioRolUpdateManyWithoutUsuarioNestedInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaUpdateManyWithoutEjecutadoPorNestedInput
@@ -1060,7 +1066,7 @@ export type UsuarioUpdateWithoutAuditoriasAfectadasInput = {
 export type UsuarioUncheckedUpdateWithoutAuditoriasAfectadasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkId?: Prisma.StringFieldUpdateOperationsInput | string
-  organizacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
   nombreUsuario?: Prisma.StringFieldUpdateOperationsInput | string
   nombreCompleto?: Prisma.StringFieldUpdateOperationsInput | string
   dni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1086,7 +1092,7 @@ export type UsuarioCreateWithoutTareasAsignadasInput = {
   telefono?: string | null
   permisoClientes?: boolean
   permisoVencimiento?: boolean
-  organizacion?: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
+  organizacion: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
   sesiones?: Prisma.SesionCreateNestedManyWithoutUsuarioInput
   roles?: Prisma.UsuarioRolCreateNestedManyWithoutUsuarioInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutEjecutadoPorInput
@@ -1098,7 +1104,7 @@ export type UsuarioCreateWithoutTareasAsignadasInput = {
 export type UsuarioUncheckedCreateWithoutTareasAsignadasInput = {
   id?: string
   clerkId: string
-  organizacionId?: string | null
+  organizacionId: string
   nombreUsuario: string
   nombreCompleto: string
   dni?: string | null
@@ -1129,7 +1135,7 @@ export type UsuarioCreateWithoutTareasAsignadasPorInput = {
   telefono?: string | null
   permisoClientes?: boolean
   permisoVencimiento?: boolean
-  organizacion?: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
+  organizacion: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
   sesiones?: Prisma.SesionCreateNestedManyWithoutUsuarioInput
   roles?: Prisma.UsuarioRolCreateNestedManyWithoutUsuarioInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutEjecutadoPorInput
@@ -1141,7 +1147,7 @@ export type UsuarioCreateWithoutTareasAsignadasPorInput = {
 export type UsuarioUncheckedCreateWithoutTareasAsignadasPorInput = {
   id?: string
   clerkId: string
-  organizacionId?: string | null
+  organizacionId: string
   nombreUsuario: string
   nombreCompleto: string
   dni?: string | null
@@ -1183,7 +1189,7 @@ export type UsuarioUpdateWithoutTareasAsignadasInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   permisoClientes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   permisoVencimiento?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  organizacion?: Prisma.OrganizacionUpdateOneWithoutUsuariosNestedInput
+  organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutUsuariosNestedInput
   sesiones?: Prisma.SesionUpdateManyWithoutUsuarioNestedInput
   roles?: Prisma.UsuarioRolUpdateManyWithoutUsuarioNestedInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaUpdateManyWithoutEjecutadoPorNestedInput
@@ -1195,7 +1201,7 @@ export type UsuarioUpdateWithoutTareasAsignadasInput = {
 export type UsuarioUncheckedUpdateWithoutTareasAsignadasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkId?: Prisma.StringFieldUpdateOperationsInput | string
-  organizacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
   nombreUsuario?: Prisma.StringFieldUpdateOperationsInput | string
   nombreCompleto?: Prisma.StringFieldUpdateOperationsInput | string
   dni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1232,7 +1238,7 @@ export type UsuarioUpdateWithoutTareasAsignadasPorInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   permisoClientes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   permisoVencimiento?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  organizacion?: Prisma.OrganizacionUpdateOneWithoutUsuariosNestedInput
+  organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutUsuariosNestedInput
   sesiones?: Prisma.SesionUpdateManyWithoutUsuarioNestedInput
   roles?: Prisma.UsuarioRolUpdateManyWithoutUsuarioNestedInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaUpdateManyWithoutEjecutadoPorNestedInput
@@ -1244,7 +1250,7 @@ export type UsuarioUpdateWithoutTareasAsignadasPorInput = {
 export type UsuarioUncheckedUpdateWithoutTareasAsignadasPorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkId?: Prisma.StringFieldUpdateOperationsInput | string
-  organizacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
   nombreUsuario?: Prisma.StringFieldUpdateOperationsInput | string
   nombreCompleto?: Prisma.StringFieldUpdateOperationsInput | string
   dni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1270,7 +1276,7 @@ export type UsuarioCreateWithoutVencimientosCreadosInput = {
   telefono?: string | null
   permisoClientes?: boolean
   permisoVencimiento?: boolean
-  organizacion?: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
+  organizacion: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
   sesiones?: Prisma.SesionCreateNestedManyWithoutUsuarioInput
   roles?: Prisma.UsuarioRolCreateNestedManyWithoutUsuarioInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutEjecutadoPorInput
@@ -1282,7 +1288,7 @@ export type UsuarioCreateWithoutVencimientosCreadosInput = {
 export type UsuarioUncheckedCreateWithoutVencimientosCreadosInput = {
   id?: string
   clerkId: string
-  organizacionId?: string | null
+  organizacionId: string
   nombreUsuario: string
   nombreCompleto: string
   dni?: string | null
@@ -1324,7 +1330,7 @@ export type UsuarioUpdateWithoutVencimientosCreadosInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   permisoClientes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   permisoVencimiento?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  organizacion?: Prisma.OrganizacionUpdateOneWithoutUsuariosNestedInput
+  organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutUsuariosNestedInput
   sesiones?: Prisma.SesionUpdateManyWithoutUsuarioNestedInput
   roles?: Prisma.UsuarioRolUpdateManyWithoutUsuarioNestedInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaUpdateManyWithoutEjecutadoPorNestedInput
@@ -1336,7 +1342,7 @@ export type UsuarioUpdateWithoutVencimientosCreadosInput = {
 export type UsuarioUncheckedUpdateWithoutVencimientosCreadosInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clerkId?: Prisma.StringFieldUpdateOperationsInput | string
-  organizacionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
   nombreUsuario?: Prisma.StringFieldUpdateOperationsInput | string
   nombreCompleto?: Prisma.StringFieldUpdateOperationsInput | string
   dni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1510,7 +1516,7 @@ export type UsuarioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   telefono?: boolean
   permisoClientes?: boolean
   permisoVencimiento?: boolean
-  organizacion?: boolean | Prisma.Usuario$organizacionArgs<ExtArgs>
+  organizacion?: boolean | Prisma.OrganizacionDefaultArgs<ExtArgs>
   sesiones?: boolean | Prisma.Usuario$sesionesArgs<ExtArgs>
   roles?: boolean | Prisma.Usuario$rolesArgs<ExtArgs>
   auditoriasEjecutadas?: boolean | Prisma.Usuario$auditoriasEjecutadasArgs<ExtArgs>
@@ -1532,7 +1538,7 @@ export type UsuarioSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   telefono?: boolean
   permisoClientes?: boolean
   permisoVencimiento?: boolean
-  organizacion?: boolean | Prisma.Usuario$organizacionArgs<ExtArgs>
+  organizacion?: boolean | Prisma.OrganizacionDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["usuario"]>
 
 export type UsuarioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1546,7 +1552,7 @@ export type UsuarioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   telefono?: boolean
   permisoClientes?: boolean
   permisoVencimiento?: boolean
-  organizacion?: boolean | Prisma.Usuario$organizacionArgs<ExtArgs>
+  organizacion?: boolean | Prisma.OrganizacionDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["usuario"]>
 
 export type UsuarioSelectScalar = {
@@ -1564,7 +1570,7 @@ export type UsuarioSelectScalar = {
 
 export type UsuarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clerkId" | "organizacionId" | "nombreUsuario" | "nombreCompleto" | "dni" | "email" | "telefono" | "permisoClientes" | "permisoVencimiento", ExtArgs["result"]["usuario"]>
 export type UsuarioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  organizacion?: boolean | Prisma.Usuario$organizacionArgs<ExtArgs>
+  organizacion?: boolean | Prisma.OrganizacionDefaultArgs<ExtArgs>
   sesiones?: boolean | Prisma.Usuario$sesionesArgs<ExtArgs>
   roles?: boolean | Prisma.Usuario$rolesArgs<ExtArgs>
   auditoriasEjecutadas?: boolean | Prisma.Usuario$auditoriasEjecutadasArgs<ExtArgs>
@@ -1575,16 +1581,16 @@ export type UsuarioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   _count?: boolean | Prisma.UsuarioCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UsuarioIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  organizacion?: boolean | Prisma.Usuario$organizacionArgs<ExtArgs>
+  organizacion?: boolean | Prisma.OrganizacionDefaultArgs<ExtArgs>
 }
 export type UsuarioIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  organizacion?: boolean | Prisma.Usuario$organizacionArgs<ExtArgs>
+  organizacion?: boolean | Prisma.OrganizacionDefaultArgs<ExtArgs>
 }
 
 export type $UsuarioPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Usuario"
   objects: {
-    organizacion: Prisma.$OrganizacionPayload<ExtArgs> | null
+    organizacion: Prisma.$OrganizacionPayload<ExtArgs>
     sesiones: Prisma.$SesionPayload<ExtArgs>[]
     roles: Prisma.$UsuarioRolPayload<ExtArgs>[]
     auditoriasEjecutadas: Prisma.$RegistroAuditoriaPayload<ExtArgs>[]
@@ -1596,7 +1602,7 @@ export type $UsuarioPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     clerkId: string
-    organizacionId: string | null
+    organizacionId: string
     nombreUsuario: string
     nombreCompleto: string
     dni: string | null
@@ -1998,7 +2004,7 @@ readonly fields: UsuarioFieldRefs;
  */
 export interface Prisma__UsuarioClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  organizacion<T extends Prisma.Usuario$organizacionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Usuario$organizacionArgs<ExtArgs>>): Prisma.Prisma__OrganizacionClient<runtime.Types.Result.GetResult<Prisma.$OrganizacionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  organizacion<T extends Prisma.OrganizacionDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizacionDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizacionClient<runtime.Types.Result.GetResult<Prisma.$OrganizacionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   sesiones<T extends Prisma.Usuario$sesionesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Usuario$sesionesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SesionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   roles<T extends Prisma.Usuario$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Usuario$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UsuarioRolPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditoriasEjecutadas<T extends Prisma.Usuario$auditoriasEjecutadasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Usuario$auditoriasEjecutadasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RegistroAuditoriaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2438,25 +2444,6 @@ export type UsuarioDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Usuarios to delete.
    */
   limit?: number
-}
-
-/**
- * Usuario.organizacion
- */
-export type Usuario$organizacionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Organizacion
-   */
-  select?: Prisma.OrganizacionSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Organizacion
-   */
-  omit?: Prisma.OrganizacionOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.OrganizacionInclude<ExtArgs> | null
-  where?: Prisma.OrganizacionWhereInput
 }
 
 /**

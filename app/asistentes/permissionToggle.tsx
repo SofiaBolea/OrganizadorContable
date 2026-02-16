@@ -16,7 +16,13 @@ export function PermissionToggle({ usuarioId, label, campo, valor }: Props) {
 
   const handleToggle = () => {
     startTransition(async () => {
-      await updateUsuarioPermission(usuarioId, campo, !valor);
+      // Capturamos el resultado del server action
+      const result = await updateUsuarioPermission(usuarioId, campo, !valor);
+      
+      if (result && !result.success) {
+        // Si hay error, lo mostramos en un alert para debug rápido
+        alert("Error al guardar: " + result.error);
+      }
     });
   };
 
@@ -30,8 +36,12 @@ export function PermissionToggle({ usuarioId, label, campo, valor }: Props) {
           : "bg-white/[0.03] border-white/10 text-white/40"
       } hover:bg-white/10 disabled:opacity-50`}
     >
-      {isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
-      {label}: {valor ? "ON" : "OFF"}
+      {isPending ? (
+        <Loader2 className="w-3 h-3 animate-spin" />
+      ) : (
+        <div className={`w-1.5 h-1.5 rounded-full ${valor ? 'bg-green-400' : 'bg-white/20'}`} />
+      )}
+      {label}
     </button>
   );
 }
