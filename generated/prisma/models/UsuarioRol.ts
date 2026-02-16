@@ -198,6 +198,7 @@ export type UsuarioRolOrderByWithRelationInput = {
 
 export type UsuarioRolWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  usuarioId_rolId?: Prisma.UsuarioRolUsuarioIdRolIdCompoundUniqueInput
   AND?: Prisma.UsuarioRolWhereInput | Prisma.UsuarioRolWhereInput[]
   OR?: Prisma.UsuarioRolWhereInput[]
   NOT?: Prisma.UsuarioRolWhereInput | Prisma.UsuarioRolWhereInput[]
@@ -207,7 +208,7 @@ export type UsuarioRolWhereUniqueInput = Prisma.AtLeast<{
   fechaBaja?: Prisma.DateTimeNullableFilter<"UsuarioRol"> | Date | string | null
   usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
   rol?: Prisma.XOR<Prisma.RolScalarRelationFilter, Prisma.RolWhereInput>
-}, "id">
+}, "id" | "usuarioId_rolId">
 
 export type UsuarioRolOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -293,6 +294,11 @@ export type UsuarioRolListRelationFilter = {
 
 export type UsuarioRolOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type UsuarioRolUsuarioIdRolIdCompoundUniqueInput = {
+  usuarioId: string
+  rolId: string
 }
 
 export type UsuarioRolCountOrderByAggregateInput = {

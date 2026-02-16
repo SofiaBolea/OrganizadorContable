@@ -1,26 +1,56 @@
 @import "tailwindcss";
 
+/* =========================
+   TOKENS DE DISEÑO
+========================= */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Fondos */
+  --color-app-bg: #EFEDE7;
+  --color-sidebar-bg: #2C2C2C;
+  --color-card-bg: #FFFFFF;
+
+  /* Texto */
+  --color-text-main: #494E5F;
+
+  /* Botón primario */
+  --color-primary-bg: #90BF77;
+  --color-primary-text: #425C5A;
+
+  /* Botón peligro */
+  --color-danger-bg: #EFBEAF;
+  --color-danger-text: #E87A58;
+
+  /* Radio */
+  --radius-base: 20px;
 }
+
+/* =========================
+   VINCULAMOS A TAILWIND
+========================= */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-app: var(--color-app-bg);
+  --color-sidebar: var(--color-sidebar-bg);
+  --color-card: var(--color-card-bg);
+
+  --color-text: var(--color-text-main);
+
+  --color-primary: var(--color-primary-bg);
+  --color-primary-foreground: var(--color-primary-text);
+
+  --color-danger: var(--color-danger-bg);
+  --color-danger-foreground: var(--color-danger-text);
+
+  --radius-xl: var(--radius-base);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* =========================
+   ESTILOS BASE
+========================= */
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-app-bg);
+  color: var(--color-text-main);
+  font-family: 'Montserrat', sans-serif;
 }

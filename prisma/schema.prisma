@@ -116,7 +116,7 @@ model UsuarioRol {
   fechaAlta  DateTime  @default(now()) @db.Date
   fechaBaja  DateTime? @db.Date
 
-  @@unique(usuarioId, rolId)
+  @@unique([usuarioId, rolId])
   @@index([usuarioId])
   @@index([rolId])
   @@map("usuarios_roles")

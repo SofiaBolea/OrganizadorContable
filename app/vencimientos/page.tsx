@@ -2,6 +2,7 @@ import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { getVencimientosParaTabla } from '../../lib/data'
 import Link from 'next/link'
+import { Button } from '../components/Button'
 
 export default async function VencimientosPage() {
   const { orgRole, orgId } = await auth()
@@ -16,13 +17,13 @@ export default async function VencimientosPage() {
     <main className="p-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Vencimientos Impositivos</h1>
-
-        <Link
-          href="/vencimientos/nuevoVencimiento"
-          className="bg-green-600 text-white px-4 py-2 rounded-md"
-        >
-          + Nuevo Vencimiento
-        </Link>
+        <Button variant="primario">
+          <Link
+            href="/vencimientos/nuevoVencimiento"
+          >
+            Nuevo Vencimiento
+          </Link>
+        </Button>
       </div>
 
       {ocurrencias.length === 0 ? (
