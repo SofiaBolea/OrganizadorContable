@@ -399,6 +399,7 @@ export const ModelName = {
   RecursoRef: 'RecursoRef',
   RefColor: 'RefColor',
   Cliente: 'Cliente',
+  ClienteAsignacion: 'ClienteAsignacion',
   Tarea: 'Tarea',
   Recurrencia: 'Recurrencia',
   TareaAsignacion: 'TareaAsignacion',
@@ -420,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organizacion" | "usuario" | "sesion" | "rol" | "usuarioRol" | "dsdRegla" | "operacion" | "restriccion" | "permiso" | "rolPermiso" | "registroAuditoria" | "recurso" | "recursoRef" | "refColor" | "cliente" | "tarea" | "recurrencia" | "tareaAsignacion" | "ocurrencia" | "vencimiento" | "vencimientoOcurrencia"
+    modelProps: "organizacion" | "usuario" | "sesion" | "rol" | "usuarioRol" | "dsdRegla" | "operacion" | "restriccion" | "permiso" | "rolPermiso" | "registroAuditoria" | "recurso" | "recursoRef" | "refColor" | "cliente" | "clienteAsignacion" | "tarea" | "recurrencia" | "tareaAsignacion" | "ocurrencia" | "vencimiento" | "vencimientoOcurrencia"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1534,6 +1535,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ClienteAsignacion: {
+      payload: Prisma.$ClienteAsignacionPayload<ExtArgs>
+      fields: Prisma.ClienteAsignacionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ClienteAsignacionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClienteAsignacionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ClienteAsignacionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClienteAsignacionPayload>
+        }
+        findFirst: {
+          args: Prisma.ClienteAsignacionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClienteAsignacionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ClienteAsignacionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClienteAsignacionPayload>
+        }
+        findMany: {
+          args: Prisma.ClienteAsignacionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClienteAsignacionPayload>[]
+        }
+        create: {
+          args: Prisma.ClienteAsignacionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClienteAsignacionPayload>
+        }
+        createMany: {
+          args: Prisma.ClienteAsignacionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ClienteAsignacionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClienteAsignacionPayload>[]
+        }
+        delete: {
+          args: Prisma.ClienteAsignacionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClienteAsignacionPayload>
+        }
+        update: {
+          args: Prisma.ClienteAsignacionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClienteAsignacionPayload>
+        }
+        deleteMany: {
+          args: Prisma.ClienteAsignacionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ClienteAsignacionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ClienteAsignacionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClienteAsignacionPayload>[]
+        }
+        upsert: {
+          args: Prisma.ClienteAsignacionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClienteAsignacionPayload>
+        }
+        aggregate: {
+          args: Prisma.ClienteAsignacionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateClienteAsignacion>
+        }
+        groupBy: {
+          args: Prisma.ClienteAsignacionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClienteAsignacionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ClienteAsignacionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClienteAsignacionCountAggregateOutputType> | number
+        }
+      }
+    }
     Tarea: {
       payload: Prisma.$TareaPayload<ExtArgs>
       fields: Prisma.TareaFieldRefs
@@ -2180,12 +2255,23 @@ export type RefColorScalarFieldEnum = (typeof RefColorScalarFieldEnum)[keyof typ
 export const ClienteScalarFieldEnum = {
   id: 'id',
   nombreCompleto: 'nombreCompleto',
+  cuit: 'cuit',
   email: 'email',
   telefono: 'telefono',
   estado: 'estado'
 } as const
 
 export type ClienteScalarFieldEnum = (typeof ClienteScalarFieldEnum)[keyof typeof ClienteScalarFieldEnum]
+
+
+export const ClienteAsignacionScalarFieldEnum = {
+  id: 'id',
+  clienteId: 'clienteId',
+  usuarioId: 'usuarioId',
+  fecha: 'fecha'
+} as const
+
+export type ClienteAsignacionScalarFieldEnum = (typeof ClienteAsignacionScalarFieldEnum)[keyof typeof ClienteAsignacionScalarFieldEnum]
 
 
 export const TareaScalarFieldEnum = {
@@ -2467,6 +2553,7 @@ export type GlobalOmitConfig = {
   recursoRef?: Prisma.RecursoRefOmit
   refColor?: Prisma.RefColorOmit
   cliente?: Prisma.ClienteOmit
+  clienteAsignacion?: Prisma.ClienteAsignacionOmit
   tarea?: Prisma.TareaOmit
   recurrencia?: Prisma.RecurrenciaOmit
   tareaAsignacion?: Prisma.TareaAsignacionOmit

@@ -57,6 +57,7 @@ model Usuario {
   tareasAsignadas         TareaAsignacion[]   @relation("asignado")
   tareasAsignadasPor      TareaAsignacion[]   @relation("asignadoPor")
   vencimientosCreados     Vencimiento[]
+  clientesAsignados       ClienteAsignacion[]
 
   @@index([organizacionId])
   @@map("usuarios")
@@ -258,14 +259,29 @@ model RefColor {
 }
 
 model Cliente {
-  id             String  @id
-  recurso        Recurso @relation(fields: [id], references: [id], onDelete: Cascade)
-  nombreCompleto String  @db.VarChar(100)
-  email          String? @db.VarChar(100)
-  telefono       String? @db.VarChar(50)
-  estado         String  @default("ACTIVO") @db.VarChar(20)
+  id             String   @id
+  recurso        Recurso  @relation(fields: [id], references: [id], onDelete: Cascade)
+  nombreCompleto String   @db.VarChar(100)
+  cuit           String?  @db.VarChar(11) 
+  email          String?  @db.VarChar(100)
+  telefono       String?  @db.VarChar(50)
+  estado         String   @default("ACTIVO") @db.VarChar(20)
+  
+  asignaciones   ClienteAsignacion[] // Relación con asistentes
 
   @@map("clientes")
+}
+
+model ClienteAsignacion {
+  id        String   @id @default(cuid())
+  clienteId String
+  cliente   Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  fecha     DateTime @default(now())
+
+  @@unique([clienteId, usuarioId])
+  @@map("clientes_asignaciones")
 }
 
 // =======================================

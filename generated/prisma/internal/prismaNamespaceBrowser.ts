@@ -66,6 +66,7 @@ export const ModelName = {
   RecursoRef: 'RecursoRef',
   RefColor: 'RefColor',
   Cliente: 'Cliente',
+  ClienteAsignacion: 'ClienteAsignacion',
   Tarea: 'Tarea',
   Recurrencia: 'Recurrencia',
   TareaAsignacion: 'TareaAsignacion',
@@ -253,12 +254,23 @@ export type RefColorScalarFieldEnum = (typeof RefColorScalarFieldEnum)[keyof typ
 export const ClienteScalarFieldEnum = {
   id: 'id',
   nombreCompleto: 'nombreCompleto',
+  cuit: 'cuit',
   email: 'email',
   telefono: 'telefono',
   estado: 'estado'
 } as const
 
 export type ClienteScalarFieldEnum = (typeof ClienteScalarFieldEnum)[keyof typeof ClienteScalarFieldEnum]
+
+
+export const ClienteAsignacionScalarFieldEnum = {
+  id: 'id',
+  clienteId: 'clienteId',
+  usuarioId: 'usuarioId',
+  fecha: 'fecha'
+} as const
+
+export type ClienteAsignacionScalarFieldEnum = (typeof ClienteAsignacionScalarFieldEnum)[keyof typeof ClienteAsignacionScalarFieldEnum]
 
 
 export const TareaScalarFieldEnum = {

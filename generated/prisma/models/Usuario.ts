@@ -230,6 +230,7 @@ export type UsuarioWhereInput = {
   tareasAsignadas?: Prisma.TareaAsignacionListRelationFilter
   tareasAsignadasPor?: Prisma.TareaAsignacionListRelationFilter
   vencimientosCreados?: Prisma.VencimientoListRelationFilter
+  clientesAsignados?: Prisma.ClienteAsignacionListRelationFilter
 }
 
 export type UsuarioOrderByWithRelationInput = {
@@ -251,6 +252,7 @@ export type UsuarioOrderByWithRelationInput = {
   tareasAsignadas?: Prisma.TareaAsignacionOrderByRelationAggregateInput
   tareasAsignadasPor?: Prisma.TareaAsignacionOrderByRelationAggregateInput
   vencimientosCreados?: Prisma.VencimientoOrderByRelationAggregateInput
+  clientesAsignados?: Prisma.ClienteAsignacionOrderByRelationAggregateInput
 }
 
 export type UsuarioWhereUniqueInput = Prisma.AtLeast<{
@@ -276,6 +278,7 @@ export type UsuarioWhereUniqueInput = Prisma.AtLeast<{
   tareasAsignadas?: Prisma.TareaAsignacionListRelationFilter
   tareasAsignadasPor?: Prisma.TareaAsignacionListRelationFilter
   vencimientosCreados?: Prisma.VencimientoListRelationFilter
+  clientesAsignados?: Prisma.ClienteAsignacionListRelationFilter
 }, "id" | "clerkId_organizacionId">
 
 export type UsuarioOrderByWithAggregationInput = {
@@ -328,6 +331,7 @@ export type UsuarioCreateInput = {
   tareasAsignadas?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioUncheckedCreateInput = {
@@ -348,6 +352,7 @@ export type UsuarioUncheckedCreateInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoUncheckedCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioUpdateInput = {
@@ -368,6 +373,7 @@ export type UsuarioUpdateInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioUncheckedUpdateInput = {
@@ -388,6 +394,7 @@ export type UsuarioUncheckedUpdateInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUncheckedUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioCreateManyInput = {
@@ -592,6 +599,20 @@ export type UsuarioUpdateOneWithoutAuditoriasAfectadasNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UsuarioUpdateToOneWithWhereWithoutAuditoriasAfectadasInput, Prisma.UsuarioUpdateWithoutAuditoriasAfectadasInput>, Prisma.UsuarioUncheckedUpdateWithoutAuditoriasAfectadasInput>
 }
 
+export type UsuarioCreateNestedOneWithoutClientesAsignadosInput = {
+  create?: Prisma.XOR<Prisma.UsuarioCreateWithoutClientesAsignadosInput, Prisma.UsuarioUncheckedCreateWithoutClientesAsignadosInput>
+  connectOrCreate?: Prisma.UsuarioCreateOrConnectWithoutClientesAsignadosInput
+  connect?: Prisma.UsuarioWhereUniqueInput
+}
+
+export type UsuarioUpdateOneRequiredWithoutClientesAsignadosNestedInput = {
+  create?: Prisma.XOR<Prisma.UsuarioCreateWithoutClientesAsignadosInput, Prisma.UsuarioUncheckedCreateWithoutClientesAsignadosInput>
+  connectOrCreate?: Prisma.UsuarioCreateOrConnectWithoutClientesAsignadosInput
+  upsert?: Prisma.UsuarioUpsertWithoutClientesAsignadosInput
+  connect?: Prisma.UsuarioWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UsuarioUpdateToOneWithWhereWithoutClientesAsignadosInput, Prisma.UsuarioUpdateWithoutClientesAsignadosInput>, Prisma.UsuarioUncheckedUpdateWithoutClientesAsignadosInput>
+}
+
 export type UsuarioCreateNestedOneWithoutTareasAsignadasInput = {
   create?: Prisma.XOR<Prisma.UsuarioCreateWithoutTareasAsignadasInput, Prisma.UsuarioUncheckedCreateWithoutTareasAsignadasInput>
   connectOrCreate?: Prisma.UsuarioCreateOrConnectWithoutTareasAsignadasInput
@@ -651,6 +672,7 @@ export type UsuarioCreateWithoutOrganizacionInput = {
   tareasAsignadas?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioUncheckedCreateWithoutOrganizacionInput = {
@@ -670,6 +692,7 @@ export type UsuarioUncheckedCreateWithoutOrganizacionInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoUncheckedCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioCreateOrConnectWithoutOrganizacionInput = {
@@ -731,6 +754,7 @@ export type UsuarioCreateWithoutSesionesInput = {
   tareasAsignadas?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioUncheckedCreateWithoutSesionesInput = {
@@ -750,6 +774,7 @@ export type UsuarioUncheckedCreateWithoutSesionesInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoUncheckedCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioCreateOrConnectWithoutSesionesInput = {
@@ -785,6 +810,7 @@ export type UsuarioUpdateWithoutSesionesInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioUncheckedUpdateWithoutSesionesInput = {
@@ -804,6 +830,7 @@ export type UsuarioUncheckedUpdateWithoutSesionesInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUncheckedUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioCreateWithoutRolesInput = {
@@ -823,6 +850,7 @@ export type UsuarioCreateWithoutRolesInput = {
   tareasAsignadas?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioUncheckedCreateWithoutRolesInput = {
@@ -842,6 +870,7 @@ export type UsuarioUncheckedCreateWithoutRolesInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoUncheckedCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioCreateOrConnectWithoutRolesInput = {
@@ -877,6 +906,7 @@ export type UsuarioUpdateWithoutRolesInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioUncheckedUpdateWithoutRolesInput = {
@@ -896,6 +926,7 @@ export type UsuarioUncheckedUpdateWithoutRolesInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUncheckedUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioCreateWithoutAuditoriasEjecutadasInput = {
@@ -915,6 +946,7 @@ export type UsuarioCreateWithoutAuditoriasEjecutadasInput = {
   tareasAsignadas?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioUncheckedCreateWithoutAuditoriasEjecutadasInput = {
@@ -934,6 +966,7 @@ export type UsuarioUncheckedCreateWithoutAuditoriasEjecutadasInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoUncheckedCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioCreateOrConnectWithoutAuditoriasEjecutadasInput = {
@@ -958,6 +991,7 @@ export type UsuarioCreateWithoutAuditoriasAfectadasInput = {
   tareasAsignadas?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioUncheckedCreateWithoutAuditoriasAfectadasInput = {
@@ -977,6 +1011,7 @@ export type UsuarioUncheckedCreateWithoutAuditoriasAfectadasInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoUncheckedCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioCreateOrConnectWithoutAuditoriasAfectadasInput = {
@@ -1012,6 +1047,7 @@ export type UsuarioUpdateWithoutAuditoriasEjecutadasInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioUncheckedUpdateWithoutAuditoriasEjecutadasInput = {
@@ -1031,6 +1067,7 @@ export type UsuarioUncheckedUpdateWithoutAuditoriasEjecutadasInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUncheckedUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioUpsertWithoutAuditoriasAfectadasInput = {
@@ -1061,6 +1098,7 @@ export type UsuarioUpdateWithoutAuditoriasAfectadasInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioUncheckedUpdateWithoutAuditoriasAfectadasInput = {
@@ -1077,6 +1115,103 @@ export type UsuarioUncheckedUpdateWithoutAuditoriasAfectadasInput = {
   sesiones?: Prisma.SesionUncheckedUpdateManyWithoutUsuarioNestedInput
   roles?: Prisma.UsuarioRolUncheckedUpdateManyWithoutUsuarioNestedInput
   auditoriasEjecutadas?: Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutEjecutadoPorNestedInput
+  tareasAsignadas?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoNestedInput
+  tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoPorNestedInput
+  vencimientosCreados?: Prisma.VencimientoUncheckedUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedUpdateManyWithoutUsuarioNestedInput
+}
+
+export type UsuarioCreateWithoutClientesAsignadosInput = {
+  id?: string
+  clerkId: string
+  nombreUsuario: string
+  nombreCompleto: string
+  dni?: string | null
+  email: string
+  telefono?: string | null
+  permisoClientes?: boolean
+  permisoVencimiento?: boolean
+  organizacion: Prisma.OrganizacionCreateNestedOneWithoutUsuariosInput
+  sesiones?: Prisma.SesionCreateNestedManyWithoutUsuarioInput
+  roles?: Prisma.UsuarioRolCreateNestedManyWithoutUsuarioInput
+  auditoriasEjecutadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutEjecutadoPorInput
+  auditoriasAfectadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutUsuarioAfectadoInput
+  tareasAsignadas?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoInput
+  tareasAsignadasPor?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoPorInput
+  vencimientosCreados?: Prisma.VencimientoCreateNestedManyWithoutUsuarioCreadorInput
+}
+
+export type UsuarioUncheckedCreateWithoutClientesAsignadosInput = {
+  id?: string
+  clerkId: string
+  organizacionId: string
+  nombreUsuario: string
+  nombreCompleto: string
+  dni?: string | null
+  email: string
+  telefono?: string | null
+  permisoClientes?: boolean
+  permisoVencimiento?: boolean
+  sesiones?: Prisma.SesionUncheckedCreateNestedManyWithoutUsuarioInput
+  roles?: Prisma.UsuarioRolUncheckedCreateNestedManyWithoutUsuarioInput
+  auditoriasEjecutadas?: Prisma.RegistroAuditoriaUncheckedCreateNestedManyWithoutEjecutadoPorInput
+  auditoriasAfectadas?: Prisma.RegistroAuditoriaUncheckedCreateNestedManyWithoutUsuarioAfectadoInput
+  tareasAsignadas?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoInput
+  tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoPorInput
+  vencimientosCreados?: Prisma.VencimientoUncheckedCreateNestedManyWithoutUsuarioCreadorInput
+}
+
+export type UsuarioCreateOrConnectWithoutClientesAsignadosInput = {
+  where: Prisma.UsuarioWhereUniqueInput
+  create: Prisma.XOR<Prisma.UsuarioCreateWithoutClientesAsignadosInput, Prisma.UsuarioUncheckedCreateWithoutClientesAsignadosInput>
+}
+
+export type UsuarioUpsertWithoutClientesAsignadosInput = {
+  update: Prisma.XOR<Prisma.UsuarioUpdateWithoutClientesAsignadosInput, Prisma.UsuarioUncheckedUpdateWithoutClientesAsignadosInput>
+  create: Prisma.XOR<Prisma.UsuarioCreateWithoutClientesAsignadosInput, Prisma.UsuarioUncheckedCreateWithoutClientesAsignadosInput>
+  where?: Prisma.UsuarioWhereInput
+}
+
+export type UsuarioUpdateToOneWithWhereWithoutClientesAsignadosInput = {
+  where?: Prisma.UsuarioWhereInput
+  data: Prisma.XOR<Prisma.UsuarioUpdateWithoutClientesAsignadosInput, Prisma.UsuarioUncheckedUpdateWithoutClientesAsignadosInput>
+}
+
+export type UsuarioUpdateWithoutClientesAsignadosInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombreUsuario?: Prisma.StringFieldUpdateOperationsInput | string
+  nombreCompleto?: Prisma.StringFieldUpdateOperationsInput | string
+  dni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permisoClientes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  permisoVencimiento?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizacion?: Prisma.OrganizacionUpdateOneRequiredWithoutUsuariosNestedInput
+  sesiones?: Prisma.SesionUpdateManyWithoutUsuarioNestedInput
+  roles?: Prisma.UsuarioRolUpdateManyWithoutUsuarioNestedInput
+  auditoriasEjecutadas?: Prisma.RegistroAuditoriaUpdateManyWithoutEjecutadoPorNestedInput
+  auditoriasAfectadas?: Prisma.RegistroAuditoriaUpdateManyWithoutUsuarioAfectadoNestedInput
+  tareasAsignadas?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoNestedInput
+  tareasAsignadasPor?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoPorNestedInput
+  vencimientosCreados?: Prisma.VencimientoUpdateManyWithoutUsuarioCreadorNestedInput
+}
+
+export type UsuarioUncheckedUpdateWithoutClientesAsignadosInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizacionId?: Prisma.StringFieldUpdateOperationsInput | string
+  nombreUsuario?: Prisma.StringFieldUpdateOperationsInput | string
+  nombreCompleto?: Prisma.StringFieldUpdateOperationsInput | string
+  dni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permisoClientes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  permisoVencimiento?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sesiones?: Prisma.SesionUncheckedUpdateManyWithoutUsuarioNestedInput
+  roles?: Prisma.UsuarioRolUncheckedUpdateManyWithoutUsuarioNestedInput
+  auditoriasEjecutadas?: Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutEjecutadoPorNestedInput
+  auditoriasAfectadas?: Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutUsuarioAfectadoNestedInput
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUncheckedUpdateManyWithoutUsuarioCreadorNestedInput
@@ -1099,6 +1234,7 @@ export type UsuarioCreateWithoutTareasAsignadasInput = {
   auditoriasAfectadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutUsuarioAfectadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioUncheckedCreateWithoutTareasAsignadasInput = {
@@ -1118,6 +1254,7 @@ export type UsuarioUncheckedCreateWithoutTareasAsignadasInput = {
   auditoriasAfectadas?: Prisma.RegistroAuditoriaUncheckedCreateNestedManyWithoutUsuarioAfectadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoPorInput
   vencimientosCreados?: Prisma.VencimientoUncheckedCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioCreateOrConnectWithoutTareasAsignadasInput = {
@@ -1142,6 +1279,7 @@ export type UsuarioCreateWithoutTareasAsignadasPorInput = {
   auditoriasAfectadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutUsuarioAfectadoInput
   tareasAsignadas?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoInput
   vencimientosCreados?: Prisma.VencimientoCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioUncheckedCreateWithoutTareasAsignadasPorInput = {
@@ -1161,6 +1299,7 @@ export type UsuarioUncheckedCreateWithoutTareasAsignadasPorInput = {
   auditoriasAfectadas?: Prisma.RegistroAuditoriaUncheckedCreateNestedManyWithoutUsuarioAfectadoInput
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoInput
   vencimientosCreados?: Prisma.VencimientoUncheckedCreateNestedManyWithoutUsuarioCreadorInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioCreateOrConnectWithoutTareasAsignadasPorInput = {
@@ -1196,6 +1335,7 @@ export type UsuarioUpdateWithoutTareasAsignadasInput = {
   auditoriasAfectadas?: Prisma.RegistroAuditoriaUpdateManyWithoutUsuarioAfectadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioUncheckedUpdateWithoutTareasAsignadasInput = {
@@ -1215,6 +1355,7 @@ export type UsuarioUncheckedUpdateWithoutTareasAsignadasInput = {
   auditoriasAfectadas?: Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutUsuarioAfectadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUncheckedUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioUpsertWithoutTareasAsignadasPorInput = {
@@ -1245,6 +1386,7 @@ export type UsuarioUpdateWithoutTareasAsignadasPorInput = {
   auditoriasAfectadas?: Prisma.RegistroAuditoriaUpdateManyWithoutUsuarioAfectadoNestedInput
   tareasAsignadas?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoNestedInput
   vencimientosCreados?: Prisma.VencimientoUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioUncheckedUpdateWithoutTareasAsignadasPorInput = {
@@ -1264,6 +1406,7 @@ export type UsuarioUncheckedUpdateWithoutTareasAsignadasPorInput = {
   auditoriasAfectadas?: Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutUsuarioAfectadoNestedInput
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoNestedInput
   vencimientosCreados?: Prisma.VencimientoUncheckedUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioCreateWithoutVencimientosCreadosInput = {
@@ -1283,6 +1426,7 @@ export type UsuarioCreateWithoutVencimientosCreadosInput = {
   auditoriasAfectadas?: Prisma.RegistroAuditoriaCreateNestedManyWithoutUsuarioAfectadoInput
   tareasAsignadas?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionCreateNestedManyWithoutAsignadoPorInput
+  clientesAsignados?: Prisma.ClienteAsignacionCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioUncheckedCreateWithoutVencimientosCreadosInput = {
@@ -1302,6 +1446,7 @@ export type UsuarioUncheckedCreateWithoutVencimientosCreadosInput = {
   auditoriasAfectadas?: Prisma.RegistroAuditoriaUncheckedCreateNestedManyWithoutUsuarioAfectadoInput
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutAsignadoPorInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedCreateNestedManyWithoutUsuarioInput
 }
 
 export type UsuarioCreateOrConnectWithoutVencimientosCreadosInput = {
@@ -1337,6 +1482,7 @@ export type UsuarioUpdateWithoutVencimientosCreadosInput = {
   auditoriasAfectadas?: Prisma.RegistroAuditoriaUpdateManyWithoutUsuarioAfectadoNestedInput
   tareasAsignadas?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoPorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioUncheckedUpdateWithoutVencimientosCreadosInput = {
@@ -1356,6 +1502,7 @@ export type UsuarioUncheckedUpdateWithoutVencimientosCreadosInput = {
   auditoriasAfectadas?: Prisma.RegistroAuditoriaUncheckedUpdateManyWithoutUsuarioAfectadoNestedInput
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoPorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioCreateManyOrganizacionInput = {
@@ -1387,6 +1534,7 @@ export type UsuarioUpdateWithoutOrganizacionInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioUncheckedUpdateWithoutOrganizacionInput = {
@@ -1406,6 +1554,7 @@ export type UsuarioUncheckedUpdateWithoutOrganizacionInput = {
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoNestedInput
   tareasAsignadasPor?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutAsignadoPorNestedInput
   vencimientosCreados?: Prisma.VencimientoUncheckedUpdateManyWithoutUsuarioCreadorNestedInput
+  clientesAsignados?: Prisma.ClienteAsignacionUncheckedUpdateManyWithoutUsuarioNestedInput
 }
 
 export type UsuarioUncheckedUpdateManyWithoutOrganizacionInput = {
@@ -1433,6 +1582,7 @@ export type UsuarioCountOutputType = {
   tareasAsignadas: number
   tareasAsignadasPor: number
   vencimientosCreados: number
+  clientesAsignados: number
 }
 
 export type UsuarioCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1443,6 +1593,7 @@ export type UsuarioCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   tareasAsignadas?: boolean | UsuarioCountOutputTypeCountTareasAsignadasArgs
   tareasAsignadasPor?: boolean | UsuarioCountOutputTypeCountTareasAsignadasPorArgs
   vencimientosCreados?: boolean | UsuarioCountOutputTypeCountVencimientosCreadosArgs
+  clientesAsignados?: boolean | UsuarioCountOutputTypeCountClientesAsignadosArgs
 }
 
 /**
@@ -1504,6 +1655,13 @@ export type UsuarioCountOutputTypeCountVencimientosCreadosArgs<ExtArgs extends r
   where?: Prisma.VencimientoWhereInput
 }
 
+/**
+ * UsuarioCountOutputType without action
+ */
+export type UsuarioCountOutputTypeCountClientesAsignadosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClienteAsignacionWhereInput
+}
+
 
 export type UsuarioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1524,6 +1682,7 @@ export type UsuarioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   tareasAsignadas?: boolean | Prisma.Usuario$tareasAsignadasArgs<ExtArgs>
   tareasAsignadasPor?: boolean | Prisma.Usuario$tareasAsignadasPorArgs<ExtArgs>
   vencimientosCreados?: boolean | Prisma.Usuario$vencimientosCreadosArgs<ExtArgs>
+  clientesAsignados?: boolean | Prisma.Usuario$clientesAsignadosArgs<ExtArgs>
   _count?: boolean | Prisma.UsuarioCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["usuario"]>
 
@@ -1578,6 +1737,7 @@ export type UsuarioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   tareasAsignadas?: boolean | Prisma.Usuario$tareasAsignadasArgs<ExtArgs>
   tareasAsignadasPor?: boolean | Prisma.Usuario$tareasAsignadasPorArgs<ExtArgs>
   vencimientosCreados?: boolean | Prisma.Usuario$vencimientosCreadosArgs<ExtArgs>
+  clientesAsignados?: boolean | Prisma.Usuario$clientesAsignadosArgs<ExtArgs>
   _count?: boolean | Prisma.UsuarioCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UsuarioIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1598,6 +1758,7 @@ export type $UsuarioPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     tareasAsignadas: Prisma.$TareaAsignacionPayload<ExtArgs>[]
     tareasAsignadasPor: Prisma.$TareaAsignacionPayload<ExtArgs>[]
     vencimientosCreados: Prisma.$VencimientoPayload<ExtArgs>[]
+    clientesAsignados: Prisma.$ClienteAsignacionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2012,6 +2173,7 @@ export interface Prisma__UsuarioClient<T, Null = never, ExtArgs extends runtime.
   tareasAsignadas<T extends Prisma.Usuario$tareasAsignadasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Usuario$tareasAsignadasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TareaAsignacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   tareasAsignadasPor<T extends Prisma.Usuario$tareasAsignadasPorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Usuario$tareasAsignadasPorArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TareaAsignacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   vencimientosCreados<T extends Prisma.Usuario$vencimientosCreadosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Usuario$vencimientosCreadosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VencimientoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  clientesAsignados<T extends Prisma.Usuario$clientesAsignadosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Usuario$clientesAsignadosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClienteAsignacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2612,6 +2774,30 @@ export type Usuario$vencimientosCreadosArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.VencimientoScalarFieldEnum | Prisma.VencimientoScalarFieldEnum[]
+}
+
+/**
+ * Usuario.clientesAsignados
+ */
+export type Usuario$clientesAsignadosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ClienteAsignacion
+   */
+  select?: Prisma.ClienteAsignacionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ClienteAsignacion
+   */
+  omit?: Prisma.ClienteAsignacionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClienteAsignacionInclude<ExtArgs> | null
+  where?: Prisma.ClienteAsignacionWhereInput
+  orderBy?: Prisma.ClienteAsignacionOrderByWithRelationInput | Prisma.ClienteAsignacionOrderByWithRelationInput[]
+  cursor?: Prisma.ClienteAsignacionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ClienteAsignacionScalarFieldEnum | Prisma.ClienteAsignacionScalarFieldEnum[]
 }
 
 /**

@@ -93,6 +93,11 @@ export type RefColor = Prisma.RefColorModel
  */
 export type Cliente = Prisma.ClienteModel
 /**
+ * Model ClienteAsignacion
+ * 
+ */
+export type ClienteAsignacion = Prisma.ClienteAsignacionModel
+/**
  * Model Tarea
  * 
  */
