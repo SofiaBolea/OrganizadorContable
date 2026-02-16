@@ -1,9 +1,10 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { Users, ShieldAlert, Lock, UserCheck, ChevronRight, Edit, Trash2 } from "lucide-react";
+import { Users, ShieldAlert, Lock, UserCheck, ChevronRight } from "lucide-react";
 import { getVencimientosParaTabla, usuarioPuedeTrabajarConVencimientos } from '../../lib/data'
 import Link from 'next/link'
 import { Button } from '../components/Button'
+import VencimientosTableClient from '../components/VencimientosTableClient'
 
 export default async function VencimientosPage() {
   const { userId, orgId, has } = await auth()
@@ -28,8 +29,6 @@ export default async function VencimientosPage() {
   const canDelete = has({ permission: "org:vencimientos:eliminar_vencimiento" });
   
   const puedeTrabajarConVencimientosBD = await usuarioPuedeTrabajarConVencimientos(userId, orgId);
-
-  console.log("canCreate (Clerk):", canCreate, "puedeTrabajarConVencimientosBD (BD):", puedeTrabajarConVencimientosBD);
 
   if (!canView) {
     return (
@@ -63,49 +62,12 @@ export default async function VencimientosPage() {
       {ocurrencias.length === 0 ? (
         <p>No hay vencimientos cargados.</p>
       ) : (
-        <table className="min-w-full border">
-          <thead>
-            <tr>
-              <th>Título</th>
-              <th>Tipo</th>
-              <th>Fecha</th>
-              <th>Estado</th>
-              {(canModify || canDelete) && <th>Acciones</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {ocurrencias.map((o) => (
-              <tr key={o.id}>
-                <td>{o.vencimiento.titulo}</td>
-                <td>{o.vencimiento.tipoVencimiento}</td>
-                <td>
-                  {new Date(o.fechaVencimiento).toLocaleDateString()}
-                </td>
-                <td>{o.estado}</td>
-                {(canModify || canDelete) && (
-                  <td className="flex gap-2">
-                    {canModify && puedeTrabajarConVencimientosBD && (
-                      <button 
-                        className="text-blue-500 hover:text-blue-700"
-                        title="Modificar"
-                      >
-                        <Edit size={18} />
-                      </button>
-                    )}
-                    {canDelete && puedeTrabajarConVencimientosBD && (
-                      <button 
-                        className="text-red-500 hover:text-red-700"
-                        title="Eliminar"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    )}
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <VencimientosTableClient 
+          ocurrencias={ocurrencias}
+          canModify={canModify && puedeTrabajarConVencimientosBD}
+          canDelete={canDelete && puedeTrabajarConVencimientosBD}
+          puedeTrabajar={puedeTrabajarConVencimientosBD}
+        />
       )}
     </main>
   )
