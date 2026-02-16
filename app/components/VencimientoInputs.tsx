@@ -3,16 +3,28 @@
 import { useState } from "react";
 import VencimientoFechasForm from "./VencimientoFechasForm";
 
-export default function VencimientoInputs() {
-  const [titulo, setTitulo] = useState("");
-  const [tipoVencimiento, setTipoVencimiento] = useState("Nacional");
-  const [periodicidad, setPeriodicidad] = useState("Mensual");
-  const [jurisdiccion, setJurisdiccion] = useState("");
+
+interface VencimientoInputsProps {
+  mode?: "create" | "edit";
+  initialData?: {
+    id: string;
+    titulo: string;
+    tipoVencimiento: string;
+    periodicidad: string;
+    jurisdiccion: string | null;
+  };
+}
+  
+export default function VencimientoInputs(props: VencimientoInputsProps) {
+  const [titulo, setTitulo] = useState(props.initialData?.titulo || "");
+  const [tipoVencimiento, setTipoVencimiento] = useState(props.initialData?.tipoVencimiento || "Nacional");
+  const [periodicidad, setPeriodicidad] = useState(props.initialData?.periodicidad || "Mensual");
+  const [jurisdiccion, setJurisdiccion] = useState(props.initialData?.jurisdiccion || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [vencimientoCreado, setVencimientoCreado] = useState<any>(null);
 
-  async function createVencimiento(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!titulo) {
       setError("El título es requerido");
@@ -23,8 +35,14 @@ export default function VencimientoInputs() {
     setError("");
 
     try {
-      const response = await fetch("/api/vencimientos", {
-        method: "POST",
+      const endpoint = props.mode === "create"
+          ? "/api/vencimientos"
+          : `/api/vencimientos/${props.initialData?.id}`;
+
+      const method = props.mode === "create" ? "POST" : "PUT";
+
+      const response = await fetch(endpoint, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           titulo,
@@ -69,8 +87,13 @@ export default function VencimientoInputs() {
           }}
         />
       ) : (
-        <form onSubmit={createVencimiento} className="space-y-4 mb-8 p-4 border border-zinc-300 rounded-lg bg-white">
-      <h2 className="text-xl font-bold mb-4 text-gray-900">Nuevo Vencimiento</h2>
+        <form onSubmit={handleSubmit} className="space-y-4 mb-8 p-4 border border-zinc-300 rounded-lg bg-white">
+      <h2 className="text-xl font-bold mb-4 text-gray-900">
+          {props.mode === "create"
+          ? "Nuevo Vencimiento"
+          : "Modificar Vencimiento"}
+      
+      </h2>
 
       {error && (
         <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">

@@ -41,15 +41,7 @@ export default function Sidebar() {
 
         <NavLink href="/organizacion">Organización</NavLink>
 
-        {/* SOLO ADMIN */}
-        <Protect
-          role="org:admin"
-          fallback={null} // importante
-        >
-          <NavLink href="/vencimientos">
-            Vencimientos
-          </NavLink>
-        </Protect>
+        <NavLink href="/vencimientos">Vencimientos</NavLink>
 
       </nav>
 
