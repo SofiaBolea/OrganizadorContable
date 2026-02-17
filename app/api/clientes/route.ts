@@ -89,24 +89,66 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET /api/clientes
 export async function GET(request: NextRequest) {
   try {
-    const organizacionId = request.nextUrl.searchParams.get("organizacionId");
-    if (!organizacionId) {
-      return NextResponse.json({ error: "organizacionId es requerido" }, { status: 400 });
-    }
-    const clientes = await prisma.cliente.findMany({
-      where: {
-        estado: "ACTIVO",
-        recurso: { organizacionId },
-      },
-      include: {
-        asignaciones: true,
-      },
+    const { userId, orgId } = await auth();
+    if (!userId || !orgId) return NextResponse.json([], { status: 401 });
+
+    const orgLocal = await prisma.organizacion.findUnique({
+      where: { clerkOrganizationId: orgId },
+      select: { id: true }
     });
+    if (!orgLocal) return NextResponse.json([], { status: 404 });
+
+    const usuarioActual = await prisma.usuario.findFirst({
+      where: { clerkId: userId, organizacionId: orgLocal.id },
+      select: { id: true }
+    });
+    if (!usuarioActual) return NextResponse.json([], { status: 404 });
+
+    // Capturamos los filtros de la URL
+    const params = request.nextUrl.searchParams;
+    const nombre = params.get("nombre") || undefined;
+    const cuit = params.get("cuit") || undefined;
+    const asistenteId = params.get("asistenteId") || undefined;
+
+    const puedeVerTodo = await Permisos.puedeVerTodosLosClientes();
+    const soloAsignados = await Permisos.puedeVerClientes();
+
+    let filtroWhere: any = {
+      recurso: { organizacionId: orgLocal.id },
+      estado: "ACTIVO",
+    };
+
+    if (nombre) filtroWhere.nombreCompleto = { contains: nombre, mode: 'insensitive' };
+    if (cuit) filtroWhere.cuit = { contains: cuit };
+
+    // Lógica de permisos TPT (Table Per Type)
+    if (puedeVerTodo) {
+      if (asistenteId) {
+        filtroWhere.asignaciones = { some: { usuarioId: asistenteId } };
+      }
+    } else if (soloAsignados) {
+      filtroWhere.asignaciones = { some: { usuarioId: usuarioActual.id } };
+    } else {
+      return NextResponse.json([]);
+    }
+
+    const clientes = await prisma.cliente.findMany({
+      where: filtroWhere,
+      include: {
+        recurso: true,
+        asignaciones: { select: { usuarioId: true } }
+      },
+      orderBy: { nombreCompleto: "asc" },
+    });
+
     return NextResponse.json(clientes);
   } catch (error) {
-    return NextResponse.json({ error: "Error al obtener clientes" }, { status: 500 });
+    console.error("Error en GET /api/clientes:", error);
+    return NextResponse.json([], { status: 500 });
   }
 }
+
+
+
