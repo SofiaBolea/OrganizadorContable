@@ -12,10 +12,11 @@ export default async function VencimientosPage() {
 
   return (
     <main className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-6">Vencimientos</h1>
-        <VencimientoInputs />
-      </div>
+      <h1 className="text-3xl font-bold text-text mb-2">Vencimientos Impositivos</h1>
+      <p className="text-text/50 mb-8">Gestionar vencimientos de impuestos nacionales, provinciales y municipales</p>
+
+      <h2 className="text-xl font-semibold text-text mb-6">Cargar Vencimiento Impositivo</h2>
+      <VencimientoInputs />
     </main>
   )
 }

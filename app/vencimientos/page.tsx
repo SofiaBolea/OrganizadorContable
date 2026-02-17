@@ -48,8 +48,8 @@ export default async function VencimientosPage() {
 
   return (
     <main className="p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Vencimientos Impositivos</h1>
+      <div className="flex justify-between items-center mb-2">
+        <h1 className="text-3xl font-bold text-text">Vencimientos Impositivos</h1>
         {canCreate && puedeTrabajarConVencimientosBD && (
           <Button variant="primario">
             <Link href="/vencimientos/nuevoVencimiento">
@@ -58,9 +58,12 @@ export default async function VencimientosPage() {
           </Button>
         )}
       </div>
+      <p className="text-text/50 mb-8">Gestionar vencimientos de impuestos nacionales, provinciales y municipales</p>
 
       {ocurrencias.length === 0 ? (
-        <p>No hay vencimientos cargados.</p>
+        <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-6">
+          <p className="text-text/50">No hay vencimientos cargados.</p>
+        </div>
       ) : (
         <VencimientosTableClient 
           ocurrencias={ocurrencias}

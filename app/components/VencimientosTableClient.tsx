@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Search } from "lucide-react";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 interface VencimientoOcurrencia {
   id: string;
   vencimientoId: string;
-  fechaVencimiento: string;
+  fechaVencimiento: string | Date;
   estado: string;
   vencimiento: {
     id: string;
@@ -36,6 +36,48 @@ export default function VencimientosTableClient({
     isOpen: boolean;
     ocurrencia: VencimientoOcurrencia | null;
   }>({ isOpen: false, ocurrencia: null });
+
+  // --- Filtros ---
+  const [filtroNombre, setFiltroNombre] = useState("");
+  const [filtroTipo, setFiltroTipo] = useState("");
+  const [filtroDespuesDe, setFiltroDespuesDe] = useState("");
+  const [filtroAntesDe, setFiltroAntesDe] = useState("");
+
+  const ocurrenciasFiltradas = useMemo(() => {
+    return ocurrencias.filter((o) => {
+      // Filtro por nombre (búsqueda parcial, case-insensitive)
+      if (
+        filtroNombre &&
+        !o.vencimiento.titulo.toLowerCase().includes(filtroNombre.toLowerCase())
+      ) {
+        return false;
+      }
+      // Filtro por tipo
+      if (filtroTipo && o.vencimiento.tipoVencimiento !== filtroTipo) {
+        return false;
+      }
+      // Filtro vence después de
+      if (filtroDespuesDe) {
+        const raw = typeof o.fechaVencimiento === "string" ? o.fechaVencimiento : new Date(o.fechaVencimiento).toISOString();
+        const fecha = raw.split("T")[0];
+        if (fecha < filtroDespuesDe) return false;
+      }
+      // Filtro vence antes de
+      if (filtroAntesDe) {
+        const raw = typeof o.fechaVencimiento === "string" ? o.fechaVencimiento : new Date(o.fechaVencimiento).toISOString();
+        const fecha = raw.split("T")[0];
+        if (fecha > filtroAntesDe) return false;
+      }
+      return true;
+    });
+  }, [ocurrencias, filtroNombre, filtroTipo, filtroDespuesDe, filtroAntesDe]);
+
+  const limpiarFiltros = () => {
+    setFiltroNombre("");
+    setFiltroTipo("");
+    setFiltroDespuesDe("");
+    setFiltroAntesDe("");
+  };
 
   const handleOpenDelete = (ocurrencia: VencimientoOcurrencia) => {
     setDeleteModal({ isOpen: true, ocurrencia });
@@ -119,72 +161,199 @@ export default function VencimientosTableClient({
     return <p className="text-gray-600">No hay vencimientos cargados.</p>;
   }
 
+  const tieneAlgunFiltro = filtroNombre || filtroTipo || filtroDespuesDe || filtroAntesDe;
+
   return (
     <>
-      <table className="min-w-full border">
-        <thead>
-          <tr>
-            <th className="px-4 py-2 text-left">Título</th>
-            <th className="px-4 py-2 text-left">Tipo</th>
-            <th className="px-4 py-2 text-left">Fecha</th>
-            <th className="px-4 py-2 text-left">Estado</th>
-            {(canModify || canDelete) && (
-              <th className="px-4 py-2 text-left">Acciones</th>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {ocurrencias.map((o) => (
-            <tr key={o.id} className="border-t hover:bg-gray-50">
-              <td className="px-4 py-2">{o.vencimiento.titulo}</td>
-              <td className="px-4 py-2">{o.vencimiento.tipoVencimiento}</td>
-              <td className="px-4 py-2">
-                {(() => {
+      {/* Card de Filtros */}
+      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-6 mb-6">
+        <h2 className="text-lg font-bold text-text mb-4">Filtros de Búsqueda</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+          {/* Nombre impuesto */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+              Nombre Impuesto
+            </label>
+            <input
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={filtroNombre}
+              onChange={(e) => setFiltroNombre(e.target.value)}
+              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-[#98c18c] transition-all"
+            />
+          </div>
+
+          {/* Tipo impuesto */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+              Tipo Impuesto
+            </label>
+            <select
+              value={filtroTipo}
+              onChange={(e) => setFiltroTipo(e.target.value)}
+              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 focus:ring-2 focus:ring-[#98c18c] appearance-none cursor-pointer transition-all"
+            >
+              <option value="">Todos</option>
+              <option value="Nacional">Nacional</option>
+              <option value="Provincial">Provincial</option>
+              <option value="Municipal">Municipal</option>
+            </select>
+          </div>
+
+          {/* Vence después de */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+              Vence después de
+            </label>
+            <input
+              type="date"
+              value={filtroDespuesDe}
+              onChange={(e) => setFiltroDespuesDe(e.target.value)}
+              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 focus:ring-2 focus:ring-[#98c18c] transition-all"
+            />
+          </div>
+
+          {/* Vence antes de */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+              Vence antes de
+            </label>
+            <input
+              type="date"
+              value={filtroAntesDe}
+              onChange={(e) => setFiltroAntesDe(e.target.value)}
+              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 focus:ring-2 focus:ring-[#98c18c] transition-all"
+            />
+          </div>
+        </div>
+
+        {/* Botón limpiar filtros */}
+        {tieneAlgunFiltro && (
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={limpiarFiltros}
+              className="text-sm text-text/50 hover:text-text/80 underline transition-colors"
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Card de Tabla */}
+      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-6">
+        <h2 className="text-lg font-bold text-text mb-4">
+          Lista de Vencimientos
+          {tieneAlgunFiltro && (
+            <span className="ml-2 text-sm font-normal text-text/50">
+              ({ocurrenciasFiltradas.length} de {ocurrencias.length})
+            </span>
+          )}
+        </h2>
+
+        {ocurrenciasFiltradas.length === 0 ? (
+          <p className="text-text/50 text-sm py-8 text-center">
+            No se encontraron vencimientos con los filtros aplicados.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead>
+                <tr className="border-b border-black/10">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Impuesto</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Categoría</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Vencimiento</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Días Faltantes</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Estado</th>
+                  {(canModify || canDelete) && (
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Acciones</th>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {ocurrenciasFiltradas.map((o) => {
                   const str = typeof o.fechaVencimiento === "string" ? o.fechaVencimiento : new Date(o.fechaVencimiento).toISOString();
                   const [y, m, d] = str.split("T")[0].split("-");
-                  return `${d}/${m}/${y}`;
-                })()}
-              </td>
-              <td className="px-4 py-2">{o.estado}</td>
-              {(canModify || canDelete) && (
-                <td className="px-4 py-2 flex gap-2">
-                  <Link
-                    href={`/vencimientos/${o.vencimientoId}`}
-                    className="text-gray-500 hover:text-gray-700 text-sm underline"
-                    title="Ver detalle"
-                  >
-                    Ver Detalle
-                  </Link>
-                  {canModify && puedeTrabajar && (
-                    <Link
-                      href={`/vencimientos/${o.vencimientoId}/modificar`}
-                      className="text-blue-500 hover:text-blue-700"
-                      title="Modificar"
-                    >
-                      <Edit size={18} />
-                    </Link>
-                  )}
-                  {canDelete && puedeTrabajar && (
-                    <button
-                      onClick={() => handleOpenDelete(o)}
-                      className="text-red-500 hover:text-red-700"
-                      title="Eliminar"
-                      disabled={loading}
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  )}
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  const fechaFormateada = `${d} / ${m} / ${y}`;
+
+                  // Calcular días faltantes
+                  const hoy = new Date();
+                  hoy.setHours(0, 0, 0, 0);
+                  const fechaVenc = new Date(str.split("T")[0] + "T00:00:00");
+                  const diffMs = fechaVenc.getTime() - hoy.getTime();
+                  const diasFaltantes = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+                  // Color badge para tipo
+                  const tipoBadgeColor: Record<string, string> = {
+                    Nacional: "bg-[#d4edda] text-[#155724]",
+                    Provincial: "bg-[#fff3cd] text-[#856404]",
+                    Municipal: "bg-[#fce4ec] text-[#b71c1c]",
+                  };
+                  const badgeClass = tipoBadgeColor[o.vencimiento.tipoVencimiento] || "bg-gray-100 text-gray-600";
+
+                  return (
+                    <tr key={o.id} className="border-b border-black/5 hover:bg-black/[0.02] transition-colors">
+                      <td className="px-4 py-3 font-medium text-text">{o.vencimiento.titulo}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${badgeClass}`}>
+                          {o.vencimiento.tipoVencimiento}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 font-medium text-text">{fechaFormateada}</td>
+                      <td className="px-4 py-3 text-center font-semibold text-text">
+                        {diasFaltantes}
+                      </td>
+                      <td className="px-4 py-3">{o.estado}</td>
+                      {(canModify || canDelete) && (
+                        <td className="px-4 py-3 flex gap-3 items-center">
+                          <Link
+                            href={`/vencimientos/${o.vencimientoId}`}
+                            className="text-text/50 hover:text-text text-sm underline transition-colors"
+                            title="Ver detalle"
+                          >
+                            Ver detalle
+                          </Link>
+                          {canModify && puedeTrabajar && (
+                            <Link
+                              href={`/vencimientos/${o.vencimientoId}/modificar`}
+                              className="text-text/40 hover:text-primary-foreground transition-colors"
+                              title="Modificar"
+                            >
+                              <Edit size={18} />
+                            </Link>
+                          )}
+                          {canDelete && puedeTrabajar && (
+                            <button
+                              onClick={() => handleOpenDelete(o)}
+                              className="text-danger-foreground/60 hover:text-danger-foreground transition-colors"
+                              title="Eliminar"
+                              disabled={loading}
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       {/* Modal de confirmación */}
       <ConfirmDeleteModal
         isOpen={deleteModal.isOpen}
-        fecha={deleteModal.ocurrencia?.fechaVencimiento || ""}
+        fecha={
+          deleteModal.ocurrencia
+            ? typeof deleteModal.ocurrencia.fechaVencimiento === "string"
+              ? deleteModal.ocurrencia.fechaVencimiento
+              : new Date(deleteModal.ocurrencia.fechaVencimiento).toISOString()
+            : ""
+        }
+        titulo={deleteModal.ocurrencia?.vencimiento.titulo}
         onClose={() => setDeleteModal({ isOpen: false, ocurrencia: null })}
         onDeleteOne={handleDeleteOne}
         onDeleteAndFollowing={handleDeleteAndFollowing}

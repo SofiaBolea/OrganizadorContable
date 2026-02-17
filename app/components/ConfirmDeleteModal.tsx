@@ -1,10 +1,11 @@
 "use client";
 
-import { X } from "lucide-react";
+import { useState } from "react";
 
 interface ConfirmDeleteModalProps {
   isOpen: boolean;
   fecha: string;
+  titulo?: string;
   onClose: () => void;
   onDeleteOne: () => void;
   onDeleteAndFollowing: () => void;
@@ -14,56 +15,80 @@ interface ConfirmDeleteModalProps {
 export default function ConfirmDeleteModal({
   isOpen,
   fecha,
+  titulo,
   onClose,
   onDeleteOne,
   onDeleteAndFollowing,
   isLast,
 }: ConfirmDeleteModalProps) {
+  const [opcion, setOpcion] = useState<"one" | "following">("one");
+
   if (!isOpen) return null;
 
   const str = typeof fecha === "string" ? fecha : new Date(fecha).toISOString();
   const [y, m, d] = str.split("T")[0].split("-");
   const fechaFormato = `${d}/${m}/${y}`;
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-sm shadow-lg">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold text-gray-900">Confirmar eliminación</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <X size={20} />
-          </button>
-        </div>
+  const handleConfirm = () => {
+    if (opcion === "one") {
+      onDeleteOne();
+    } else {
+      onDeleteAndFollowing();
+    }
+  };
 
-        <p className="text-gray-700 mb-6">
-          ¿Qué deseas hacer con la fecha del <strong>{fechaFormato}</strong>?
+  return (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-xl p-8 max-w-md w-full mx-4">
+        {/* Título */}
+        <h3 className="text-xl font-bold text-text mb-4">Eliminar Vencimiento</h3>
+
+        {/* Descripción */}
+        <p className="text-text/70 mb-6 text-center">
+          Se eliminará <strong className="text-text">{titulo || "el vencimiento"}</strong> del{" "}
+          <strong className="text-text">{fechaFormato}</strong>
         </p>
 
-        <div className="space-y-3">
-          <button
-            onClick={onDeleteOne}
-            className="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-semibold"
-          >
-            Eliminar solo esta fecha
-          </button>
+        {/* Opciones radio */}
+        <div className="space-y-3 mb-8">
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <input
+              type="radio"
+              name="deleteOption"
+              checked={opcion === "one"}
+              onChange={() => setOpcion("one")}
+              className="w-4 h-4 accent-primary-foreground"
+            />
+            <span className="text-text/80 group-hover:text-text transition-colors">Solo esta fecha</span>
+          </label>
 
           {!isLast && (
-            <button
-              onClick={onDeleteAndFollowing}
-              className="w-full px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 font-semibold"
-            >
-              Eliminar esta y las siguientes
-            </button>
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <input
+                type="radio"
+                name="deleteOption"
+                checked={opcion === "following"}
+                onChange={() => setOpcion("following")}
+                className="w-4 h-4 accent-primary-foreground"
+              />
+              <span className="text-text/80 group-hover:text-text transition-colors">Esta fecha y todas las siguientes</span>
+            </label>
           )}
+        </div>
 
+        {/* Botones */}
+        <div className="flex justify-between items-center">
           <button
             onClick={onClose}
-            className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-100"
+            className="px-8 py-3 rounded-xl text-base font-medium transition-opacity border-[3px] bg-danger text-danger-foreground border-danger-foreground hover:opacity-90"
           >
             Cancelar
+          </button>
+          <button
+            onClick={handleConfirm}
+            className="px-8 py-3 rounded-xl text-base font-medium transition-opacity border-[3px] bg-primary text-primary-foreground border-primary-foreground hover:opacity-90"
+          >
+            Guardar
           </button>
         </div>
       </div>
