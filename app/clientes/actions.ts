@@ -63,31 +63,14 @@ function validarYLimpiarDatos(data: ClienteInput) {
   };
 }
 
-/**
- * Valida permisos: Admin de Clerk o Booleano en DB
- */
-async function validarPoderGestionar(permisoClerk: string) {
-  const { userId, orgId, has } = await auth();
-  if (!userId || !orgId  ) return { autorizado: false };
-
-  const esAdmin = has({ role: "org:admin" });
-  const tienePermisoClerk = has({ permission: permisoClerk });
-  
-  const usuarioDB = await prisma.usuario.findFirst({
-    where: { clerkId: userId, organizacionId: { not: "" } },
-    select: { id: true, permisoClientes: true }
-  });
-
-  const autorizado = esAdmin || (usuarioDB?.permisoClientes === true && tienePermisoClerk);
-
-  return { autorizado, orgId, userIdDB: usuarioDB?.id };
-}
+import { Permisos } from "@/lib/permisos";
 
 // --- ACCIONES ---
 
 export async function crearClienteAction(rawInput: ClienteInput) {
-  const { autorizado, orgId } = await validarPoderGestionar("org:clientes:crear_cliente");
+  const autorizado = await Permisos.puedeCrearCliente();
   if (!autorizado) return { success: false, error: "No tienes permisos para crear clientes." };
+  const { orgId } = await auth();
 
   const { esValido, errorMsg, datos } = validarYLimpiarDatos(rawInput);
   if (!esValido) return { success: false, error: errorMsg };
@@ -134,7 +117,7 @@ export async function crearClienteAction(rawInput: ClienteInput) {
 }
 
 export async function modificarClienteAction(id: string, rawInput: ClienteInput) {
-  const { autorizado } = await validarPoderGestionar("org:clientes:modificar_cliente");
+  const autorizado = await Permisos.puedeEditarCliente();
   if (!autorizado) return { success: false, error: "No tienes permisos para modificar." };
 
   const { esValido, errorMsg, datos } = validarYLimpiarDatos(rawInput);
@@ -179,7 +162,7 @@ export async function modificarClienteAction(id: string, rawInput: ClienteInput)
 }
 
 export async function eliminarClienteAction(id: string) {
-  const { autorizado } = await validarPoderGestionar("org:clientes:eliminar_cliente");
+  const autorizado = await Permisos.puedeEliminarCliente();
   if (!autorizado) return { success: false, error: "No tienes permisos para eliminar." };
 
   try {
