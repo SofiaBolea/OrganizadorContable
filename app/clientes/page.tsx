@@ -15,17 +15,22 @@ export default async function ClientesPage({
 
   if (!userId || !orgId) redirect("/");
 
-  // 1. Permisos y datos locales
-  const [orgLocal, usuarioActual] = await Promise.all([
-    prisma.organizacion.findUnique({
-      where: { clerkOrganizationId: orgId },
-      select: { id: true, nombre: true }
-    }),
-    prisma.usuario.findFirst({
-      where: { clerkId: userId, organizacionId: { not: "" } },
-      select: { id: true, permisoClientes: true }
-    })
-  ]);
+// 1. Buscamos primero la organización
+  const orgLocal = await prisma.organizacion.findUnique({
+    where: { clerkOrganizationId: orgId },
+    select: { id: true, nombre: true }
+  });
+
+  if (!orgLocal) return <div className="p-10 text-amber-600">Sincronizando organización...</div>;
+
+  // 2. Buscamos al usuario usando el ID de la organización encontrada
+  const usuarioActual = await prisma.usuario.findFirst({
+    where: { 
+      clerkId: userId, 
+      organizacionId: orgLocal.id // Nos aseguramos que pertenezca a esta org
+    },
+    select: { id: true, permisoClientes: true }
+  });
 
   if (!orgLocal || !usuarioActual) return <div>Sincronizando...</div>;
 

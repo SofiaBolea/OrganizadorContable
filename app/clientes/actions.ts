@@ -68,7 +68,7 @@ function validarYLimpiarDatos(data: ClienteInput) {
  */
 async function validarPoderGestionar(permisoClerk: string) {
   const { userId, orgId, has } = await auth();
-  if (!userId || !orgId) return { autorizado: false };
+  if (!userId || !orgId  ) return { autorizado: false };
 
   const esAdmin = has({ role: "org:admin" });
   const tienePermisoClerk = has({ permission: permisoClerk });
