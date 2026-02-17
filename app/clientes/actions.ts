@@ -67,54 +67,7 @@ import { Permisos } from "@/lib/permisos";
 
 // --- ACCIONES ---
 
-export async function crearClienteAction(rawInput: ClienteInput) {
-  const autorizado = await Permisos.puedeCrearCliente();
-  if (!autorizado) return { success: false, error: "No tienes permisos para crear clientes." };
-  const { orgId } = await auth();
 
-  const { esValido, errorMsg, datos } = validarYLimpiarDatos(rawInput);
-  if (!esValido) return { success: false, error: errorMsg };
-
-  try {
-    const orgLocal = await prisma.organizacion.findUnique({
-      where: { clerkOrganizationId: orgId! },
-      select: { id: true }
-    });
-
-    if (!orgLocal) throw new Error("Organización no encontrada.");
-
-    await prisma.$transaction(async (tx) => {
-      const recurso = await tx.recurso.create({
-        data: {
-          organizacionId: orgLocal.id,
-          nombre: datos.nombreCompleto,
-          tipoRecurso: "CLIENTE",
-        },
-      });
-
-      await tx.cliente.create({
-        data: {
-          id: recurso.id,
-          nombreCompleto: datos.nombreCompleto,
-          cuit: datos.cuit,
-          email: datos.email,
-          telefono: datos.telefono,
-          estado: "ACTIVO",
-          asignaciones: {
-            create: datos.asistentesIds.map(uId => ({ usuarioId: uId }))
-          }
-        },
-      });
-    });
-
-    revalidatePath("/clientes");
-    return { success: true };
-  } catch (error: any) {
-    if (error.code === 'P2002') return { success: false, error: "Ya existe un cliente con ese CUIT." };
-    console.error(error);
-    return { success: false, error: "Error interno al procesar el registro." };
-  }
-}
 
 export async function modificarClienteAction(id: string, rawInput: ClienteInput) {
   const autorizado = await Permisos.puedeEditarCliente();
