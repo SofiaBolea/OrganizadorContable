@@ -48,7 +48,8 @@ export function FormularioEditarCliente({ cliente, asistentes, onClose }: Formul
     }
   };
 
-  async function handleOnSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  const router = require('next/navigation').useRouter();
+  async function handleOnSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
 
@@ -69,6 +70,7 @@ export function FormularioEditarCliente({ cliente, asistentes, onClose }: Formul
       });
       const res = await response.json();
       if (res.success) {
+        router.refresh();
         onClose();
       } else {
         setErrorMsg(res.error || "Ocurrió un error al intentar actualizar el cliente.");

@@ -3,9 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { Permisos } from "@/lib/permisos";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { revalidatePath } from "next/cache";
 import { validarYLimpiarDatos } from "../lib/validarYLimpiarDatos"; // Importamos la función de validación desde actions.ts
 
+
+/* ------------------------------------------- */
+/*------------- Crear clientes --------------- */
+/* ------------------------------------------- */
 
 export async function crearCliente(body: any) {
   try {
@@ -57,6 +60,9 @@ export async function crearCliente(body: any) {
   }
 }
 
+/* ------------------------------------------- */
+/*------------- Listar Clientes -------------- */
+/* ------------------------------------------- */
 export async function listarClientes(request: NextRequest) {
   try {
     const { userId, orgId } = await auth();
@@ -118,6 +124,9 @@ export async function listarClientes(request: NextRequest) {
   }
 }
 
+/* ------------------------------------------- */
+/*----------- Modificar Clientes ------------- */
+/* ------------------------------------------- */
 
 interface DatosUpdateCliente {
   nombreCompleto: string;
@@ -153,7 +162,7 @@ export async function modificarCliente(id: string, datos: DatosUpdateCliente) {
 
     if (datos.asistentesIds && datos.asistentesIds.length > 0) {
       await tx.clienteAsignacion.createMany({
-        data: datos.asistentesIds.map((uId) => ({
+        data: datos.asistentesIds.map((uId:string) => ({
           clienteId: id,
           usuarioId: uId,
         })),
@@ -161,5 +170,45 @@ export async function modificarCliente(id: string, datos: DatosUpdateCliente) {
     }
 
     return clienteActualizado;
+  });
+}
+
+// lib/clientes.ts
+export async function eliminarClienteService(id: string) {
+  const { orgId } = await auth();
+  if (!orgId) throw new Error("UNAUTHORIZED");
+
+  return await prisma.$transaction(async (tx) => {
+    // 1. Verificamos propiedad y existencia en un solo paso
+    const clienteExistente = await tx.cliente.findFirst({
+      where: { 
+        id,
+        recurso: { organizacion: { clerkOrganizationId: orgId } } 
+      },
+      select: { nombreCompleto: true }
+    });
+
+    if (!clienteExistente) throw new Error("NOT_FOUND");
+
+    // 2. DELETE físico para las asignaciones (como pediste)
+    await tx.clienteAsignacion.deleteMany({
+      where: { clienteId: id },
+    });
+
+    // 3. SOFT DELETE para el Cliente y el Recurso
+    // En Prisma 7, las actualizaciones anidadas son extremadamente eficientes
+    await tx.cliente.update({
+      where: { id },
+      data: { 
+        estado: "INACTIVO",
+        recurso: {
+          update: {
+            nombre: `(ELIMINADO) ${clienteExistente.nombreCompleto}`
+          }
+        }
+      },
+    });
+
+    return { success: true };
   });
 }

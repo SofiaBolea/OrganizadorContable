@@ -37,7 +37,8 @@ export function FormularioCrearCliente({ asistentes, onClienteCreado }: { asiste
     }
   };
 
-  async function handleOnSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  const router = require('next/navigation').useRouter();
+  async function handleOnSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget; 
     setLoading(true);
@@ -59,6 +60,7 @@ export function FormularioCrearCliente({ asistentes, onClienteCreado }: { asiste
       });
       const res = await response.json();
       if (res.success) {
+        router.refresh();
         setIsOpen(false);
         setSeleccionados([]);
         setAsignarTodos(false);

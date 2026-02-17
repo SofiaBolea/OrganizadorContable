@@ -2,8 +2,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { Permisos } from "@/lib/permisos";
-import { modificarCliente } from "../../../../lib/clientes"; // Importamos la función de negocio
+import { eliminarClienteService, modificarCliente } from "../../../../lib/clientes"; // Importamos la función de negocio
 import { revalidatePath } from "next/cache";
+
 
 export async function PUT(
   request: NextRequest,
@@ -39,6 +40,29 @@ export async function PUT(
     return NextResponse.json(
       { success: false, error: "Error al intentar actualizar el cliente." },
       { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> } 
+) {
+  try {
+    const { id } = await params;
+    
+    await eliminarClienteService(id);
+    
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("[DELETE_CLIENTE_ERROR]:", error);
+    
+    const status = error.message === "UNAUTHORIZED" ? 401 : 
+                   error.message === "NOT_FOUND" ? 404 : 500;
+                   
+    return NextResponse.json(
+      { success: false, error: error.message || "Error interno del servidor" },
+      { status }
     );
   }
 }
