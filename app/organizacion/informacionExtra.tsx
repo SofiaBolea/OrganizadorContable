@@ -21,7 +21,7 @@ export function InformacionExtraPage() {
           setDireccion(data[0].direccion || "");
         }
       } catch {
-        // No mostrar error, solo no previsualizar
+        
       }
     }
     fetchInfo();

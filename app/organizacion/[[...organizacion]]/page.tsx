@@ -63,7 +63,7 @@ export default function OrganizationProfilePage() {
               colorDanger: "#E08A76",
               colorText: "#3F4A5A",
               colorBackground: "#FFFFFF",
-              fontFamily: "Inter, sans-serif",
+              fontFamily: "montserrat, sans-serif",
             },
             elements: {
               card: {
