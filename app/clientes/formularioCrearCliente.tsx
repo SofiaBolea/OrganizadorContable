@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { crearClienteAction } from "./actions";
+// import { crearClienteAction } from "./actions";
 import { ModalError } from "./modalError";
 
-export function FormularioCrearCliente({ asistentes }: { asistentes: any[] }) {
+export function FormularioCrearCliente({ asistentes, onClienteCreado }: { asistentes: any[], onClienteCreado?: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -37,7 +37,8 @@ export function FormularioCrearCliente({ asistentes }: { asistentes: any[] }) {
     }
   };
 
-  async function handleOnSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  const router = require('next/navigation').useRouter();
+  async function handleOnSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget; 
     setLoading(true);
@@ -51,15 +52,25 @@ export function FormularioCrearCliente({ asistentes }: { asistentes: any[] }) {
       asistentesIds: seleccionados,
     };
 
-    const res = await crearClienteAction(data);
-    
-    if (res.success) {
-      setIsOpen(false);
-      setSeleccionados([]);
-      setAsignarTodos(false);
-      form.reset(); 
-    } else {
-      setErrorMsg(res.error || "No se pudo crear el cliente.");
+    try {
+      const response = await fetch("/api/clientes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const res = await response.json();
+      if (res.success) {
+        router.refresh();
+        setIsOpen(false);
+        setSeleccionados([]);
+        setAsignarTodos(false);
+        form.reset();
+        if (onClienteCreado) onClienteCreado();
+      } else {
+        setErrorMsg(res.error || "No se pudo crear el cliente.");
+      }
+    } catch (err) {
+      setErrorMsg("Error de red o servidor.");
     }
     setLoading(false);
   }

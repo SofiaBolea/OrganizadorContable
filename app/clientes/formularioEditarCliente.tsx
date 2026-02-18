@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { modificarClienteAction } from "./actions";
+// import { modificarClienteAction } from "./actions";
 import { ModalError } from "./modalError"; // Importamos el modal de error
 
 interface FormularioEditarProps {
@@ -48,7 +48,8 @@ export function FormularioEditarCliente({ cliente, asistentes, onClose }: Formul
     }
   };
 
-  async function handleOnSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  const router = require('next/navigation').useRouter();
+  async function handleOnSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
 
@@ -61,13 +62,21 @@ export function FormularioEditarCliente({ cliente, asistentes, onClose }: Formul
       asistentesIds: seleccionados,
     };
 
-    const res = await modificarClienteAction(cliente.id, data);
-    
-    if (res.success) {
-      onClose(); 
-    } else {
-      // En lugar de alert, activamos el modal de error
-      setErrorMsg(res.error || "Ocurrió un error al intentar actualizar el cliente.");
+    try {
+      const response = await fetch(`/api/clientes/${cliente.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const res = await response.json();
+      if (res.success) {
+        router.refresh();
+        onClose();
+      } else {
+        setErrorMsg(res.error || "Ocurrió un error al intentar actualizar el cliente.");
+      }
+    } catch (err) {
+      setErrorMsg("Error de red o servidor.");
     }
     setLoading(false);
   }
