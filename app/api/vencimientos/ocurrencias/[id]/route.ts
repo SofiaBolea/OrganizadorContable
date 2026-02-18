@@ -1,15 +1,24 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { eliminarOcurrenciaVencimiento } from "@/lib/vencimientos";
+import { Permisos } from "@/lib/permisos";
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { orgId, orgRole } = await auth();
+    const { orgId } = await auth();
 
-    if (!orgId || orgRole !== "org:admin") {
+    if (!orgId) {
+      return NextResponse.json(
+        { error: "Organización no encontrada" },
+        { status: 403 }
+      );
+    }
+
+    const puedeEliminar = await Permisos.puedeEliminarVencimiento();
+    if (!puedeEliminar) {
       return NextResponse.json(
         { error: "No tienes permisos para eliminar ocurrencias" },
         { status: 403 }
@@ -20,80 +29,16 @@ export async function DELETE(
     const body = await request.json();
     const { deleteFollowing = false } = body;
 
-    // Buscar la organización interna con el clerkOrganizationId
-    const organizacion = await prisma.organizacion.findUnique({
-      where: { clerkOrganizationId: orgId },
-    });
-
-    if (!organizacion) {
-      return NextResponse.json(
-        { error: "Organización no encontrada" },
-        { status: 400 }
-      );
-    }
-
-    // Buscar la ocurrencia
-    const ocurrencia = await prisma.vencimientoOcurrencia.findUnique({
-      where: { id: ocurrenciaId },
-      include: {
-        vencimiento: {
-          include: {
-            recurso: true,
-          },
-        },
-      },
-    });
-
-    if (!ocurrencia) {
-      return NextResponse.json(
-        { error: "Ocurrencia no encontrada" },
-        { status: 404 }
-      );
-    }
-
-    // Verificar que pertenece a la organización del usuario (usando ID interno)
-    if (ocurrencia.vencimiento.recurso.organizacionId !== organizacion.id) {
-      return NextResponse.json(
-        { error: "No tienes permisos para eliminar esta ocurrencia" },
-        { status: 403 }
-      );
-    }
-
-    // Si deleteFollowing es true, eliminar esta y todas las siguientes
-    if (deleteFollowing) {
-      const idsAEliminar = await prisma.vencimientoOcurrencia.findMany({
-        where: {
-          vencimientoId: ocurrencia.vencimientoId,
-          fechaVencimiento: {
-            gte: ocurrencia.fechaVencimiento,
-          },
-        },
-        select: { id: true },
-      });
-
-      await prisma.vencimientoOcurrencia.deleteMany({
-        where: {
-          id: {
-            in: idsAEliminar.map((o) => o.id),
-          },
-        },
-      });
-    } else {
-      // Eliminar solo esta ocurrencia
-      await prisma.vencimientoOcurrencia.delete({
-        where: { id: ocurrenciaId },
-      });
-    }
+    await eliminarOcurrenciaVencimiento(orgId, ocurrenciaId, deleteFollowing);
 
     return NextResponse.json(
       { message: "Ocurrencia(s) eliminada(s) exitosamente" },
       { status: 200 }
     );
   } catch (error) {
+    const mensaje = error instanceof Error ? error.message : "Error eliminando ocurrencia";
+    const status = mensaje.includes("no encontrad") ? 404 : mensaje.includes("permisos") ? 403 : 500;
     console.error("Error eliminando ocurrencia:", error);
-    return NextResponse.json(
-      { error: "Error eliminando ocurrencia" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: mensaje }, { status });
   }
 }
