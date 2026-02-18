@@ -8,6 +8,22 @@ export function Perfil() {
     const [loading, setLoading] = useState(false);
     const [successMsg, setSuccessMsg] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
+    const [showErrorModal, setShowErrorModal] = useState(false);
+
+    {/* Modal de error */ }
+    {
+        showErrorModal && (
+            <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
+                <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full border border-[#E1E3E6]">
+                    <h3 className="text-lg font-semibold text-[#3F4A5A] mb-2">Error</h3>
+                    <p className="text-red-600 mb-4">{errorMsg}</p>
+                    <Button variant="peligro" onClick={() => setShowErrorModal(false)}>
+                        Cerrar
+                    </Button>
+                </div>
+            </div>
+        )
+    }
 
 
     useEffect(() => {
@@ -20,7 +36,8 @@ export function Perfil() {
                     setTelefono(data.usuario.telefono || "");
                 }
             } catch (error) {
-
+                setErrorMsg("Error al cargar la información del usuario.");
+                setShowErrorModal(true);
             }
         }
         fetchInfo();
@@ -52,12 +69,12 @@ export function Perfil() {
     return (
         <div className="bg-white rounded-2xl shadow-md p-8 max-w-xl mx-auto border border-[#E1E3E6]">
             <h2 className="text-2xl font-semibold mb-4 text-[#3F4A5A]">Información Extra</h2>
-            
+
             <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-                
+
 
                 <label className="flex flex-col font-medium text-[#3F4A5A]">
-                    DNI 
+                    DNI
                     <input
                         type="text"
                         placeholder="12345678"
@@ -68,7 +85,7 @@ export function Perfil() {
                 </label>
 
                 <label className="flex flex-col font-medium text-[#3F4A5A]">
-                   Teléfono 
+                    Teléfono
                     <input
                         type="text"
                         placeholder="+54 9 1234-5678"
