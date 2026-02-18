@@ -4,6 +4,7 @@ import { Montserrat } from "next/font/google"
 import './globals.css'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
+import { esES } from "@clerk/localizations";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -39,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider afterSignOutUrl="/">
+    <ClerkProvider afterSignOutUrl="/" localization={esES}>
       <html lang="es">
         <body>
           <SignedIn>

@@ -1,3 +1,4 @@
+
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
@@ -97,5 +98,11 @@ export class Permisos {
       select: { id: true, permisoClientes: true }
     });
     return esAdmin || (usuarioActual?.permisoClientes === true && tienePermiso);
+  }
+
+  static async esAdmin() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    return has({ role: "org:admin" });
   }
 }
