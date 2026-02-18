@@ -74,6 +74,13 @@ export default function OrganizationProfilePage() {
               rootBox: {
                 width: "100%",
               },
+              input: {
+                borderRadius: "9999px",        // redondeado tipo “pill”
+                backgroundColor: "#F8F8F6",     // fondo suave de input
+                border: "1px solid #E1E3E6",    // borde muy suave
+                padding: "12px 16px",
+                fontSize: "16px",
+              },
             },
           }}
         >
@@ -86,7 +93,6 @@ export default function OrganizationProfilePage() {
             <InformacionOrganizacion />
           </OrganizationProfile.Page>
 
-          {/* Solo para administradores */}
           {isAdmin && (
             <OrganizationProfile.Page
               label="Editar Información Extra"
