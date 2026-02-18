@@ -1,12 +1,18 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import VencimientoInputs from '../../components/VencimientoInputs'
+import { Permisos } from '@/lib/permisos'
 
 export default async function VencimientosPage() {
-  const { orgRole, orgId } = await auth()
+  const { orgId } = await auth()
 
-  if (orgRole !== 'org:admin' || !orgId) {
+  if (!orgId) {
     redirect('/')
+  }
+
+  const puedeCrear = await Permisos.puedeCrearVencimiento()
+  if (!puedeCrear) {
+    redirect('/vencimientos')
   }
 
 

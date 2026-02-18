@@ -2,15 +2,21 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import VencimientoInputs from "@/app/components/VencimientoInputs";
+import { Permisos } from "@/lib/permisos";
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
 export default async function DetalleVencimientoPage({ params }: PageProps) {
-  const { orgRole, orgId } = await auth();
+  const { orgId } = await auth();
 
-  if (!orgRole || !orgId) {
+  if (!orgId) {
+    redirect("/");
+  }
+
+  const puedeVer = await Permisos.puedeVerVencimiento();
+  if (!puedeVer) {
     redirect("/");
   }
 

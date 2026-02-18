@@ -1,13 +1,13 @@
 import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
-import { Users, ShieldAlert, Lock, UserCheck, ChevronRight } from "lucide-react";
-import { getVencimientosParaTabla, usuarioPuedeTrabajarConVencimientos } from '../../lib/data'
+import { ShieldAlert, Lock } from "lucide-react";
+import { getVencimientosParaTabla } from '../../lib/vencimientos'
+import { Permisos } from '../../lib/permisos'
 import Link from 'next/link'
 import { Button } from '../components/Button'
 import VencimientosTableClient from '../components/VencimientosTableClient'
 
 export default async function VencimientosPage() {
-  const { userId, orgId, has } = await auth()
+  const { orgId } = await auth()
 
     if (!orgId) {
     return (
@@ -23,12 +23,12 @@ export default async function VencimientosPage() {
     );
   }
 
-  const canCreate = has({ permission: "org:vencimientos:crear_vencimientos" });
-  const canView = has({ permission: "org:vencimientos:ver_vencimientos" });
-  const canModify = has({ permission: "org:vencimientos:modificar_vencimientos" });
-  const canDelete = has({ permission: "org:vencimientos:eliminar_vencimiento" });
-  
-  const puedeTrabajarConVencimientosBD = await usuarioPuedeTrabajarConVencimientos(userId, orgId);
+  const [canView, canCreate, canModify, canDelete] = await Promise.all([
+    Permisos.puedeVerVencimiento(),
+    Permisos.puedeCrearVencimiento(),
+    Permisos.puedeModificarVencimiento(),
+    Permisos.puedeEliminarVencimiento(),
+  ]);
 
   if (!canView) {
     return (
@@ -50,7 +50,7 @@ export default async function VencimientosPage() {
     <main className="p-8">
       <div className="flex justify-between items-center mb-2">
         <h1 className="text-3xl font-bold text-text">Vencimientos Impositivos</h1>
-        {canCreate && puedeTrabajarConVencimientosBD && (
+        {canCreate && (
           <Button variant="primario">
             <Link href="/vencimientos/nuevoVencimiento">
               Nuevo Vencimiento
@@ -67,9 +67,8 @@ export default async function VencimientosPage() {
       ) : (
         <VencimientosTableClient 
           ocurrencias={ocurrencias}
-          canModify={canModify && puedeTrabajarConVencimientosBD}
-          canDelete={canDelete && puedeTrabajarConVencimientosBD}
-          puedeTrabajar={puedeTrabajarConVencimientosBD}
+          canModify={canModify}
+          canDelete={canDelete}
         />
       )}
     </main>

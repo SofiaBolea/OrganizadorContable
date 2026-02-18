@@ -21,14 +21,12 @@ interface VencimientosTableClientProps {
   ocurrencias: VencimientoOcurrencia[];
   canModify: boolean;
   canDelete: boolean;
-  puedeTrabajar: boolean;
 }
 
 export default function VencimientosTableClient({
   ocurrencias: initialOcurrencias,
   canModify,
   canDelete,
-  puedeTrabajar,
 }: VencimientosTableClientProps) {
   const [ocurrencias, setOcurrencias] = useState(initialOcurrencias);
   const [loading, setLoading] = useState(false);
@@ -313,7 +311,7 @@ export default function VencimientosTableClient({
                           >
                             Ver detalle
                           </Link>
-                          {canModify && puedeTrabajar && (
+                          {canModify && (
                             <Link
                               href={`/vencimientos/${o.vencimientoId}/modificar`}
                               className="text-text/40 hover:text-primary-foreground transition-colors"
@@ -322,7 +320,7 @@ export default function VencimientosTableClient({
                               <Edit size={18} />
                             </Link>
                           )}
-                          {canDelete && puedeTrabajar && (
+                          {canDelete && (
                             <button
                               onClick={() => handleOpenDelete(o)}
                               className="text-danger-foreground/60 hover:text-danger-foreground transition-colors"
