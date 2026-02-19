@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 // import { crearClienteAction } from "./actions";
 import { ModalError } from "./modalError";
+import { Button } from "../components/Button";
 
 export function FormularioCrearCliente({ asistentes, onClienteCreado }: { asistentes: any[], onClienteCreado?: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -76,9 +77,9 @@ export function FormularioCrearCliente({ asistentes, onClienteCreado }: { asiste
   }
 
   if (!isOpen) return (
-    <button onClick={() => setIsOpen(true)} className="bg-indigo-600 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-indigo-700 transition-all">
+    <Button onClick={() => setIsOpen(true)} variant="primario" >
       + Nuevo Cliente
-    </button>
+    </Button>
   );
 
   return (
@@ -119,10 +120,10 @@ export function FormularioCrearCliente({ asistentes, onClienteCreado }: { asiste
             </div>
 
             <div className="flex justify-between gap-4 pt-4">
-              <button type="button" onClick={() => setIsOpen(false)} className="flex-1 bg-[#f4a28c] text-[#8e4a3a] py-3 rounded-2xl font-bold shadow-md">Cancelar</button>
-              <button type="submit" disabled={loading} className="flex-1 bg-[#98c18c] text-[#3e5a34] py-3 rounded-2xl font-bold shadow-md disabled:opacity-50">
+              <Button type="button" onClick={() => setIsOpen(false)} variant="peligro" >Cancelar</Button>
+              <Button type="submit" disabled={loading} variant="primario" >
                 {loading ? "Guardando..." : "Guardar Cliente"}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
