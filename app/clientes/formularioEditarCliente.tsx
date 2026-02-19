@@ -1,25 +1,49 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 // import { modificarClienteAction } from "./actions";
 import { ModalError } from "./modalError"; // Importamos el modal de error
 
+
 interface FormularioEditarProps {
   cliente: any;
-  asistentes: any[];
   onClose: () => void;
 }
 
-export function FormularioEditarCliente({ cliente, asistentes, onClose }: FormularioEditarProps) {
+export function FormularioEditarCliente({ cliente, onClose }: FormularioEditarProps) {
+  const [asistentes, setAsistentes] = useState<any[]>([]);
+  const [asistentesLoading, setAsistentesLoading] = useState(true);
+  const [asistentesError, setAsistentesError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAsistentes = async () => {
+      setAsistentesLoading(true);
+      setAsistentesError(null);
+      try {
+        const res = await fetch("/api/selectorDeAsistentes");
+        if (!res.ok) throw new Error("No se pudieron obtener los asistentes");
+        const data = await res.json();
+        setAsistentes(data);
+      } catch (err) {
+        setAsistentesError("Error al cargar asistentes");
+      }
+      setAsistentesLoading(false);
+    };
+    fetchAsistentes();
+  }, []);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null); // Estado para controlar el modal de error
 
   // 1. Pre-cargamos los asistentes ya asignados desde la base de datos
   const idsIniciales = cliente.asignaciones?.map((a: any) => a.usuarioId) || [];
-  
   const [seleccionados, setSeleccionados] = useState<string[]>(idsIniciales);
-  const [asignarTodos, setAsignarTodos] = useState(idsIniciales.length === asistentes.length && asistentes.length > 0);
+  const [asignarTodos, setAsignarTodos] = useState(false);
+
+  // Actualizar asignarTodos si cambia la lista de asistentes
+  useEffect(() => {
+    setAsignarTodos(idsIniciales.length > 0 && asistentes.length > 0 && idsIniciales.length === asistentes.length);
+  }, [asistentes]);
 
   // Filtrar asistentes por búsqueda
   const asistentesFiltrados = useMemo(() => {
@@ -79,6 +103,14 @@ export function FormularioEditarCliente({ cliente, asistentes, onClose }: Formul
       setErrorMsg("Error de red o servidor.");
     }
     setLoading(false);
+  }
+
+  if (asistentesError) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <span className="text-red-500">{asistentesError}</span>
+      </div>
+    );
   }
 
   return (

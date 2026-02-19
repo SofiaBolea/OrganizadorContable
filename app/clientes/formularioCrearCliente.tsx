@@ -1,11 +1,31 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 // import { crearClienteAction } from "./actions";
 import { ModalError } from "./modalError";
 import { Button } from "../components/Button";
 
-export function FormularioCrearCliente({ asistentes, onClienteCreado }: { asistentes: any[], onClienteCreado?: () => void }) {
+export function FormularioCrearCliente({ onClienteCreado }: { onClienteCreado?: () => void }) {
+  const [asistentes, setAsistentes] = useState<any[]>([]);
+  const [asistentesLoading, setAsistentesLoading] = useState(true);
+  const [asistentesError, setAsistentesError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAsistentes = async () => {
+      setAsistentesLoading(true);
+      setAsistentesError(null);
+      try {
+        const res = await fetch("/api/selectorDeAsistentes");
+        if (!res.ok) throw new Error("No se pudieron obtener los asistentes");
+        const data = await res.json();
+        setAsistentes(data);
+      } catch (err) {
+        setAsistentesError("Error al cargar asistentes");
+      }
+      setAsistentesLoading(false);
+    };
+    fetchAsistentes();
+  }, []);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -81,6 +101,21 @@ export function FormularioCrearCliente({ asistentes, onClienteCreado }: { asiste
       + Nuevo Cliente
     </Button>
   );
+
+  if (asistentesLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <span className="text-gray-500">Cargando asistentes...</span>
+      </div>
+    );
+  }
+  if (asistentesError) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <span className="text-red-500">{asistentesError}</span>
+      </div>
+    );
+  }
 
   return (
     <>
