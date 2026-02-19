@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { Permisos } from "@/lib/permisos";
+import { request } from "https";
 
 export async function updateUsuarioPermission({
   usuarioId,
@@ -103,5 +104,59 @@ export async function listarAsistentes(request: NextRequest) {
     console.error("Error en GET /api/asistentes:", error);
     return NextResponse.json([], { status: 500 });
   }
+
+
 }
+
+export default async function listarAsistentesIdentificadores(request: NextRequest) {
+  try {
+    const { userId, orgId } = await auth();
+
+    // Seguridad básica
+    if (!userId || !orgId) {
+      return NextResponse.json([], { status: 401 });
+    }
+
+    // Buscar organización local vinculada a Clerk
+    const orgLocal = await prisma.organizacion.findUnique({
+      where: { clerkOrganizationId: orgId },
+      select: { id: true },
+    });
+
+    if (!orgLocal) {
+      return NextResponse.json([], { status: 404 });
+    }
+
+    const filtroWhere: any = {
+      organizacionId: orgLocal.id,
+    };
+
+    // Solo usuarios con el rol de "asistente"
+    const asistentes = await prisma.usuario.findMany({
+      where: {
+        ...filtroWhere,
+        roles: {
+          some: {
+            rol: {
+              nombreRol: "org:member"
+            },
+            fechaBaja: null // Solo roles activos
+          }
+        }
+      },
+      select: {
+        id: true,
+        nombreCompleto: true,
+      }
+    });
+
+    return NextResponse.json(asistentes);
+  } catch (error) {
+    console.error("Error en GET /api/asistentes:", error);
+    return NextResponse.json([], { status: 500 });
+  }
+
+}
+
+
 

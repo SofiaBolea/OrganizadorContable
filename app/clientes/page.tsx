@@ -40,7 +40,7 @@ export default async function ClientesPage() {
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight italic">Lista de Clientes</h1>
           <p className="text-slate-500 mt-1 italic">Estudio {orgLocal.nombre}</p>
         </div>
-        {puedeCrear && <FormularioCrearCliente asistentes={asistentes} />}
+        {puedeCrear && <FormularioCrearCliente  />}
       </header>
 
       <FiltrosClientes asistentes={asistentes} esAdmin={puedeVerTodosLosClientes} />
