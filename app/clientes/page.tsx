@@ -46,7 +46,6 @@ export default async function ClientesPage() {
       <FiltrosClientes asistentes={asistentes} esAdmin={puedeVerTodosLosClientes} />
 
       <div className="bg-white border border-slate-200 rounded-[20px] shadow-sm overflow-hidden">
-        {/* La tabla ahora hace su propio fetch a route.ts */}
         <TableCliente 
           asistentes={asistentes} 
           permisos={{ puedeEditar, puedeEliminar }} 
