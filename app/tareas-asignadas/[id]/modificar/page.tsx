@@ -6,9 +6,10 @@ import TareaForm from "@/app/tareas-asignadas/components/TareaForm";
 
 interface PageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ taId?: string; fechaOc?: string }>;
 }
 
-export default async function ModificarTareaAsignadaPage({ params }: PageProps) {
+export default async function ModificarTareaAsignadaPage({ params, searchParams }: PageProps) {
   const { orgId } = await auth();
 
   if (!orgId) {
@@ -21,6 +22,7 @@ export default async function ModificarTareaAsignadaPage({ params }: PageProps) 
   }
 
   const { id } = await params;
+  const { taId, fechaOc } = await searchParams;
   const tarea = await getTareaDetalle(id);
 
   if (!tarea) {
@@ -43,6 +45,11 @@ export default async function ModificarTareaAsignadaPage({ params }: PageProps) 
         mode="edit"
         tipoTarea="ASIGNADA"
         basePath="/tareas-asignadas"
+        ocurrenciaContext={
+          taId && fechaOc
+            ? { tareaAsignacionId: taId, fechaOcurrencia: fechaOc }
+            : null
+        }
         initialData={{
           id: tarea.id,
           titulo: tarea.titulo,

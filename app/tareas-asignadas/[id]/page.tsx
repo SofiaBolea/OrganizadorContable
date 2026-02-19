@@ -94,13 +94,17 @@ export default async function DetalleTareaAsignadaPage({ params }: PageProps) {
                 )}
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    asig.estado === "REALIZADA"
+                    asig.estado === "COMPLETADA"
                       ? "bg-[#d4edda] text-[#155724]"
                       : asig.estado === "CANCELADA"
                         ? "bg-[#f8d7da] text-[#721c24]"
-                        : asig.estado === "EN_PROGRESO"
-                          ? "bg-[#d1ecf1] text-[#0c5460]"
-                          : "bg-[#fff3cd] text-[#856404]"
+                        : asig.estado === "VENCIDA"
+                          ? "bg-[#f5c6cb] text-[#721c24]"
+                          : asig.estado === "FINALIZADA"
+                            ? "bg-[#d1ecf1] text-[#0c5460]"
+                            : asig.estado === "REVOCADA"
+                              ? "bg-[#e2e3e5] text-[#383d41]"
+                              : "bg-[#fff3cd] text-[#856404]"
                   }`}
                 >
                   {asig.estado.replace("_", " ")}

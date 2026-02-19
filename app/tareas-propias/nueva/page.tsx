@@ -17,7 +17,7 @@ export default async function NuevaMiTareaPage() {
       <TareaForm
         mode="create"
         tipoTarea="PROPIA"
-        basePath="/mis-tareas"
+        basePath="/tareas-propias"
       />
     </main>
   );

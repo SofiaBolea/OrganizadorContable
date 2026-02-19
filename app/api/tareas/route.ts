@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { crearTarea, getTareasAsignadasAdmin, getTareasAsignadasAsistente, getMisTareas } from "@/lib/tareas";
+import { crearTarea, getTareasAsignadasAdmin, getTareasAsignadasAsistente, getTareasPropias } from "@/lib/tareas";
 import { Permisos } from "@/lib/permisos";
 
 // POST: Crear nueva tarea
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const tipo = request.nextUrl.searchParams.get("tipo"); // "asignadas" | "mis-tareas"
+    const tipo = request.nextUrl.searchParams.get("tipo"); // "asignadas" | "tareas-propias"
     const esAdmin = await Permisos.esAdmin();
 
     let tareas;
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
         ? await getTareasAsignadasAdmin(orgId, userId)
         : await getTareasAsignadasAsistente(orgId, userId);
     } else {
-      tareas = await getMisTareas(orgId, userId);
+      tareas = await getTareasPropias(orgId, userId);
     }
 
     return NextResponse.json(tareas);

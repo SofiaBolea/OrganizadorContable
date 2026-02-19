@@ -103,14 +103,14 @@ body {
   color: #856404;
 }
 
-.badge-estado-en_progreso {
-  background-color: #d1ecf1;
-  color: #0c5460;
-}
-
-.badge-estado-realizada {
+.badge-estado-completada {
   background-color: #d4edda;
   color: #155724;
+}
+
+.badge-estado-vencida {
+  background-color: #f5c6cb;
+  color: #721c24;
 }
 
 .badge-estado-cancelada {

@@ -1,12 +1,12 @@
 import { auth } from "@clerk/nextjs/server";
 import { ShieldAlert } from "lucide-react";
-import { getMisTareas } from "@/lib/tareas";
+import { getTareasPropias } from "@/lib/tareas";
 import { Permisos } from "@/lib/permisos";
 import Link from "next/link";
 import { Button } from "../components/Button";
 import TareasTableClient from "@/app/tareas-asignadas/components/TareasTableClient";
 
-export default async function MisTareasPage() {
+export default async function TareasPropiasPage() {
   const { orgId, userId } = await auth();
 
   if (!orgId || !userId) {
@@ -24,14 +24,14 @@ export default async function MisTareasPage() {
   }
 
   const esAdmin = await Permisos.esAdmin();
-  const tareas = await getMisTareas(orgId, userId);
+  const tareas = await getTareasPropias(orgId, userId);
 
   return (
     <main className="p-8">
       <div className="flex justify-between items-center mb-2">
         <h1 className="text-3xl font-bold text-text">Mis Tareas</h1>
         <Button variant="primario">
-          <Link href="/mis-tareas/nueva">
+          <Link href="/tareas-propias/nueva">
             Nueva Tarea
           </Link>
         </Button>
@@ -41,11 +41,11 @@ export default async function MisTareasPage() {
       <TareasTableClient
         tareas={tareas}
         esAdmin={esAdmin}
-        modo="mis-tareas"
+        modo="tareas-propias"
         mostrarColumnaAsistente={false}
         canModify={true}
         canDelete={true}
-        basePath="/mis-tareas"
+        basePath="/tareas-propias"
       />
     </main>
   );

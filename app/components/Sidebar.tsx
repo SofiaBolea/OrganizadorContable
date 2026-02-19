@@ -45,7 +45,7 @@ export default function Sidebar() {
 
         <NavLink href="/tareas-asignadas">Tareas Asignadas</NavLink>
 
-        <NavLink href="/mis-tareas">Mis Tareas</NavLink>
+        <NavLink href="/tareas-propias">Mis Tareas</NavLink>
 
       </nav>
 

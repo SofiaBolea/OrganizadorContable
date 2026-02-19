@@ -8,6 +8,7 @@ export interface OcurrenciaMaterializada {
   fechaOriginal: string;
   estado: string;
   tituloOverride: string | null;
+  fechaOverride: string | null;
   colorOverride: string | null;
 }
 
@@ -52,10 +53,14 @@ export interface TareaDisplayRow {
   ocurrenciaId: string | null;
   esVirtual: boolean;
   titulo: string;
+  /** Título base de la tarea (sin override) */
+  tituloBase: string;
   prioridad: string;
   tipoTarea: string;
-  /** Fecha concreta de esta ocurrencia (o fechaVencimientoBase si no es recurrente) */
+  /** Fecha concreta de esta ocurrencia (con override si aplica) */
   fechaOcurrencia: string | null;
+  /** Fecha original de la ocurrencia (sin override) — usada para materializar */
+  fechaOriginalOcurrencia: string | null;
   descripcion: string | null;
   asignadoId: string;
   asignadoNombre: string;
@@ -225,22 +230,32 @@ export function expandirTareasADisplayRows(
 
   for (const t of tareas) {
     if (!t.recurrencia) {
+      // Tarea única: buscar ocurrencia materializada (si existe)
+      const mat = t.ocurrenciasMaterializadas.length > 0
+        ? t.ocurrenciasMaterializadas[0]
+        : null;
+
+      // No mostrar si la ocurrencia está cancelada
+      if (mat?.estado === "CANCELADA") continue;
+
       rows.push({
         key: t.tareaAsignacionId,
         tareaAsignacionId: t.tareaAsignacionId,
         tareaId: t.tareaId,
-        ocurrenciaId: null,
-        esVirtual: false,
-        titulo: t.titulo,
+        ocurrenciaId: mat?.id || null,
+        esVirtual: !mat,
+        titulo: mat?.tituloOverride || t.titulo,
+        tituloBase: t.titulo,
         prioridad: t.prioridad,
         tipoTarea: t.tipoTarea,
-        fechaOcurrencia: t.fechaVencimientoBase,
+        fechaOcurrencia: mat?.fechaOverride || mat?.fechaOriginal || t.fechaVencimientoBase,
+        fechaOriginalOcurrencia: mat?.fechaOriginal || t.fechaVencimientoBase,
         descripcion: t.descripcion,
         asignadoId: t.asignadoId,
         asignadoNombre: t.asignadoNombre,
         asignadoPorId: t.asignadoPorId,
         asignadoPorNombre: t.asignadoPorNombre,
-        estado: t.estado,
+        estado: mat?.estado || "PENDIENTE",
         fechaAsignacion: t.fechaAsignacion,
         refColorId: t.refColorId,
         refColorTitulo: t.refColorTitulo,
@@ -269,9 +284,11 @@ export function expandirTareasADisplayRows(
           ocurrenciaId: null,
           esVirtual: true,
           titulo: t.titulo,
+          tituloBase: t.titulo,
           prioridad: t.prioridad,
           tipoTarea: t.tipoTarea,
           fechaOcurrencia: t.fechaVencimientoBase,
+          fechaOriginalOcurrencia: t.fechaVencimientoBase,
           descripcion: t.descripcion,
           asignadoId: t.asignadoId,
           asignadoNombre: t.asignadoNombre,
@@ -291,6 +308,12 @@ export function expandirTareasADisplayRows(
       for (const fechaStr of fechas) {
         const mat = matMap.get(fechaStr);
 
+        // Ocultar ocurrencias canceladas
+        if (mat?.estado === "CANCELADA") {
+          matMap.delete(fechaStr);
+          continue;
+        }
+
         rows.push({
           key: `${t.tareaAsignacionId}--${fechaStr}`,
           tareaAsignacionId: t.tareaAsignacionId,
@@ -298,9 +321,11 @@ export function expandirTareasADisplayRows(
           ocurrenciaId: mat?.id || null,
           esVirtual: !mat,
           titulo: mat?.tituloOverride || t.titulo,
+          tituloBase: t.titulo,
           prioridad: t.prioridad,
           tipoTarea: t.tipoTarea,
-          fechaOcurrencia: mat ? mat.fechaOriginal : fechaStr,
+          fechaOcurrencia: mat?.fechaOverride || mat?.fechaOriginal || fechaStr,
+          fechaOriginalOcurrencia: mat?.fechaOriginal || fechaStr,
           descripcion: t.descripcion,
           asignadoId: t.asignadoId,
           asignadoNombre: t.asignadoNombre,
@@ -318,8 +343,10 @@ export function expandirTareasADisplayRows(
         matMap.delete(fechaStr);
       }
 
-      // Ocurrencias materializadas huérfanas
+      // Ocurrencias materializadas huérfanas (excluir canceladas)
       for (const [fechaKey, mat] of matMap.entries()) {
+        if (mat.estado === "CANCELADA") continue;
+
         rows.push({
           key: `${t.tareaAsignacionId}--${fechaKey}`,
           tareaAsignacionId: t.tareaAsignacionId,
@@ -327,9 +354,11 @@ export function expandirTareasADisplayRows(
           ocurrenciaId: mat.id,
           esVirtual: false,
           titulo: mat.tituloOverride || t.titulo,
+          tituloBase: t.titulo,
           prioridad: t.prioridad,
           tipoTarea: t.tipoTarea,
-          fechaOcurrencia: fechaKey,
+          fechaOcurrencia: mat.fechaOverride || fechaKey,
+          fechaOriginalOcurrencia: fechaKey,
           descripcion: t.descripcion,
           asignadoId: t.asignadoId,
           asignadoNombre: t.asignadoNombre,

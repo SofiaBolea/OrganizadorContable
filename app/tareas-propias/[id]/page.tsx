@@ -36,7 +36,7 @@ export default async function DetalleMiTareaPage({ params }: PageProps) {
       <TareaForm
         mode="view"
         tipoTarea="PROPIA"
-        basePath="/mis-tareas"
+        basePath="/tareas-propias"
         initialData={{
           id: tarea.id,
           titulo: tarea.titulo,

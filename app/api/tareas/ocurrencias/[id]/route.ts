@@ -1,8 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { eliminarOcurrencia } from "@/lib/tareas";
+import { cancelarOcurrencia } from "@/lib/tareas";
 
-// DELETE: Eliminar una ocurrencia materializada
+// DELETE: Cancelar una ocurrencia materializada (marca como CANCELADA)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -14,11 +14,11 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await eliminarOcurrencia(id);
+    const ocurrencia = await cancelarOcurrencia(id);
 
-    return NextResponse.json({ message: "Ocurrencia eliminada" }, { status: 200 });
+    return NextResponse.json({ message: "Ocurrencia cancelada", data: ocurrencia }, { status: 200 });
   } catch (error) {
-    const mensaje = error instanceof Error ? error.message : "Error eliminando ocurrencia";
+    const mensaje = error instanceof Error ? error.message : "Error cancelando ocurrencia";
     console.error("Error:", error);
     return NextResponse.json({ error: mensaje }, { status: 500 });
   }

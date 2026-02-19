@@ -12,7 +12,7 @@ export default function Header() {
     if (pathname.startsWith("/vencimientos")) return "Vencimientos Impositivos"
     if (pathname.startsWith("/organizacion")) return "Organización"
     if (pathname.startsWith("/tareas-asignadas")) return "Tareas Asignadas"
-    if (pathname.startsWith("/mis-tareas")) return "Mis Tareas"
+    if (pathname.startsWith("/tareas-propias")) return "Tareas Propias"
     return "Tablero General"
   }
 

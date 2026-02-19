@@ -28,8 +28,7 @@ export default function ConfirmEstadoModal({
         </p>
 
         <p className="text-danger-foreground text-sm text-center mb-8 font-medium">
-          Una vez marcada como realizada, no podrás deshacer este cambio.
-          Solo el administrador podrá modificarlo.
+          Una vez marcada como completada, solo el administrador podrá revertir el estado.
         </p>
 
         <div className="flex justify-between items-center">

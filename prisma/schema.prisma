@@ -333,7 +333,7 @@ model TareaAsignacion {
   asignadoPorId   String
   asignadoPor     Usuario  @relation("asignadoPor", fields: [asignadoPorId], references: [id])
   fechaAsignacion DateTime @default(now())
-  estado          String   @default("PENDIENTE") @db.VarChar(20)
+  estado          String   @default("ACTIVA") @db.VarChar(20)
 
   // Relaciones
   ocurrencias     Ocurrencia[]

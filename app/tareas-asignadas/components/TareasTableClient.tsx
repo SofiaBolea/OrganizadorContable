@@ -25,8 +25,8 @@ const PRIORIDAD_CLASS: Record<string, string> = {
 
 const ESTADO_CLASS: Record<string, string> = {
   PENDIENTE: "badge-estado-pendiente",
-  EN_PROGRESO: "badge-estado-en_progreso",
-  REALIZADA: "badge-estado-realizada",
+  COMPLETADA: "badge-estado-completada",
+  VENCIDA: "badge-estado-vencida",
   CANCELADA: "badge-estado-cancelada",
 };
 
@@ -52,7 +52,7 @@ function getDiasFaltantes(fechaStr: string | null) {
 interface TareasTableClientProps {
   tareas: TareaAsignacionRow[];
   esAdmin: boolean;
-  modo: "asignadas" | "mis-tareas";
+  modo: "asignadas" | "tareas-propias";
   mostrarColumnaAsistente?: boolean;
   canModify: boolean;
   canDelete: boolean;
@@ -95,6 +95,8 @@ export default function TareasTableClient({
     row: TareaDisplayRow | null;
     nuevoEstado: string;
   }>({ isOpen: false, row: null, nuevoEstado: "" });
+
+
 
   // ─── Expandir tareas a filas de display ───
   const todasLasFilas = useMemo(
@@ -152,9 +154,12 @@ export default function TareasTableClient({
 
   // ─── Opciones de estado para una fila ───
   const getOpcionesEstado = (row: TareaDisplayRow) => {
-    const opciones = ["PENDIENTE", "EN_PROGRESO", "REALIZADA", "CANCELADA"];
-    if (modo === "asignadas" && !esAdmin && row.estado === "REALIZADA") return [];
-    return opciones.filter((e) => e !== row.estado);
+    // Solo se puede alternar entre PENDIENTE y COMPLETADA
+    // VENCIDA y CANCELADA son estados finales, no editables
+    if (row.estado === "VENCIDA" || row.estado === "CANCELADA") return [];
+    if (row.estado === "PENDIENTE") return ["COMPLETADA"];
+    if (row.estado === "COMPLETADA") return ["PENDIENTE"];
+    return [];
   };
 
   // ═══════════════════════════════════════
@@ -162,7 +167,7 @@ export default function TareasTableClient({
   // ═══════════════════════════════════════
 
   const handleCambiarEstado = async (row: TareaDisplayRow, nuevoEstado: string) => {
-    if (modo === "asignadas" && !esAdmin && nuevoEstado === "REALIZADA") {
+    if (modo === "asignadas" && !esAdmin && nuevoEstado === "COMPLETADA") {
       setEstadoModal({ isOpen: true, row, nuevoEstado });
       return;
     }
@@ -173,73 +178,53 @@ export default function TareasTableClient({
     async (row: TareaDisplayRow, nuevoEstado: string) => {
       setLoading(true);
       try {
-        if (row.tieneRecurrencia) {
-          const res = await fetch("/api/tareas/ocurrencias", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              tareaAsignacionId: row.tareaAsignacionId,
-              fechaOriginal: row.fechaOcurrencia,
-              estado: nuevoEstado,
-            }),
-          });
-          if (!res.ok) {
-            const data = await res.json();
-            alert(data.error || "Error al cambiar estado");
-            return;
-          }
-          const { data: ocurrencia } = await res.json();
-
-          setTareasBase((prev) =>
-            prev.map((t) => {
-              if (t.tareaAsignacionId !== row.tareaAsignacionId) return t;
-              const fechaKey = row.fechaOcurrencia!;
-              const yaExiste = t.ocurrenciasMaterializadas.some(
-                (o) => o.fechaOriginal.split("T")[0] === fechaKey
-              );
-              return {
-                ...t,
-                ocurrenciasMaterializadas: yaExiste
-                  ? t.ocurrenciasMaterializadas.map((o) =>
-                      o.fechaOriginal.split("T")[0] === fechaKey
-                        ? { ...o, estado: nuevoEstado, id: ocurrencia.id }
-                        : o
-                    )
-                  : [
-                      ...t.ocurrenciasMaterializadas,
-                      {
-                        id: ocurrencia.id,
-                        fechaOriginal: row.fechaOcurrencia!,
-                        estado: nuevoEstado,
-                        tituloOverride: null,
-                        colorOverride: null,
-                      },
-                    ],
-              };
-            })
-          );
-        } else {
-          const res = await fetch(
-            `/api/tareas/asignaciones/${row.tareaAsignacionId}`,
-            {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ estado: nuevoEstado }),
-            }
-          );
-          if (!res.ok) {
-            const data = await res.json();
-            alert(data.error || "Error al cambiar estado");
-            return;
-          }
-          setTareasBase((prev) =>
-            prev.map((t) =>
-              t.tareaAsignacionId === row.tareaAsignacionId
-                ? { ...t, estado: nuevoEstado }
-                : t
-            )
-          );
+        // Siempre materializar ocurrencia (tanto recurrentes como únicas)
+        const fechaOriginal = row.fechaOcurrencia || new Date().toISOString().split("T")[0];
+        const res = await fetch("/api/tareas/ocurrencias", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tareaAsignacionId: row.tareaAsignacionId,
+            fechaOriginal,
+            estado: nuevoEstado,
+          }),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          alert(data.error || "Error al cambiar estado");
+          return;
         }
+        const { data: ocurrencia } = await res.json();
+
+        setTareasBase((prev) =>
+          prev.map((t) => {
+            if (t.tareaAsignacionId !== row.tareaAsignacionId) return t;
+            const fechaKey = fechaOriginal.split("T")[0];
+            const yaExiste = t.ocurrenciasMaterializadas.some(
+              (o) => o.fechaOriginal.split("T")[0] === fechaKey
+            );
+            return {
+              ...t,
+              ocurrenciasMaterializadas: yaExiste
+                ? t.ocurrenciasMaterializadas.map((o) =>
+                    o.fechaOriginal.split("T")[0] === fechaKey
+                      ? { ...o, estado: nuevoEstado, id: ocurrencia.id }
+                      : o
+                  )
+                : [
+                    ...t.ocurrenciasMaterializadas,
+                    {
+                      id: ocurrencia.id,
+                      fechaOriginal: fechaOriginal,
+                      estado: nuevoEstado,
+                      tituloOverride: null,
+                      fechaOverride: null,
+                      colorOverride: null,
+                    },
+                  ],
+            };
+          })
+        );
       } catch {
         alert("Error al conectar con el servidor");
       } finally {
@@ -261,19 +246,69 @@ export default function TareasTableClient({
 
   const handleDeleteOne = async () => {
     if (!deleteModal.row) return;
+    const row = deleteModal.row;
     setLoading(true);
     try {
-      const res = await fetch(
-        `/api/tareas/asignaciones/${deleteModal.row.tareaAsignacionId}`,
-        { method: "DELETE" }
-      );
-      if (!res.ok) {
-        const data = await res.json();
-        alert(data.error || "Error al eliminar");
-        return;
+      // Cancelar la ocurrencia (materializar con CANCELADA) en vez de eliminar la asignación
+      if (row.ocurrenciaId) {
+        // Ocurrencia ya materializada: marcarla CANCELADA
+        const res = await fetch(`/api/tareas/ocurrencias/${row.ocurrenciaId}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          alert(data.error || "Error al cancelar");
+          return;
+        }
+      } else {
+        // Ocurrencia virtual: materializar con estado CANCELADA
+        const fechaOriginal = row.fechaOcurrencia || new Date().toISOString().split("T")[0];
+        const res = await fetch("/api/tareas/ocurrencias", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tareaAsignacionId: row.tareaAsignacionId,
+            fechaOriginal,
+            estado: "CANCELADA",
+          }),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          alert(data.error || "Error al cancelar");
+          return;
+        }
       }
+
+      // Actualizar en memoria: agregar/actualizar ocurrencia con CANCELADA
+      // expandirTareasADisplayRows filtrará las CANCELADA automáticamente
+      const fechaKey = (row.fechaOcurrencia || new Date().toISOString()).split("T")[0];
       setTareasBase((prev) =>
-        prev.filter((t) => t.tareaAsignacionId !== deleteModal.row!.tareaAsignacionId)
+        prev.map((t) => {
+          if (t.tareaAsignacionId !== row.tareaAsignacionId) return t;
+          const yaExiste = t.ocurrenciasMaterializadas.some(
+            (o) => o.fechaOriginal.split("T")[0] === fechaKey
+          );
+          return {
+            ...t,
+            ocurrenciasMaterializadas: yaExiste
+              ? t.ocurrenciasMaterializadas.map((o) =>
+                  o.fechaOriginal.split("T")[0] === fechaKey
+                    ? { ...o, estado: "CANCELADA" }
+                    : o
+                )
+              : [
+                  ...t.ocurrenciasMaterializadas,
+                  {
+                    id: "temp",
+                    fechaOriginal: fechaKey,
+                    estado: "CANCELADA",
+                    tituloOverride: null,
+                    fechaOverride: null,
+                    colorOverride: null,
+                  },
+                ],
+          };
+        })
       );
       setDeleteModal({ isOpen: false, row: null });
     } catch {
@@ -386,8 +421,8 @@ export default function TareasTableClient({
             >
               <option value="">Todos</option>
               <option value="PENDIENTE">Pendiente</option>
-              <option value="EN_PROGRESO">En Progreso</option>
-              <option value="REALIZADA">Realizada</option>
+              <option value="COMPLETADA">Completada</option>
+              <option value="VENCIDA">Vencida</option>
               <option value="CANCELADA">Cancelada</option>
             </select>
           </div>
@@ -566,7 +601,7 @@ export default function TareasTableClient({
 
                           {canModify && (
                             <Link
-                              href={`${basePath}/${row.tareaId}/modificar`}
+                              href={`${basePath}/${row.tareaId}/modificar?taId=${row.tareaAsignacionId}&fechaOc=${row.fechaOriginalOcurrencia || row.fechaOcurrencia || ""}`}
                               className="text-text/40 hover:text-primary-foreground transition-colors"
                               title="Modificar"
                             >
@@ -624,6 +659,7 @@ export default function TareasTableClient({
         onClose={() => setEstadoModal({ isOpen: false, row: null, nuevoEstado: "" })}
         onConfirm={handleConfirmEstado}
       />
+
     </>
   );
 }

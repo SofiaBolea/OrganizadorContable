@@ -32,10 +32,10 @@ export default function ConfirmDeleteTareaModal({
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-xl p-8 max-w-md w-full mx-4">
-        <h3 className="text-xl font-bold text-text mb-4">Eliminar Tarea</h3>
+        <h3 className="text-xl font-bold text-text mb-4">Cancelar / Eliminar Tarea</h3>
 
         <p className="text-text/70 mb-6 text-center">
-          Se eliminará <strong className="text-text">{titulo}</strong>
+          <strong className="text-text">{titulo}</strong>
         </p>
 
         <div className="space-y-3 mb-8">
@@ -48,7 +48,7 @@ export default function ConfirmDeleteTareaModal({
               className="w-4 h-4 accent-primary-foreground"
             />
             <span className="text-text/80 group-hover:text-text transition-colors">
-              Solo esta asignación
+              Cancelar solo esta ocurrencia
             </span>
           </label>
 

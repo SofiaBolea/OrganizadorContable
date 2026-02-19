@@ -108,7 +108,7 @@ export async function crearTarea(
             create: idsAsignados.map((uid) => ({
               asignadoId: uid,
               asignadoPorId: usuarioCreador.id,
-              estado: "PENDIENTE",
+              estado: "ACTIVA",
               refColorId: tipoTarea === "PROPIA" ? (refColorId || null) : null,
             })),
           },
@@ -179,12 +179,16 @@ export async function getTareasAsignadasAdmin(
           fechaOriginal: true,
           estado: true,
           tituloOverride: true,
+          fechaOverride: true,
           colorOverride: true,
         },
       },
     },
     orderBy: { fechaAsignacion: "desc" },
   });
+
+  // Marcar como VENCIDA las que correspondan
+  await marcarVencidasAlLeer(asignaciones);
 
   return asignaciones.map(mapToRow);
 }
@@ -210,6 +214,7 @@ export async function getTareasAsignadasAsistente(
   const asignaciones = await prisma.tareaAsignacion.findMany({
     where: {
       asignadoId: usuario.id,
+      estado: { not: "REVOCADA" }, // No mostrar asignaciones revocadas al asistente
       tarea: {
         tipoTarea: "ASIGNADA",
         recurso: { organizacionId: organizacion.id },
@@ -232,6 +237,7 @@ export async function getTareasAsignadasAsistente(
           fechaOriginal: true,
           estado: true,
           tituloOverride: true,
+          fechaOverride: true,
           colorOverride: true,
         },
       },
@@ -239,13 +245,16 @@ export async function getTareasAsignadasAsistente(
     orderBy: { fechaAsignacion: "desc" },
   });
 
+  // Marcar como VENCIDA las que correspondan
+  await marcarVencidasAlLeer(asignaciones);
+
   return asignaciones.map(mapToRow);
 }
 
 /**
  * Mis Tareas: Tareas PROPIA donde el usuario es el asignado
  */
-export async function getMisTareas(
+export async function getTareasPropias(
   orgId: string,
   clerkUserId: string
 ): Promise<TareaAsignacionRow[]> {
@@ -284,12 +293,16 @@ export async function getMisTareas(
           fechaOriginal: true,
           estado: true,
           tituloOverride: true,
+          fechaOverride: true,
           colorOverride: true,
         },
       },
     },
     orderBy: { fechaAsignacion: "desc" },
   });
+
+  // Marcar como VENCIDA las que correspondan
+  await marcarVencidasAlLeer(asignaciones);
 
   return asignaciones.map(mapToRow);
 }
@@ -414,24 +427,25 @@ export async function actualizarTarea(
   if (datos.asignadoIds && tareaExistente.tipoTarea === "ASIGNADA") {
     const asignacionesActuales = await prisma.tareaAsignacion.findMany({
       where: { tareaId },
-      select: { id: true, asignadoId: true },
+      select: { id: true, asignadoId: true, estado: true },
     });
 
     const idsActuales = asignacionesActuales.map((a) => a.asignadoId);
     const idsNuevos = datos.asignadoIds;
 
-    // Eliminar asignaciones que ya no están
-    const idsAEliminar = asignacionesActuales
-      .filter((a) => !idsNuevos.includes(a.asignadoId))
-      .map((a) => a.id);
+    // Revocar asignaciones que ya no están (en vez de eliminar)
+    const asignacionesARevocar = asignacionesActuales
+      .filter((a) => !idsNuevos.includes(a.asignadoId) && a.estado !== "REVOCADA");
 
-    if (idsAEliminar.length > 0) {
-      await prisma.tareaAsignacion.deleteMany({
-        where: { id: { in: idsAEliminar } },
+    if (asignacionesARevocar.length > 0) {
+      await prisma.tareaAsignacion.updateMany({
+        where: { id: { in: asignacionesARevocar.map((a) => a.id) } },
+        data: { estado: "REVOCADA" },
       });
     }
 
     // Crear nuevas asignaciones
+    // Excluir los que ya tienen asignación (incluso REVOCADA, se reactiva)
     const idsAAgregar = idsNuevos.filter((id) => !idsActuales.includes(id));
     if (idsAAgregar.length > 0) {
       await prisma.tareaAsignacion.createMany({
@@ -439,8 +453,20 @@ export async function actualizarTarea(
           tareaId,
           asignadoId: uid,
           asignadoPorId: usuario.id,
-          estado: "PENDIENTE",
+          estado: "ACTIVA",
         })),
+      });
+    }
+
+    // Reactivar asignaciones que estaban REVOCADA y ahora vuelven a estar asignadas
+    const idsAReactivar = asignacionesActuales
+      .filter((a) => idsNuevos.includes(a.asignadoId) && a.estado === "REVOCADA")
+      .map((a) => a.id);
+
+    if (idsAReactivar.length > 0) {
+      await prisma.tareaAsignacion.updateMany({
+        where: { id: { in: idsAReactivar } },
+        data: { estado: "ACTIVA" },
       });
     }
   }
@@ -486,6 +512,57 @@ export async function eliminarTareaCompleta(tareaId: string) {
 // ═══════════════════════════════════════
 // ACTUALIZAR ESTADO DE ASIGNACIÓN
 // ═══════════════════════════════════════
+
+/**
+ * Evalúa si una TareaAsignacion debe cambiar a COMPLETADA o FINALIZADA.
+ * Se llama después de cambiar el estado de una ocurrencia.
+ * 
+ * - COMPLETADA: todas las ocurrencias son COMPLETADA
+ * - FINALIZADA: todas tienen estado final (COMPLETADA + VENCIDA + CANCELADA),
+ *   pero no todas son COMPLETADA (hay al menos una VENCIDA o CANCELADA)
+ * - Si hay alguna PENDIENTE, no cambia nada
+ */
+async function evaluarEstadoAsignacion(tareaAsignacionId: string): Promise<void> {
+  const asignacion = await prisma.tareaAsignacion.findUnique({
+    where: { id: tareaAsignacionId },
+    include: {
+      ocurrencias: { select: { estado: true } },
+    },
+  });
+
+  if (!asignacion) return;
+  // No tocar REVOCADA
+  if (asignacion.estado === "REVOCADA") return;
+
+  const ocurrencias = asignacion.ocurrencias;
+  if (ocurrencias.length === 0) return; // Aún no hay materializadas
+
+  const estados = ocurrencias.map((o) => o.estado);
+  const hayPendientes = estados.some((e) => e === "PENDIENTE");
+
+  if (hayPendientes) {
+    // Si hay pendientes pero la asignación ya estaba COMPLETADA/FINALIZADA,
+    // revertir a ACTIVA (el usuario deshizo la completación)
+    if (["COMPLETADA", "FINALIZADA"].includes(asignacion.estado)) {
+      await prisma.tareaAsignacion.update({
+        where: { id: tareaAsignacionId },
+        data: { estado: "ACTIVA" },
+      });
+    }
+    return;
+  }
+
+  // Todas las ocurrencias tienen estado final (COMPLETADA, VENCIDA, CANCELADA)
+  const todasCompletadas = estados.every((e) => e === "COMPLETADA");
+  const nuevoEstado = todasCompletadas ? "COMPLETADA" : "FINALIZADA";
+
+  if (asignacion.estado !== nuevoEstado) {
+    await prisma.tareaAsignacion.update({
+      where: { id: tareaAsignacionId },
+      data: { estado: nuevoEstado },
+    });
+  }
+}
 
 export async function actualizarEstadoAsignacion(
   asignacionId: string,
@@ -534,36 +611,123 @@ export async function materializarOcurrencia(
     },
   });
 
+  let resultado;
+
   if (existente) {
-    return await prisma.ocurrencia.update({
+    resultado = await prisma.ocurrencia.update({
       where: { id: existente.id },
       data: {
         estado: datos.estado ?? existente.estado,
         fechaOverride: datos.fechaOverride ? new Date(datos.fechaOverride) : existente.fechaOverride,
         tituloOverride: datos.tituloOverride ?? existente.tituloOverride,
         colorOverride: datos.colorOverride ?? existente.colorOverride,
-        fechaEjecucion: datos.estado === "REALIZADA" ? new Date() : existente.fechaEjecucion,
+        fechaEjecucion: datos.estado === "COMPLETADA" ? new Date() : existente.fechaEjecucion,
+      },
+    });
+  } else {
+    resultado = await prisma.ocurrencia.create({
+      data: {
+        tareaAsignacionId,
+        fechaOriginal: new Date(fechaOriginal),
+        estado: datos.estado || "PENDIENTE",
+        fechaOverride: datos.fechaOverride ? new Date(datos.fechaOverride) : null,
+        tituloOverride: datos.tituloOverride || null,
+        colorOverride: datos.colorOverride || null,
+        fechaEjecucion: datos.estado === "COMPLETADA" ? new Date() : null,
       },
     });
   }
 
-  return await prisma.ocurrencia.create({
+  // Después de cambiar estado, evaluar si la asignación debe cambiar
+  if (datos.estado) {
+    await evaluarEstadoAsignacion(tareaAsignacionId);
+  }
+
+  return resultado;
+}
+
+export async function cancelarOcurrencia(ocurrenciaId: string) {
+  const ocurrencia = await prisma.ocurrencia.update({
+    where: { id: ocurrenciaId },
+    data: { estado: "CANCELADA" },
+  });
+
+  // Evaluar si la asignación debe cambiar de estado
+  await evaluarEstadoAsignacion(ocurrencia.tareaAsignacionId);
+
+  return ocurrencia;
+}
+
+/**
+ * Cancelar una ocurrencia virtual (que aún no existe en BD).
+ * La materializa con estado CANCELADA.
+ */
+export async function cancelarOcurrenciaVirtual(
+  tareaAsignacionId: string,
+  fechaOriginal: string
+) {
+  const ocurrencia = await prisma.ocurrencia.create({
     data: {
       tareaAsignacionId,
       fechaOriginal: new Date(fechaOriginal),
-      estado: datos.estado || "PENDIENTE",
-      fechaOverride: datos.fechaOverride ? new Date(datos.fechaOverride) : null,
-      tituloOverride: datos.tituloOverride || null,
-      colorOverride: datos.colorOverride || null,
-      fechaEjecucion: datos.estado === "REALIZADA" ? new Date() : null,
+      estado: "CANCELADA",
     },
   });
+
+  await evaluarEstadoAsignacion(tareaAsignacionId);
+
+  return ocurrencia;
 }
 
-export async function eliminarOcurrencia(ocurrenciaId: string) {
-  await prisma.ocurrencia.delete({
-    where: { id: ocurrenciaId },
+/**
+ * Cancelar todas las ocurrencias desde una fecha en adelante.
+ * - Modifica la recurrencia hastaFecha al día anterior
+ * - Marca como CANCELADA las ocurrencias materializadas que estén en esa fecha o después
+ */
+export async function cancelarDesdeAqui(
+  tareaAsignacionId: string,
+  fechaDesde: string
+) {
+  const asignacion = await prisma.tareaAsignacion.findUnique({
+    where: { id: tareaAsignacionId },
+    include: {
+      tarea: { include: { recurrencia: true } },
+      ocurrencias: true,
+    },
   });
+
+  if (!asignacion) throw new Error("Asignación no encontrada");
+  if (!asignacion.tarea.recurrencia) throw new Error("Solo se puede cancelar desde aquí en tareas recurrentes");
+
+  // Calcular el día anterior como nueva hastaFecha
+  const fechaCorte = new Date(fechaDesde.split("T")[0] + "T12:00:00");
+  const diaAnterior = new Date(fechaCorte);
+  diaAnterior.setDate(diaAnterior.getDate() - 1);
+
+  // Actualizar hastaFecha de la recurrencia
+  await prisma.recurrencia.update({
+    where: { tareaId: asignacion.tareaId },
+    data: { hastaFecha: diaAnterior },
+  });
+
+  // Marcar como CANCELADA las ocurrencias materializadas en esa fecha o después
+  const ocurrenciasACancelar = asignacion.ocurrencias.filter((oc) => {
+    const fechaOc = new Date(oc.fechaOriginal);
+    fechaOc.setHours(0, 0, 0, 0);
+    fechaCorte.setHours(0, 0, 0, 0);
+    return fechaOc >= fechaCorte && oc.estado === "PENDIENTE";
+  });
+
+  if (ocurrenciasACancelar.length > 0) {
+    await prisma.ocurrencia.updateMany({
+      where: { id: { in: ocurrenciasACancelar.map((oc) => oc.id) } },
+      data: { estado: "CANCELADA" },
+    });
+  }
+
+  await evaluarEstadoAsignacion(tareaAsignacionId);
+
+  return { canceladas: ocurrenciasACancelar.length, nuevaHastaFecha: diaAnterior.toISOString() };
 }
 
 // ═══════════════════════════════════════
@@ -648,6 +812,109 @@ export async function getAsistentesOrganizacion(orgId: string) {
 // HELPERS INTERNOS
 // ═══════════════════════════════════════
 
+/**
+ * Marca como VENCIDA las ocurrencias PENDIENTES cuya fecha ya pasó.
+ * Para tareas sin recurrencia, crea una ocurrencia con estado VENCIDA
+ * si su fechaVencimientoBase ya pasó y la asignación está ACTIVA.
+ * 
+ * Se ejecuta al leer las tareas para mantener los estados actualizados
+ * sin necesidad de un cron job.
+ */
+async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
+  const idsOcurrenciasAVencer: string[] = [];
+  // Para tareas únicas sin ocurrencia existente: crear una con VENCIDA
+  const ocurrenciasACrear: { tareaAsignacionId: string; fechaOriginal: Date; asigIndex: number }[] = [];
+
+  for (let i = 0; i < asignaciones.length; i++) {
+    const asig = asignaciones[i];
+    const tieneRecurrencia = !!asig.tarea.recurrencia;
+
+    // Marcar ocurrencias materializadas PENDIENTES cuya fecha ya pasó
+    for (const oc of asig.ocurrencias || []) {
+      if (oc.estado === "PENDIENTE") {
+        const fechaOc = new Date(oc.fechaOriginal);
+        fechaOc.setHours(0, 0, 0, 0);
+        if (fechaOc < hoy) {
+          idsOcurrenciasAVencer.push(oc.id);
+          oc.estado = "VENCIDA"; // Actualizar en memoria también
+        }
+      }
+    }
+
+    // Para tareas sin recurrencia: si no tiene ocurrencia y la fecha pasó,
+    // crear una ocurrencia con estado VENCIDA
+    if (
+      !tieneRecurrencia &&
+      asig.tarea.fechaVencimientoBase &&
+      asig.estado === "ACTIVA"
+    ) {
+      const fechaVenc = new Date(asig.tarea.fechaVencimientoBase);
+      fechaVenc.setHours(0, 0, 0, 0);
+      if (fechaVenc < hoy) {
+        const ocurrencias = asig.ocurrencias || [];
+        const yaResuelta = ocurrencias.some(
+          (oc: any) => ["COMPLETADA", "VENCIDA", "CANCELADA"].includes(oc.estado)
+        );
+        if (!yaResuelta && !ocurrencias.some((oc: any) => idsOcurrenciasAVencer.includes(oc.id))) {
+          ocurrenciasACrear.push({
+            tareaAsignacionId: asig.id,
+            fechaOriginal: asig.tarea.fechaVencimientoBase,
+            asigIndex: i,
+          });
+        }
+      }
+    }
+  }
+
+  // Batch update: ocurrencias existentes PENDIENTE → VENCIDA
+  if (idsOcurrenciasAVencer.length > 0) {
+    await prisma.ocurrencia.updateMany({
+      where: { id: { in: idsOcurrenciasAVencer } },
+      data: { estado: "VENCIDA" },
+    });
+  }
+
+  // Crear ocurrencias nuevas para tareas únicas vencidas
+  for (const { tareaAsignacionId, fechaOriginal, asigIndex } of ocurrenciasACrear) {
+    const nuevaOc = await prisma.ocurrencia.create({
+      data: {
+        tareaAsignacionId,
+        fechaOriginal: new Date(fechaOriginal),
+        estado: "VENCIDA",
+      },
+    });
+    // Agregar a la memoria para que mapToRow la incluya
+    if (!asignaciones[asigIndex].ocurrencias) {
+      asignaciones[asigIndex].ocurrencias = [];
+    }
+    asignaciones[asigIndex].ocurrencias.push({
+      id: nuevaOc.id,
+      fechaOriginal: nuevaOc.fechaOriginal,
+      estado: "VENCIDA",
+      tituloOverride: null,
+      fechaOverride: null,
+      colorOverride: null,
+    });
+  }
+
+  // Evaluar si alguna asignación afectada debe pasar a COMPLETADA/FINALIZADA
+  const asignacionesAfectadas = new Set<string>();
+  for (const asig of asignaciones) {
+    if ((asig.ocurrencias || []).some((oc: any) => idsOcurrenciasAVencer.includes(oc.id))) {
+      asignacionesAfectadas.add(asig.id);
+    }
+  }
+  for (const { tareaAsignacionId } of ocurrenciasACrear) {
+    asignacionesAfectadas.add(tareaAsignacionId);
+  }
+  for (const asigId of asignacionesAfectadas) {
+    await evaluarEstadoAsignacion(asigId);
+  }
+}
+
 function mapToRow(asignacion: any): TareaAsignacionRow {
   const rec = asignacion.tarea.recurrencia;
   return {
@@ -685,6 +952,7 @@ function mapToRow(asignacion: any): TareaAsignacionRow {
       fechaOriginal: o.fechaOriginal.toISOString(),
       estado: o.estado,
       tituloOverride: o.tituloOverride,
+      fechaOverride: o.fechaOverride ? o.fechaOverride.toISOString() : null,
       colorOverride: o.colorOverride,
     })),
   };
