@@ -43,6 +43,10 @@ export default function Sidebar() {
 
         <NavLink href="/vencimientos">Vencimientos</NavLink>
 
+        <NavLink href="/tareas-asignadas">Tareas Asignadas</NavLink>
+
+        <NavLink href="/mis-tareas">Mis Tareas</NavLink>
+
       </nav>
 
     </aside>

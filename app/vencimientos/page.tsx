@@ -4,7 +4,7 @@ import { getVencimientosParaTabla } from '../../lib/vencimientos'
 import { Permisos } from '../../lib/permisos'
 import Link from 'next/link'
 import { Button } from '../components/Button'
-import VencimientosTableClient from '../components/VencimientosTableClient'
+import VencimientosTableClient from './components/VencimientosTableClient'
 
 export default async function VencimientosPage() {
   const { orgId } = await auth()

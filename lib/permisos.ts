@@ -151,4 +151,49 @@ export class Permisos {
     const tienePermiso = has({ permission: "org:vencimientos:eliminar_vencimiento" });
     return esAdmin || (permisoVencimiento && tienePermiso);
   }
+
+  // ── Tareas ──────────────────────────────────────────────
+
+  static async esAdmin() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    return has({ role: "org:admin" });
+  }
+
+  static async obtenerContextoUsuario() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return null;
+
+    const esAdmin = has({ role: "org:admin" });
+
+    const organizacion = await prisma.organizacion.findUnique({
+      where: { clerkOrganizationId: orgId },
+    });
+    if (!organizacion) return null;
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { clerkId_organizacionId: { clerkId: userId, organizacionId: organizacion.id } },
+    });
+    if (!usuario) return null;
+
+    return { userId, orgId, esAdmin, organizacion, usuario };
+  }
+
+  static async puedeCrearTareaAsignada() {
+    const ctx = await this.obtenerContextoUsuario();
+    if (!ctx) return false;
+    return ctx.esAdmin;
+  }
+
+  static async puedeModificarTareaAsignada() {
+    const ctx = await this.obtenerContextoUsuario();
+    if (!ctx) return false;
+    return ctx.esAdmin;
+  }
+
+  static async puedeEliminarTareaAsignada() {
+    const ctx = await this.obtenerContextoUsuario();
+    if (!ctx) return false;
+    return ctx.esAdmin;
+  }
 }
