@@ -31,7 +31,7 @@ export default async function ClientesPage() {
   const puedeCrear = await Permisos.puedeCrearCliente();
   const puedeEditar = await Permisos.puedeEditarCliente();
   const puedeEliminar = await Permisos.puedeEliminarCliente();
-  const esAdmin = has({ role: "org:admin" });
+ const puedeVerTodosLosClientes = await Permisos.puedeVerTodosLosClientes();
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -43,7 +43,7 @@ export default async function ClientesPage() {
         {puedeCrear && <FormularioCrearCliente asistentes={asistentes} />}
       </header>
 
-      <FiltrosClientes asistentes={asistentes} esAdmin={esAdmin} />
+      <FiltrosClientes asistentes={asistentes} esAdmin={puedeVerTodosLosClientes} />
 
       <div className="bg-white border border-slate-200 rounded-[20px] shadow-sm overflow-hidden">
         {/* La tabla ahora hace su propio fetch a route.ts */}

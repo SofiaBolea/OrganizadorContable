@@ -52,7 +52,7 @@ export function FiltrosClientes({
         />
       </div>
 
-      {/* Filtro por Asistente (Solo visible para Admin) */}
+     
       {esAdmin && (
         <select
           defaultValue={searchParams.get("asistenteId")?.toString()}

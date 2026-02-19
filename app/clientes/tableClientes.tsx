@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { useSearchParams } from "next/navigation";
 import { AccionesCliente } from "./accionesClientes";
 
-export default function TableCliente({ asistentes, permisos }: any) {
+function TableCliente({ asistentes, permisos }: any) {
   const [clientes, setClientes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
@@ -70,3 +70,5 @@ export default function TableCliente({ asistentes, permisos }: any) {
     </table>
   );
 }
+
+export default memo(TableCliente);
