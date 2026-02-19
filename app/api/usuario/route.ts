@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { listarInfoUsuario } from "@/lib/usuario";
-import { actualizarInformacionExtraUsuario } from "@/lib/usuario";
+import { listarInfoUsuario } from "@/lib/usuario/usuario";
+import { actualizarInformacionExtraUsuario } from "@/lib/usuario/usuario";
 
 
 export async function GET(request: NextRequest) {

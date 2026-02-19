@@ -105,4 +105,11 @@ export class Permisos {
     if (!userId || !orgId) return false;
     return has({ role: "org:admin" });
   }
+
+  static async asistentes() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:asistentes:ver_asistentes" });
+    return tienePermiso;
+  }
 }
