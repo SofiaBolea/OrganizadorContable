@@ -1,3 +1,4 @@
+"use client"
 import { ClerkProvider, SignedIn, SignedOut } from '@clerk/nextjs'
 import { Navbar } from './components/Navbar'
 import { Montserrat } from "next/font/google"
