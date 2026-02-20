@@ -1,0 +1,134 @@
+organizador-contable/
+├── eslint.config.mjs
+├── next-env.d.ts
+├── next.config.ts
+├── package.json
+├── postcss.config.mjs
+├── prisma.config.ts
+├── proxy.ts
+├── README.md
+├── tsconfig.json
+├── app/
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── api/
+│   │   ├── administrador/
+│   │   │   └── route.ts
+│   │   ├── asistentes/
+│   │   │   └── route.ts
+│   │   ├── clientes/
+│   │   │   ├── route.ts
+│   │   │   └── [id]/
+│   │   ├── organizacion/
+│   │   │   └── route.ts
+│   │   ├── ref-colores/
+│   │   │   └── route.ts
+│   │   ├── selectorDeAsistentes/
+│   │   │   └── route.ts
+│   │   ├── tareas/
+│   │   │   ├── route.ts
+│   │   │   ├── [id]/
+│   │   │   ├── asignaciones/
+│   │   │   ├── asistentes/
+│   │   │   └── ocurrencias/
+│   │   ├── usuario/
+│   │   │   └── route.ts
+│   │   ├── vencimientos/
+│   │   │   ├── route.ts
+│   │   │   ├── [id]/
+│   │   │   └── ocurrencias/
+│   │   └── webhooks/
+│   │       └── clerk/
+│   ├── asistentes/
+│   │   ├── filtrosAsistentes.tsx
+│   │   ├── inviteMemberButton.tsx
+│   │   ├── page.tsx
+│   │   ├── permissionToggle.tsx
+│   │   └── tablaAsistentes.tsx
+│   ├── clientes/
+│   │   ├── accionesClientes.tsx
+│   │   ├── filtrosClientes.tsx
+│   │   ├── formularioCrearCliente.tsx
+│   │   ├── formularioEditarCliente.tsx
+│   │   ├── modalConfirmacionEliminar.tsx
+│   │   ├── modalError.tsx
+│   │   ├── page.tsx
+│   │   └── tableClientes.tsx
+│   ├── components/
+│   │   ├── Button.tsx
+│   │   ├── Header.tsx
+│   │   ├── Navbar.tsx
+│   │   ├── Sidebar.tsx
+│   │   └── perfilDeUsuario/
+│   │       └── userProfile.tsx
+│   ├── organizacion/
+│   │   ├── informacionExtra.tsx
+│   │   ├── vistaInformaciónOrganizacion.tsx
+│   │   └── [[...organizacion]]/
+│   │       └── page.tsx
+│   ├── sign-in/
+│   │   └── [[...sign-in]]/
+│   │       └── page.tsx
+│   ├── sign-up/
+│   │   └── [[...sign-up]]/
+│   │       └── page.tsx
+│   ├── tareas-asignadas/
+│   │   ├── page.tsx
+│   │   ├── [id]/
+│   │   │   ├── page.tsx
+│   │   │   └── modificar/
+│   │   ├── components/
+│   │   │   ├── ConfirmDeleteTareaModal.tsx
+│   │   │   ├── ConfirmEstadoModal.tsx
+│   │   │   ├── RefColorSelector.tsx
+│   │   │   ├── TareaForm.tsx
+│   │   │   └── TareasTableClient.tsx
+│   │   └── nueva/
+│   │       └── page.tsx
+│   ├── tareas-propias/
+│   │   ├── page.tsx
+│   │   ├── [id]/
+│   │   │   ├── page.tsx
+│   │   │   └── modificar/
+│   │   └── nueva/
+│   │       └── page.tsx
+│   ├── vencimientos/
+│   │   ├── page.tsx
+│   │   ├── [id]/
+│   │   │   ├── page.tsx
+│   │   │   └── modificar/
+│   │   ├── components/
+│   │   │   ├── ConfirmDeleteModal.tsx
+│   │   │   ├── VencimientoFechasForm.tsx
+│   │   │   ├── VencimientoInputs.tsx
+│   │   │   └── VencimientosTableClient.tsx
+│   │   └── nuevoVencimiento/
+│   │       └── page.tsx
+├── generated/
+│   └── prisma/
+│       ├── browser.ts
+│       ├── client.ts
+│       ├── commonInputTypes.ts
+│       ├── enums.ts
+│       ├── models.ts
+│       ├── internal/
+│       │   └── class.ts
+│       │   └── ...
+│       └── models/
+│           └── ...
+├── lib/
+│   ├── clientes.ts
+│   ├── organizacion.ts
+│   ├── permisos.ts
+│   ├── prisma.ts
+│   ├── tareas-shared.ts
+│   ├── tareas.ts
+│   ├── validarYLimpiarDatos.ts
+│   ├── vencimientos.ts
+│   └── usuario/
+│       ├── asistentes.ts
+│       └── usuario.ts
+├── prisma/
+│   ├── schema.prisma
+│   └── seed.ts
