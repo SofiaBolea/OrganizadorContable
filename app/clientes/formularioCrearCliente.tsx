@@ -1,10 +1,31 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 // import { crearClienteAction } from "./actions";
 import { ModalError } from "./modalError";
+import { Button } from "../components/Button";
 
-export function FormularioCrearCliente({ asistentes, onClienteCreado }: { asistentes: any[], onClienteCreado?: () => void }) {
+export function FormularioCrearCliente({ onClienteCreado }: { onClienteCreado?: () => void }) {
+  const [asistentes, setAsistentes] = useState<any[]>([]);
+  const [asistentesLoading, setAsistentesLoading] = useState(true);
+  const [asistentesError, setAsistentesError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAsistentes = async () => {
+      setAsistentesLoading(true);
+      setAsistentesError(null);
+      try {
+        const res = await fetch("/api/selectorDeAsistentes");
+        if (!res.ok) throw new Error("No se pudieron obtener los asistentes");
+        const data = await res.json();
+        setAsistentes(data);
+      } catch (err) {
+        setAsistentesError("Error al cargar asistentes");
+      }
+      setAsistentesLoading(false);
+    };
+    fetchAsistentes();
+  }, []);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -76,10 +97,25 @@ export function FormularioCrearCliente({ asistentes, onClienteCreado }: { asiste
   }
 
   if (!isOpen) return (
-    <button onClick={() => setIsOpen(true)} className="bg-indigo-600 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-indigo-700 transition-all">
+    <Button onClick={() => setIsOpen(true)} variant="primario" >
       + Nuevo Cliente
-    </button>
+    </Button>
   );
+
+  if (asistentesLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <span className="text-gray-500">Cargando asistentes...</span>
+      </div>
+    );
+  }
+  if (asistentesError) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <span className="text-red-500">{asistentesError}</span>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -119,10 +155,10 @@ export function FormularioCrearCliente({ asistentes, onClienteCreado }: { asiste
             </div>
 
             <div className="flex justify-between gap-4 pt-4">
-              <button type="button" onClick={() => setIsOpen(false)} className="flex-1 bg-[#f4a28c] text-[#8e4a3a] py-3 rounded-2xl font-bold shadow-md">Cancelar</button>
-              <button type="submit" disabled={loading} className="flex-1 bg-[#98c18c] text-[#3e5a34] py-3 rounded-2xl font-bold shadow-md disabled:opacity-50">
+              <Button type="button" onClick={() => setIsOpen(false)} variant="peligro" >Cancelar</Button>
+              <Button type="submit" disabled={loading} variant="primario" >
                 {loading ? "Guardando..." : "Guardar Cliente"}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

@@ -2,6 +2,9 @@
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
+
+// ── CLientes ──────────────────────────────────────────────
+
 export class Permisos {
   static async puedeCrearCliente() {
     const { userId, orgId, has } = await auth();
@@ -100,6 +103,58 @@ export class Permisos {
     return esAdmin || (usuarioActual?.permisoClientes === true && tienePermiso);
   }
 
+  // ── Vencimientos ──────────────────────────────────────────────
+
+  private static async obtenerPermisoVencimientoDB() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return { userId, orgId, has, permisoVencimiento: false, esAdmin: false };
+
+    const esAdmin = has({ role: "org:admin" });
+
+    const organizacion = await prisma.organizacion.findUnique({
+      where: { clerkOrganizationId: orgId },
+    });
+
+    if (!organizacion) return { userId, orgId, has, permisoVencimiento: false, esAdmin };
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { clerkId_organizacionId: { clerkId: userId, organizacionId: organizacion.id } },
+      select: { permisoVencimiento: true },
+    });
+
+    return { userId, orgId, has, permisoVencimiento: !!usuario?.permisoVencimiento, esAdmin };
+  }
+
+  static async puedeVerVencimiento() {
+    const { userId, orgId, has, esAdmin } = await this.obtenerPermisoVencimientoDB();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:vencimientos:ver_vencimientos" });
+    return esAdmin || tienePermiso;
+  }
+
+  static async puedeCrearVencimiento() {
+    const { userId, orgId, has, permisoVencimiento, esAdmin } = await this.obtenerPermisoVencimientoDB();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:vencimientos:crear_vencimientos" });
+    return esAdmin || (permisoVencimiento && tienePermiso);
+  }
+
+  static async puedeModificarVencimiento() {
+    const { userId, orgId, has, permisoVencimiento, esAdmin } = await this.obtenerPermisoVencimientoDB();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:vencimientos:modificar_vencimientos" });
+    return esAdmin || (permisoVencimiento && tienePermiso);
+  }
+
+  static async puedeEliminarVencimiento() {
+    const { userId, orgId, has, permisoVencimiento, esAdmin } = await this.obtenerPermisoVencimientoDB();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:vencimientos:eliminar_vencimiento" });
+    return esAdmin || (permisoVencimiento && tienePermiso);
+  }
+
+  // ── Tareas ──────────────────────────────────────────────
+
   static async esAdmin() {
     const { userId, orgId, has } = await auth();
     if (!userId || !orgId) return false;
@@ -111,5 +166,41 @@ export class Permisos {
     if (!userId || !orgId) return false;
     const tienePermiso = has({ permission: "org:asistentes:ver_asistentes" });
     return tienePermiso;
+  }
+  static async obtenerContextoUsuario() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return null;
+
+    const esAdmin = has({ role: "org:admin" });
+
+    const organizacion = await prisma.organizacion.findUnique({
+      where: { clerkOrganizationId: orgId },
+    });
+    if (!organizacion) return null;
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { clerkId_organizacionId: { clerkId: userId, organizacionId: organizacion.id } },
+    });
+    if (!usuario) return null;
+
+    return { userId, orgId, esAdmin, organizacion, usuario };
+  }
+
+  static async puedeCrearTareaAsignada() {
+    const ctx = await this.obtenerContextoUsuario();
+    if (!ctx) return false;
+    return ctx.esAdmin;
+  }
+
+  static async puedeModificarTareaAsignada() {
+    const ctx = await this.obtenerContextoUsuario();
+    if (!ctx) return false;
+    return ctx.esAdmin;
+  }
+
+  static async puedeEliminarTareaAsignada() {
+    const ctx = await this.obtenerContextoUsuario();
+    if (!ctx) return false;
+    return ctx.esAdmin;
   }
 }

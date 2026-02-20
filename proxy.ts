@@ -7,17 +7,9 @@ const isPublicRoute = createRouteMatcher([
   '/organizacion(.*)',
 ]);
 
-const isAdminRoute = createRouteMatcher([
-  '/vencimientos(.*)',
-]);
-
 export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
     await auth.protect();
-  }
-
-  if (isAdminRoute(request)) {
-    await auth.protect({ role: 'org:admin' });
   }
 });
 
