@@ -38,24 +38,20 @@ export async function updateUsuarioPermission({
     where: { clerkId_organizacionId: { clerkId: userId, organizacionId: orgLocal.id } },
     select: { id: true }
   });
+
   if (!usuarioEjecutor) {
-    const usuarioEjecutor = await prisma.usuario.findUnique({
-      where: { clerkId_organizacionId: { clerkId: userId, organizacionId: orgId } },
-      select: { id: true }
-    });
-    if (!usuarioEjecutor) {
-      throw new Error("Usuario ejecutor no encontrado en la base de datos.");
-    }
-    await prisma.registroAuditoria.create({
-      data: {
-        organizacionId: orgId,
-        ejecutadoPorId: usuarioEjecutor.id,
-        usuarioAfectadoId: usuarioId,
-        accion: `Cambio de permiso ${campo}`,
-        detalleAccion: `El permiso '${campo}' fue cambiado a '${valor ? "habilitado" : "deshabilitado"}' para el usuario ${usuarioActualizado.nombreCompleto} (${usuarioActualizado.email})`,
-      },
-    });
+    throw new Error("Usuario ejecutor no encontrado en la base de datos.");
   }
+  await prisma.registroAuditoria.create({
+    data: {
+      organizacionId: orgLocal.id,
+      ejecutadoPorId: usuarioEjecutor.id,
+      usuarioAfectadoId: usuarioId,
+      accion: `Cambio de permiso ${campo}`,
+      detalleAccion: `El permiso '${campo}' fue cambiado a '${valor ? "habilitado" : "deshabilitado"}' para el usuario ${usuarioActualizado.nombreCompleto} (${usuarioActualizado.email})`,
+    },
+  });
+
 }
 
 export async function listarAsistentes(request: NextRequest) {
