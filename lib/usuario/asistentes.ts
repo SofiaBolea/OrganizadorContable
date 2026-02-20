@@ -13,9 +13,11 @@ export async function updateUsuarioPermission({
   campo: "permisoClientes" | "permisoVencimiento";
   valor: boolean;
 }) {
-  const { userId, orgId, has } = await auth();
-  const canEdit = has({ permission: "org:asistentes:ver_asistentes" });
-  if (!orgId || !canEdit) {
+  const { userId, orgId} = await auth();
+  const puedeVer = await Permisos.puedeVerAsistentes();
+  const canEdit = await Permisos.puedeEditarAsistentes();
+  
+  if (!orgId || !canEdit || !puedeVer) {
     throw new Error("No tenés permisos para editar.");
   }
   const usuarioActualizado = await prisma.usuario.update({

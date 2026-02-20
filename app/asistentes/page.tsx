@@ -1,6 +1,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { TablaAsistentes } from "./tablaAsistentes";
+import { Permisos } from "@/lib/permisos";
 
 
 export default async function AsistentesPage({ searchParams }: { searchParams: Record<string, string> }) {
@@ -20,7 +21,7 @@ export default async function AsistentesPage({ searchParams }: { searchParams: R
   }
 
 
-  const canView = has({ permission: "org:asistentes:ver_asistentes" });
+  const canView = await Permisos.puedeVerAsistentes();
   const canInvite = has({ permission: "org:asistentes:crear_asistente" });
 
 
