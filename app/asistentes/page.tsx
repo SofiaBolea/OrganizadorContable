@@ -29,7 +29,6 @@ export default async function AsistentesPage({ searchParams }: { searchParams: R
     return (
       <main className="flex min-h-[80vh] items-center justify-center p-6 bg-app">
         <div className="bg-danger/10 border border-danger/20 p-12 rounded-xl text-center max-w-md">
-          <span className="w-10 h-10 text-danger-foreground mx-auto mb-6">🔒</span>
           <h2 className="text-2xl font-black text-text mb-2">Acceso Denegado</h2>
           <p className="text-text/60 italic">No tenés permisos para gestionar asistentes.</p>
         </div>
