@@ -43,11 +43,10 @@ export default async function ClientesPage() {
         {puedeCrear && <FormularioCrearCliente  />}
       </header>
 
-      <FiltrosClientes asistentes={asistentes} esAdmin={puedeVerTodosLosClientes} />
+      <FiltrosClientes  esAdmin={puedeVerTodosLosClientes} />
 
       <div className="bg-white border border-slate-200 rounded-[20px] shadow-sm overflow-hidden">
         <TableCliente 
-          asistentes={asistentes} 
           permisos={{ puedeEditar, puedeEliminar }} 
         />
       </div>

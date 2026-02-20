@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "../components/Button";
+
 interface Props {
   nombreCliente: string;
   onConfirm: () => void;
@@ -17,18 +19,18 @@ export function ModalConfirmacionEliminar({ nombreCliente, onConfirm, onCancel }
         </p>
 
         <div className="flex justify-between gap-4">
-          <button
+          <Button
             onClick={onCancel}
-            className="flex-1 bg-[#f4a28c] text-[#8e4a3a] py-3 rounded-full font-bold hover:opacity-90 transition-opacity"
+            variant="peligro"
           >
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onConfirm}
-            className="flex-1 bg-[#98c18c] text-[#3e5a34] py-3 rounded-full font-bold hover:opacity-90 transition-opacity"
+            variant="primario"
           >
             Aceptar
-          </button>
+          </Button>
         </div>
       </div>
     </div>
