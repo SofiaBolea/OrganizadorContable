@@ -58,6 +58,7 @@ model Usuario {
   tareasAsignadasPor      TareaAsignacion[]   @relation("asignadoPor")
   vencimientosCreados     Vencimiento[]
   clientesAsignados       ClienteAsignacion[]
+  refColores              RefColor[]
 
   @@index([organizacionId])
   @@map("usuarios")
@@ -249,12 +250,15 @@ model RecursoRef {
 model RefColor {
   id          String  @id
   recurso     Recurso @relation(fields: [id], references: [id], onDelete: Cascade)
+  usuarioId   String
+  usuario     Usuario @relation(fields: [usuarioId], references: [id])
   titulo      String  @db.VarChar(50)
   codigoHexa  String  @db.VarChar(7)
 
   // Relaciones
   tareasAsignadas TareaAsignacion[]
 
+  @@index([usuarioId])
   @@map("ref_colores")
 }
 
@@ -385,7 +389,7 @@ model VencimientoOcurrencia {
   vencimientoId    String
   vencimiento      Vencimiento @relation(fields: [vencimientoId], references: [id], onDelete: Cascade)
   fechaVencimiento DateTime    @db.Date
-  estado           String      @default("PENDIENTE") @db.VarChar(20)
+  estado           String      @default("ACTIVA") @db.VarChar(20)
 
   @@index([vencimientoId])
   @@index([fechaVencimiento])

@@ -70,6 +70,7 @@ export default async function ModificarTareaAsignadaPage({ params, searchParams 
           asignadoIds: tarea.asignaciones.map((a) => a.asignadoId),
           refColorId: null,
         }}
+        esAdmin={puedeModificar}
       />
     </main>
   );

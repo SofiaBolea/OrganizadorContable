@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { ChevronDown, Eye, Edit, Trash2, Plus } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Eye, Edit, Trash2, Plus } from "lucide-react";
 
 interface RefColor {
   id: string;
@@ -9,19 +9,11 @@ interface RefColor {
   codigoHexa: string;
 }
 
-interface RefColorSelectorProps {
-  selectedId: string | null;
-  onChange: (id: string | null) => void;
-  disabled?: boolean;
-}
-
 type ModalMode = "crear" | "editar" | "ver" | null;
 
-export default function RefColorSelector({ selectedId, onChange, disabled }: RefColorSelectorProps) {
+export default function RefColorTable() {
   const [colores, setColores] = useState<RefColor[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Modal state
   const [modalMode, setModalMode] = useState<ModalMode>(null);
@@ -38,17 +30,6 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
     fetchColores();
   }, []);
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const fetchColores = async () => {
     try {
       const res = await fetch("/api/ref-colores");
@@ -63,12 +44,9 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
     }
   };
 
-  const selectedColor = colores.find((c) => c.id === selectedId);
-
   // ── Modal handlers ──
 
   const openCrear = () => {
-    setIsOpen(false);
     setFormTitulo("");
     setFormCodigoHexa("#4A90D9");
     setModalMode("crear");
@@ -76,7 +54,6 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
   };
 
   const openEditar = (color: RefColor) => {
-    setIsOpen(false);
     setFormTitulo(color.titulo);
     setFormCodigoHexa(color.codigoHexa);
     setModalMode("editar");
@@ -84,7 +61,6 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
   };
 
   const openVer = (color: RefColor) => {
-    setIsOpen(false);
     setFormTitulo(color.titulo);
     setFormCodigoHexa(color.codigoHexa);
     setModalMode("ver");
@@ -111,7 +87,6 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
         if (res.ok) {
           const { data } = await res.json();
           setColores((prev) => [...prev, data]);
-          onChange(data.id);
           closeModal();
         } else {
           alert("Error al crear color");
@@ -138,7 +113,6 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
   };
 
   const openDeleteConfirm = (color: RefColor) => {
-    setIsOpen(false);
     setDeleteConfirm(color);
   };
 
@@ -151,7 +125,6 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
       });
       if (res.ok) {
         setColores((prev) => prev.filter((c) => c.id !== deleteConfirm.id));
-        if (selectedId === deleteConfirm.id) onChange(null);
         setDeleteConfirm(null);
       } else {
         alert("Error al eliminar color");
@@ -164,118 +137,88 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
   };
 
   if (loading) {
-    return <div className="text-text/50 text-sm">Cargando colores...</div>;
+    return (
+      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-8 mt-8">
+        <p className="text-text/50 text-sm">Cargando colores de referencia...</p>
+      </div>
+    );
   }
 
   return (
     <>
-      {/* Dropdown */}
-      <div className="relative" ref={dropdownRef}>
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={() => setIsOpen(!isOpen)}
-          className={`w-full flex items-center justify-between bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text transition-all ${
-            disabled ? "cursor-default opacity-60" : "cursor-pointer hover:ring-2 hover:ring-primary"
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            {selectedColor ? (
-              <>
-                <span
-                  className="w-4 h-4 rounded-full inline-block flex-shrink-0"
-                  style={{ backgroundColor: selectedColor.codigoHexa }}
-                />
-                <span className="text-sm font-medium">{selectedColor.titulo}</span>
-              </>
-            ) : (
-              <span className="text-sm text-text/40">Color de Referencia (Opcional)</span>
-            )}
-          </div>
-          <ChevronDown size={18} className={`text-text/40 transition-transform ${isOpen ? "rotate-180" : ""}`} />
-        </button>
+      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-8 mt-8">
+        <h2 className="text-xl font-bold text-text mb-6">Colores de Referencia</h2>
 
-        {/* Dropdown list */}
-        {isOpen && !disabled && (
-          <div className="absolute z-20 left-0 right-0 mt-1 bg-card rounded-2xl border border-white shadow-lg overflow-hidden">
-            {/* Sin color option */}
-            {selectedId !== null && (
-              <button
-                type="button"
-                onClick={() => { onChange(null); setIsOpen(false); }}
-                className="w-full text-left px-5 py-3 text-sm text-text/50 hover:bg-black/[0.02] transition-colors border-b border-text/5"
-              >
-                Sin color
-              </button>
-            )}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b-2 border-text/20">
+                <th className="px-4 py-3 text-sm font-semibold text-text/70">Titulo de Tarea</th>
+                <th className="px-4 py-3 text-sm font-semibold text-text/70 text-center">Color</th>
+                <th className="px-4 py-3 text-sm font-semibold text-text/70">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {colores.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="px-4 py-6 text-center text-text/40 text-sm">
+                    No hay colores de referencia creados.
+                  </td>
+                </tr>
+              )}
+              {colores.map((c) => (
+                <tr key={c.id} className="border-b border-text/5 hover:bg-black/[0.01] transition-colors">
+                  <td className="px-4 py-4 text-sm font-semibold text-text">{c.titulo}</td>
+                  <td className="px-4 py-4 text-center">
+                    <span
+                      className="inline-block w-8 h-8 rounded-full"
+                      style={{ backgroundColor: c.codigoHexa }}
+                    />
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-4">
+                      <button
+                        type="button"
+                        onClick={() => openVer(c)}
+                        className="text-text/40 hover:text-text transition-colors text-sm underline"
+                      >
+                        Ver detalle
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openEditar(c)}
+                        className="text-text/40 hover:text-text transition-colors"
+                        title="Modificar"
+                      >
+                        <Edit size={18} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openDeleteConfirm(c)}
+                        className="text-danger-foreground/60 hover:text-danger-foreground transition-colors"
+                        title="Eliminar"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-            {/* Color items */}
-            {colores.map((c, i) => (
-              <div
-                key={c.id}
-                className={`flex items-center justify-between px-5 py-3 hover:bg-black/[0.02] transition-colors ${
-                  i < colores.length - 1 ? "border-b border-text/5" : ""
-                }`}
-              >
-                {/* Clickable area for selection */}
-                <button
-                  type="button"
-                  onClick={() => { onChange(c.id); setIsOpen(false); }}
-                  className="flex items-center gap-3 flex-1 text-left"
-                >
-                  <span className="text-sm font-semibold text-text">{c.titulo}</span>
-                </button>
-
-                {/* Color circle */}
-                <div className="flex items-center gap-4">
-                  <span
-                    className={`w-8 h-8 rounded-full inline-block flex-shrink-0 ${
-                      selectedId === c.id ? "ring-2 ring-offset-2 ring-current" : ""
-                    }`}
-                    style={{ backgroundColor: c.codigoHexa, color: c.codigoHexa }}
-                  />
-
-                  {/* Actions */}
-                  <button
-                    type="button"
-                    onClick={() => openVer(c)}
-                    className="text-text/40 hover:text-text transition-colors text-sm underline"
-                  >
-                    Ver detalle
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => openEditar(c)}
-                    className="text-text/40 hover:text-text transition-colors"
-                    title="Modificar"
-                  >
-                    <Edit size={18} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => openDeleteConfirm(c)}
-                    className="text-danger-foreground/60 hover:text-danger-foreground transition-colors"
-                    title="Eliminar"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              </div>
-            ))}
-
-            {/* Agregar nueva referencia */}
-            <div className="border-t border-text/10">
-              <button
-                type="button"
-                onClick={openCrear}
-                className="w-full flex items-center justify-between px-5 py-3 text-sm text-text hover:bg-black/[0.02] transition-colors"
-              >
-                <span>Agregar nueva Referencia</span>
-                <Plus size={18} className="text-text/60" />
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Agregar nueva Referencia */}
+        <div className="border-t border-text/10 mt-2 pt-2">
+          <button
+            type="button"
+            onClick={openCrear}
+            className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-text hover:bg-black/[0.02] rounded-xl transition-colors"
+          >
+            <span>Agregar nueva Referencia</span>
+            <Plus size={18} className="text-text/60" />
+          </button>
+        </div>
       </div>
 
       {/* ── Modal Crear / Editar / Ver ── */}
@@ -286,8 +229,8 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
               {modalMode === "crear"
                 ? "Nuevo Color de Referencia"
                 : modalMode === "editar"
-                ? "Modificar Color de Referencia"
-                : "Detalle del Color"}
+                  ? "Modificar Color de Referencia"
+                  : "Detalle del Color"}
             </h3>
 
             {/* Nombre / Título */}

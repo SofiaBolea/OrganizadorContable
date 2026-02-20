@@ -35,7 +35,7 @@ export async function crearOcurrenciasVencimiento(
         data: {
           vencimientoId,
           fechaVencimiento: new Date(fecha),
-          estado: "PENDIENTE",
+          estado: "ACTIVA",
         },
       })
     )
@@ -103,6 +103,9 @@ export async function eliminarOcurrenciaVencimiento(
       where: { id: ocurrenciaId },
     });
   }
+
+  // Evaluar si el vencimiento padre debe pasar a BAJA
+  await evaluarEstadoVencimiento(ocurrencia.vencimientoId);
 }
 
 interface DatosCrearVencimiento {
@@ -161,7 +164,7 @@ export async function crearVencimiento(
             ocurrencias: {
               create: fechas.map((fecha) => ({
                 fechaVencimiento: new Date(fecha),
-                estado: "PENDIENTE",
+                estado: "ACTIVA",
               })),
             },
           }),
@@ -228,7 +231,7 @@ export async function actualizarVencimiento(
         where: { id: o.id },
         data: {
           fechaVencimiento: new Date(o.fecha),
-          estado: o.estado || "PENDIENTE",
+          estado: o.estado || "ACTIVA",
         },
       });
     }
@@ -239,7 +242,7 @@ export async function actualizarVencimiento(
         data: ocurrenciasNuevas.map((o) => ({
           vencimientoId,
           fechaVencimiento: new Date(o.fecha),
-          estado: o.estado || "PENDIENTE",
+          estado: o.estado || "ACTIVA",
         })),
       });
     }
@@ -269,10 +272,60 @@ export async function actualizarVencimiento(
   return updated;
 }
 
+/**
+ * Evalúa si un vencimiento padre debe pasar a "BAJA".
+ * Si no le quedan ocurrencias, se pone en estado "BAJA".
+ */
+async function evaluarEstadoVencimiento(vencimientoId: string) {
+  const count = await prisma.vencimientoOcurrencia.count({
+    where: { vencimientoId },
+  });
+
+  if (count === 0) {
+    await prisma.vencimiento.update({
+      where: { id: vencimientoId },
+      data: { estado: "BAJA" },
+    });
+  }
+}
+
+/**
+ * Elimina de la BD todas las ocurrencias cuya fechaVencimiento ya pasó.
+ * Luego evalúa si cada vencimiento padre afectado debe pasar a "BAJA".
+ */
+async function eliminarOcurrenciasVencidasAlLeer(organizacionId: string) {
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
+  // Buscar ocurrencias vencidas para saber qué vencimientos padres se afectan
+  const ocurrenciasVencidas = await prisma.vencimientoOcurrencia.findMany({
+    where: {
+      fechaVencimiento: { lt: hoy },
+      vencimiento: {
+        recurso: { organizacionId },
+      },
+    },
+    select: { id: true, vencimientoId: true },
+  });
+
+  if (ocurrenciasVencidas.length === 0) return;
+
+  // Eliminar las ocurrencias vencidas
+  await prisma.vencimientoOcurrencia.deleteMany({
+    where: {
+      id: { in: ocurrenciasVencidas.map((o) => o.id) },
+    },
+  });
+
+  // Evaluar cada vencimiento padre afectado
+  const vencimientoIdsAfectados = [...new Set(ocurrenciasVencidas.map((o) => o.vencimientoId))];
+  for (const vId of vencimientoIdsAfectados) {
+    await evaluarEstadoVencimiento(vId);
+  }
+}
+
 export async function getVencimientosParaTabla(orgId: string) {
   try {
-    // orgId es el clerkOrganizationId, lo usamos directamente
-    // Primero buscamos la organización en la BD
     const organizacion = await prisma.organizacion.findUnique({
       where: { clerkOrganizationId: orgId },
     });
@@ -281,6 +334,9 @@ export async function getVencimientosParaTabla(orgId: string) {
       console.warn(`Organización no encontrada para clerkOrganizationId: ${orgId}`);
       return [];
     }
+
+    // Eliminar ocurrencias vencidas y evaluar padres
+    await eliminarOcurrenciasVencidasAlLeer(organizacion.id);
 
     return await prisma.vencimientoOcurrencia.findMany({
       where: {

@@ -221,7 +221,7 @@ export default function VencimientoInputs(props: VencimientoInputsProps) {
         <div className="mb-6">
           <input
             type="text"
-            placeholder="Subtítulo (Opcional)"
+            placeholder="Jurisdicción (Opcional)"
             value={jurisdiccion}
             onChange={(e) => setJurisdiccion(e.target.value)}
             className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text placeholder:text-text/40 focus:ring-2 focus:ring-primary transition-all"

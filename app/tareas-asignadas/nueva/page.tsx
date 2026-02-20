@@ -24,6 +24,7 @@ export default async function NuevaTareaAsignadaPage() {
         mode="create"
         tipoTarea="ASIGNADA"
         basePath="/tareas-asignadas"
+        esAdmin={puedeCrear}
       />
     </main>
   );

@@ -318,21 +318,112 @@ export default function TareasTableClient({
     }
   };
 
+  // Cancelar esta ocurrencia y todas las futuras
   const handleDeleteAll = async () => {
     if (!deleteModal.row) return;
+    const row = deleteModal.row;
     setLoading(true);
     try {
-      const res = await fetch(`/api/tareas/${deleteModal.row.tareaId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        alert(data.error || "Error al eliminar");
-        return;
+      const fechaDesde = row.fechaOcurrencia || new Date().toISOString().split("T")[0];
+
+      if (row.tieneRecurrencia) {
+        // Tarea recurrente → cortar recurrencia y cancelar futuras
+        const res = await fetch("/api/tareas/ocurrencias", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tareaAsignacionId: row.tareaAsignacionId,
+            fechaDesde,
+          }),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          alert(data.error || "Error al cancelar");
+          return;
+        }
+
+        // Actualizar en memoria: setear hastaFecha y marcar ocurrencias futuras como CANCELADA
+        // No actualiza en la BD solo en lo que se muestra, el endpoint se encarga de actualizar correctamente la recurrencia y las ocurrencias futuras
+        const fechaCorteStr = fechaDesde.split("T")[0];
+        setTareasBase((prev) =>
+          prev.map((t) => {
+            if (t.tareaAsignacionId !== row.tareaAsignacionId) return t;
+            // Actualizar hastaFecha en recurrencia (día anterior)
+            const diaAnterior = new Date(fechaCorteStr + "T12:00:00");
+            diaAnterior.setDate(diaAnterior.getDate() - 1);
+            return {
+              ...t,
+              recurrencia: t.recurrencia
+                ? { ...t.recurrencia, hastaFecha: diaAnterior.toISOString() }
+                : null,
+              ocurrenciasMaterializadas: t.ocurrenciasMaterializadas.map((o) =>
+                o.fechaOriginal.split("T")[0] >= fechaCorteStr && o.estado === "PENDIENTE"
+                  ? { ...o, estado: "CANCELADA" }
+                  : o
+              ),
+            };
+          })
+        );
+      } else {
+        // Tarea no recurrente → cancelar la única ocurrencia
+        if (row.ocurrenciaId) {
+          const res = await fetch(`/api/tareas/ocurrencias/${row.ocurrenciaId}`, {
+            method: "DELETE",
+          });
+          if (!res.ok) {
+            const data = await res.json();
+            alert(data.error || "Error al cancelar");
+            return;
+          }
+        } else {
+          const res = await fetch("/api/tareas/ocurrencias", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              tareaAsignacionId: row.tareaAsignacionId,
+              fechaOriginal: fechaDesde,
+              estado: "CANCELADA",
+            }),
+          });
+          if (!res.ok) {
+            const data = await res.json();
+            alert(data.error || "Error al cancelar");
+            return;
+          }
+        }
+
+        // Actualizar en memoria
+        const fechaKey = fechaDesde.split("T")[0];
+        setTareasBase((prev) =>
+          prev.map((t) => {
+            if (t.tareaAsignacionId !== row.tareaAsignacionId) return t;
+            const yaExiste = t.ocurrenciasMaterializadas.some(
+              (o) => o.fechaOriginal.split("T")[0] === fechaKey
+            );
+            return {
+              ...t,
+              ocurrenciasMaterializadas: yaExiste
+                ? t.ocurrenciasMaterializadas.map((o) =>
+                    o.fechaOriginal.split("T")[0] === fechaKey
+                      ? { ...o, estado: "CANCELADA" }
+                      : o
+                  )
+                : [
+                    ...t.ocurrenciasMaterializadas,
+                    {
+                      id: "temp",
+                      fechaOriginal: fechaKey,
+                      estado: "CANCELADA",
+                      tituloOverride: null,
+                      fechaOverride: null,
+                      colorOverride: null,
+                    },
+                  ],
+            };
+          })
+        );
       }
-      setTareasBase((prev) =>
-        prev.filter((t) => t.tareaId !== deleteModal.row!.tareaId)
-      );
+
       setDeleteModal({ isOpen: false, row: null });
     } catch {
       alert("Error al conectar con el servidor");
@@ -592,7 +683,7 @@ export default function TareasTableClient({
                         {/* Acciones */}
                         <td className="px-4 py-3 flex gap-3 items-center">
                           <Link
-                            href={`${basePath}/${row.tareaId}`}
+                            href={`${basePath}/${row.tareaId}?fechaOc=${row.fechaOriginalOcurrencia || row.fechaOcurrencia || ""}`}
                             className="text-text/50 hover:text-text transition-colors"
                             title="Ver detalle"
                           >

@@ -5,6 +5,8 @@ import { Permisos } from "@/lib/permisos";
 import Link from "next/link";
 import { Button } from "../components/Button";
 import TareasTableClient from "./components/TareasTableClient";
+import RefColorSelector from "./components/RefColorSelector";
+import RefColorTable from "./components/RefColorTable";
 
 export default async function TareasAsignadasPage() {
   const { orgId, userId } = await auth();
@@ -59,6 +61,8 @@ export default async function TareasAsignadasPage() {
         canDelete={canDelete}
         basePath="/tareas-asignadas"
       />
+
+      {!esAdmin && <RefColorTable />}
     </main>
   );
 }

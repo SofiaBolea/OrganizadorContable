@@ -244,6 +244,7 @@ export type RecursoRefScalarFieldEnum = (typeof RecursoRefScalarFieldEnum)[keyof
 
 export const RefColorScalarFieldEnum = {
   id: 'id',
+  usuarioId: 'usuarioId',
   titulo: 'titulo',
   codigoHexa: 'codigoHexa'
 } as const

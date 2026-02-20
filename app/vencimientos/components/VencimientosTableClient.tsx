@@ -262,7 +262,6 @@ export default function VencimientosTableClient({
                   <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Categoría</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Vencimiento</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Días Faltantes</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Estado</th>
                   {(canModify || canDelete) && (
                     <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Acciones</th>
                   )}
@@ -301,7 +300,6 @@ export default function VencimientosTableClient({
                       <td className="px-4 py-3 text-center font-semibold text-text">
                         {diasFaltantes}
                       </td>
-                      <td className="px-4 py-3">{o.estado}</td>
                       {(canModify || canDelete) && (
                         <td className="px-4 py-3 flex gap-3 items-center">
                           <Link
