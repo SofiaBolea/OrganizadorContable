@@ -31,7 +31,7 @@ export default async function ClientesPage() {
   const puedeCrear = await Permisos.puedeCrearCliente();
   const puedeEditar = await Permisos.puedeEditarCliente();
   const puedeEliminar = await Permisos.puedeEliminarCliente();
-  const esAdmin = has({ role: "org:admin" });
+ const puedeVerTodosLosClientes = await Permisos.puedeVerTodosLosClientes();
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -40,15 +40,13 @@ export default async function ClientesPage() {
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight italic">Lista de Clientes</h1>
           <p className="text-slate-500 mt-1 italic">Estudio {orgLocal.nombre}</p>
         </div>
-        {puedeCrear && <FormularioCrearCliente asistentes={asistentes} />}
+        {puedeCrear && <FormularioCrearCliente  />}
       </header>
 
-      <FiltrosClientes asistentes={asistentes} esAdmin={esAdmin} />
+      <FiltrosClientes  esAdmin={puedeVerTodosLosClientes} />
 
       <div className="bg-white border border-slate-200 rounded-[20px] shadow-sm overflow-hidden">
-        {/* La tabla ahora hace su propio fetch a route.ts */}
         <TableCliente 
-          asistentes={asistentes} 
           permisos={{ puedeEditar, puedeEliminar }} 
         />
       </div>

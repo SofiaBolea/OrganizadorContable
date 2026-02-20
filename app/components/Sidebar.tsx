@@ -13,10 +13,9 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
       href={href}
       className={`
         px-4 py-2 rounded-md text-sm transition-colors
-        ${
-          isActive
-            ? "bg-white text-[#2C2C2C] font-semibold"
-            : "text-white/70 hover:bg-white/10 hover:text-white"
+        ${isActive
+          ? "bg-white text-[#2C2C2C] font-semibold"
+          : "text-white/70 hover:bg-white/10 hover:text-white"
         }
       `}
     >
@@ -29,11 +28,13 @@ export default function Sidebar() {
   return (
     <aside className="w-64 bg-[#2C2C2C] text-white p-6 flex flex-col">
 
-      <h2 className="text-lg font-semibold mb-8">
+
+      <Link href="/" className="text-lg font-semibold mb-8">
         Organizador Contable
-      </h2>
+      </Link>
 
       <nav className="flex flex-col gap-2">
+        <NavLink href="/">Inicio</NavLink>
 
         <NavLink href="/clientes">Clientes</NavLink>
 

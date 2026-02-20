@@ -1,3 +1,4 @@
+
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
@@ -71,14 +72,14 @@ export class Permisos {
     });
     return esAdmin || (usuarioActual?.permisoClientes === true && tienePermiso);
   }
- 
+
   static async puedeVerClientes() {
     const { userId, orgId, has } = await auth();
     if (!userId || !orgId) return false;
     const tienePermiso = has({ permission: "org:clientes:ver_clientes" });
     return tienePermiso;
   }
-  
+
   static async puedeVerTodosLosClientes() {
     const { userId, orgId, has } = await auth();
     if (!userId || !orgId) return false;
@@ -160,6 +161,12 @@ export class Permisos {
     return has({ role: "org:admin" });
   }
 
+  static async asistentes() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:asistentes:ver_asistentes" });
+    return tienePermiso;
+  }
   static async obtenerContextoUsuario() {
     const { userId, orgId, has } = await auth();
     if (!userId || !orgId) return null;
@@ -195,5 +202,26 @@ export class Permisos {
     const ctx = await this.obtenerContextoUsuario();
     if (!ctx) return false;
     return ctx.esAdmin;
+  }
+
+  static async puedeVerAsistentes() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:asistentes:ver_asistentes" });
+    return tienePermiso;
+  }
+
+  static async puedeEditarAsistentes() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:asistentes:modificar_asistente" });
+    return tienePermiso;
+  }
+
+  static async puedeInvitarAsistentes() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:asistentes:crear_asistente" });
+    return tienePermiso;
   }
 }

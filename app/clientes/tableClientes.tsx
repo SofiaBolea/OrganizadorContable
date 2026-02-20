@@ -1,20 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { useSearchParams } from "next/navigation";
 import { AccionesCliente } from "./accionesClientes";
 
-export default function TableCliente({ asistentes, permisos }: any) {
+
+function TableCliente({ permisos }: any) {
   const [clientes, setClientes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [asistentes, setAsistentes] = useState<any[]>([]);
+  const [asistentesLoading, setAsistentesLoading] = useState(true);
+  const [asistentesError, setAsistentesError] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchClientes = async () => {
       setLoading(true);
-      // Construimos la URL con los filtros actuales del navegador
       const url = `/api/clientes?${searchParams.toString()}`;
-      
       try {
         const res = await fetch(url);
         const data = await res.json();
@@ -25,15 +27,33 @@ export default function TableCliente({ asistentes, permisos }: any) {
         setLoading(false);
       }
     };
-
     fetchClientes();
-  }, [searchParams]); // Se ejecuta cada vez que cambian los filtros
+  }, [searchParams]);
 
-  if (loading) return <div className="p-20 text-center text-slate-500 italic">Cargando clientes...</div>;
+  useEffect(() => {
+    const fetchAsistentes = async () => {
+      setAsistentesLoading(true);
+      setAsistentesError(null);
+      try {
+        const res = await fetch("/api/selectorDeAsistentes");
+        if (!res.ok) throw new Error("No se pudieron obtener los asistentes");
+        const data = await res.json();
+        setAsistentes(data);
+      } catch (err) {
+        setAsistentesError("Error al cargar asistentes");
+      }
+      setAsistentesLoading(false);
+    };
+    fetchAsistentes();
+  }, []);
+
+  if (loading || asistentesLoading) return <div className="p-20 text-center text-slate-500 italic">Cargando clientes...</div>;
+  if (asistentesError) return <div className="p-20 text-center text-red-500 italic">{asistentesError}</div>;
 
   return (
-    <table className="w-full text-left border-collapse">
-      <thead className="border-b border-slate-200 bg-slate-50">
+    <>
+      <table className="w-full text-left border-collapse">
+        <thead className="border-b border-slate-200 bg-slate-50">
         <tr className="text-sm font-bold text-slate-600">
           <th className="p-6">Nombre / Razon Social</th>
           <th className="p-6">Email</th>
@@ -67,6 +87,15 @@ export default function TableCliente({ asistentes, permisos }: any) {
           ))
         )}
       </tbody>
-    </table>
+      </table>
+      <div className="flex items-center gap-2 mt-4 mb-2 p-2 rounded-md text-sm font-medium justify-center" style={{ background: '#E7F4DE', color: '#90BF77' }}>
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M21 12A9 9 0 11 3 12a9 9 0 0118 0z" />
+        </svg>
+        Los asistentes con permiso activado tendrán la capacidad de cargar clientes y/o vencimientos impositivos libremente
+      </div>
+    </>
   );
 }
+
+export default memo(TableCliente);

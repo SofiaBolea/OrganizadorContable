@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import { useRouter } from "next/navigation"; // Para refrescar la página
 import { FormularioEditarCliente } from "./formularioEditarCliente";
 import { ModalConfirmacionEliminar } from "./modalConfirmacionEliminar";
@@ -15,7 +15,7 @@ interface AccionesClienteProps {
   };
 }
 
-export function AccionesCliente({ cliente, asistentes, permisos }: AccionesClienteProps) {
+function AccionesClienteComponent({ cliente, permisos }: AccionesClienteProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -79,8 +79,7 @@ export function AccionesCliente({ cliente, asistentes, permisos }: AccionesClien
 
       {isEditOpen && (
         <FormularioEditarCliente 
-          cliente={cliente} 
-          asistentes={asistentes} 
+          cliente={cliente}
           onClose={() => setIsEditOpen(false)} 
         />
       )}
@@ -99,3 +98,5 @@ export function AccionesCliente({ cliente, asistentes, permisos }: AccionesClien
     </div>
   );
 }
+
+export const AccionesCliente = memo(AccionesClienteComponent);
