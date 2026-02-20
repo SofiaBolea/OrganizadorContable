@@ -1,15 +1,33 @@
 "use client";
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useTransition } from "react";
+import { useTransition, useEffect, useState } from "react";
 
 export function FiltrosClientes({ 
-  asistentes, 
   esAdmin 
 }: { 
-  asistentes: any[], 
   esAdmin: boolean 
 }) {
+  const [asistentes, setAsistentes] = useState<any[]>([]);
+  const [asistentesLoading, setAsistentesLoading] = useState(true);
+  const [asistentesError, setAsistentesError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAsistentes = async () => {
+      setAsistentesLoading(true);
+      setAsistentesError(null);
+      try {
+        const res = await fetch("/api/selectorDeAsistentes");
+        if (!res.ok) throw new Error("No se pudieron obtener los asistentes");
+        const data = await res.json();
+        setAsistentes(data);
+      } catch (err) {
+        setAsistentesError("Error al cargar asistentes");
+      }
+      setAsistentesLoading(false);
+    };
+    fetchAsistentes();
+  }, []);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -27,6 +45,21 @@ export function FiltrosClientes({
       router.push(`${pathname}?${params.toString()}`);
     });
   };
+
+  if (asistentesLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <span className="text-gray-500">Cargando asistentes...</span>
+      </div>
+    );
+  }
+  if (asistentesError) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <span className="text-red-500">{asistentesError}</span>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 bg-[#f2f1eb] p-6 rounded-[30px] border border-white shadow-sm">

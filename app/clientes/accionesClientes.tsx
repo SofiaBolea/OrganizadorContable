@@ -15,7 +15,7 @@ interface AccionesClienteProps {
   };
 }
 
-function AccionesClienteComponent({ cliente, asistentes, permisos }: AccionesClienteProps) {
+function AccionesClienteComponent({ cliente, permisos }: AccionesClienteProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -79,8 +79,7 @@ function AccionesClienteComponent({ cliente, asistentes, permisos }: AccionesCli
 
       {isEditOpen && (
         <FormularioEditarCliente 
-          cliente={cliente} 
-          asistentes={asistentes} 
+          cliente={cliente}
           onClose={() => setIsEditOpen(false)} 
         />
       )}

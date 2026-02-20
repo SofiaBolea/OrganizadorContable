@@ -4,17 +4,19 @@ import { useEffect, useState, memo } from "react";
 import { useSearchParams } from "next/navigation";
 import { AccionesCliente } from "./accionesClientes";
 
-function TableCliente({ asistentes, permisos }: any) {
+
+function TableCliente({ permisos }: any) {
   const [clientes, setClientes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [asistentes, setAsistentes] = useState<any[]>([]);
+  const [asistentesLoading, setAsistentesLoading] = useState(true);
+  const [asistentesError, setAsistentesError] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchClientes = async () => {
       setLoading(true);
-      // Construimos la URL con los filtros actuales del navegador
       const url = `/api/clientes?${searchParams.toString()}`;
-      
       try {
         const res = await fetch(url);
         const data = await res.json();
@@ -25,11 +27,28 @@ function TableCliente({ asistentes, permisos }: any) {
         setLoading(false);
       }
     };
-
     fetchClientes();
-  }, [searchParams]); // Se ejecuta cada vez que cambian los filtros
+  }, [searchParams]);
 
-  if (loading) return <div className="p-20 text-center text-slate-500 italic">Cargando clientes...</div>;
+  useEffect(() => {
+    const fetchAsistentes = async () => {
+      setAsistentesLoading(true);
+      setAsistentesError(null);
+      try {
+        const res = await fetch("/api/selectorDeAsistentes");
+        if (!res.ok) throw new Error("No se pudieron obtener los asistentes");
+        const data = await res.json();
+        setAsistentes(data);
+      } catch (err) {
+        setAsistentesError("Error al cargar asistentes");
+      }
+      setAsistentesLoading(false);
+    };
+    fetchAsistentes();
+  }, []);
+
+  if (loading || asistentesLoading) return <div className="p-20 text-center text-slate-500 italic">Cargando clientes...</div>;
+  if (asistentesError) return <div className="p-20 text-center text-red-500 italic">{asistentesError}</div>;
 
   return (
     <>
