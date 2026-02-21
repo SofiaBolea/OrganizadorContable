@@ -1,5 +1,6 @@
 import prisma from "./prisma";
 import type { OcurrenciaMaterializada, RecurrenciaData, TareaAsignacionRow } from "./tareas-shared";
+import { generarFechasRecurrencia, formatDateISO } from "./tareas-shared";
 
 // Re-exportar tipos y funciones puras para que los server components
 // puedan seguir importando desde "@/lib/tareas"
@@ -935,6 +936,43 @@ async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
             asigIndex: i,
           });
         }
+      }
+    }
+
+    // Para tareas CON recurrencia: materializar ocurrencias virtuales vencidas
+    if (tieneRecurrencia && asig.estado === "ACTIVA" && asig.tarea.recurrencia) {
+      const rec = asig.tarea.recurrencia;
+      const recData: RecurrenciaData = {
+        frecuencia: rec.frecuencia,
+        intervalo: rec.intervalo,
+        diaSemana: rec.diaSemana,
+        diaDelMes: rec.diaDelMes,
+        mesDelAnio: rec.mesDelAnio,
+        hastaFecha: rec.hastaFecha ? rec.hastaFecha.toISOString() : null,
+        conteoMaximo: rec.conteoMaximo,
+      };
+      const fechaBaseStr = asig.tarea.fechaVencimientoBase
+        ? asig.tarea.fechaVencimientoBase.toISOString()
+        : null;
+      const fechasGeneradas = generarFechasRecurrencia(recData, fechaBaseStr);
+      const hoyStr = formatDateISO(hoy);
+      const ocurrencias = asig.ocurrencias || [];
+
+      // Índice de ocurrencias materializadas por fechaOriginal (YYYY-MM-DD)
+      const matPorFecha = new Map<string, any>();
+      for (const oc of ocurrencias) {
+        const key = formatDateISO(new Date(oc.fechaOriginal));
+        matPorFecha.set(key, oc);
+      }
+
+      for (const fechaStr of fechasGeneradas) {
+        if (fechaStr >= hoyStr) break; // Solo fechas pasadas
+        if (matPorFecha.has(fechaStr)) continue; // Ya materializada
+        ocurrenciasACrear.push({
+          tareaAsignacionId: asig.id,
+          fechaOriginal: new Date(fechaStr + "T12:00:00"),
+          asigIndex: i,
+        });
       }
     }
   }
