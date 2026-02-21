@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { Permisos } from "@/lib/permisos";
+import { Permisos } from "@/lib/permisos/permisos";
 import TareaForm from "@/app/tareas-asignadas/components/TareaForm";
 
 export default async function NuevaTareaAsignadaPage() {

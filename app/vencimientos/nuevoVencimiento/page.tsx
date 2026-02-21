@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import VencimientoInputs from '../components/VencimientoInputs'
-import { Permisos } from '@/lib/permisos'
+import { Permisos } from '@/lib/permisos/permisos'
 
 export default async function VencimientosPage() {
   const { orgId } = await auth()

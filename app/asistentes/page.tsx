@@ -1,7 +1,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { TablaAsistentes } from "./tablaAsistentes";
-import { Permisos } from "@/lib/permisos";
+import { Permisos } from "@/lib/permisos/permisos";
 
 
 export default async function AsistentesPage({ searchParams }: { searchParams: Record<string, string> }) {

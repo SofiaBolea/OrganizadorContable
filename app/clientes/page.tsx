@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { FormularioCrearCliente } from "./formularioCrearCliente";
 import { FiltrosClientes } from "./filtrosClientes";
 import TableCliente from "./tableClientes";
-import { Permisos } from "@/lib/permisos";
+import { Permisos } from "@/lib/permisos/permisos";
 
 export default async function ClientesPage() {
   const { userId, orgId, has } = await auth();

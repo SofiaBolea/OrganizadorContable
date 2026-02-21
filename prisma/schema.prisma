@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -28,7 +28,6 @@ model Organizacion {
 
   // Relaciones
   usuarios            Usuario[]
-  sesiones            Sesion[]
   roles               Rol[]
   recursos            Recurso[]
   registrosAuditoria  RegistroAuditoria[]
@@ -50,7 +49,6 @@ model Usuario {
   permisoVencimiento  Boolean @default(false)
 
   // Relaciones
-  sesiones                Sesion[]
   roles                   UsuarioRol[]
   auditoriasEjecutadas    RegistroAuditoria[] @relation("ejecutor")
   auditoriasAfectadas     RegistroAuditoria[] @relation("afectado")
@@ -58,31 +56,11 @@ model Usuario {
   tareasAsignadasPor      TareaAsignacion[]   @relation("asignadoPor")
   vencimientosCreados     Vencimiento[]
   clientesAsignados       ClienteAsignacion[]
+  refColores              RefColor[]
 
   @@index([organizacionId])
   @@map("usuarios")
   @@unique([clerkId, organizacionId])
-}
-
-model Sesion {
-  id              String    @id @default(cuid())
-  usuarioId       String
-  usuario         Usuario   @relation(fields: [usuarioId], references: [id])
-  organizacionId  String
-  organizacion    Organizacion @relation(fields: [organizacionId], references: [id])
-  rolActivoId     String?
-  rolActivo       Rol?      @relation(fields: [rolActivoId], references: [id])
-  fechaInicio     DateTime  @default(now())
-  fechaFin        DateTime?
-  ipOrigen        String?   @db.VarChar(45)
-  activa          Boolean   @default(true)
-
-  // Relaciones
-  registrosAuditoria RegistroAuditoria[]
-
-  @@index([usuarioId])
-  @@index([organizacionId])
-  @@map("sesiones")
 }
 
 // =======================================
@@ -99,11 +77,6 @@ model Rol {
 
   // Relaciones
   usuariosRol     UsuarioRol[]
-  rolPermisos     RolPermiso[]
-  sesionesActivas Sesion[]
-  dsdComoActual   DsdRegla[] @relation("rolActual")
-  dsdComoNegado   DsdRegla[] @relation("rolNegado")
-
   @@unique([organizacionId, nombreRol]) 
   @@map("roles")
 
@@ -125,77 +98,11 @@ model UsuarioRol {
   
 }
 
-model DsdRegla {
-  id                   String @id @default(cuid())
-  rolActualId          String
-  rolActual            Rol    @relation("rolActual", fields: [rolActualId], references: [id])
-  rolNegadoId          String
-  rolNegado            Rol    @relation("rolNegado", fields: [rolNegadoId], references: [id])
-  descripcionConflicto String? @db.VarChar(255)
-
-  @@index([rolActualId])
-  @@index([rolNegadoId])
-  @@map("dsd_reglas")
-}
-
-model Operacion {
-  id               String @id @default(cuid())
-  nombreOperacion  String @db.VarChar(50)
-  descripcion      String? @db.VarChar(255)
-
-  // Relaciones
-  permisos         Permiso[]
-
-  @@map("operaciones")
-}
-
-model Restriccion {
-  id                 String @id @default(cuid())
-  nombreRestriccion  String @db.VarChar(50)
-  descripcion        String? @db.VarChar(255)
-
-  // Relaciones
-  permisos           Permiso[]
-
-  @@map("restricciones")
-}
-
-model Permiso {
-  id             String  @id @default(cuid())
-  recursoId      String
-  recurso        Recurso @relation(fields: [recursoId], references: [id])
-  operacionId    String
-  operacion      Operacion @relation(fields: [operacionId], references: [id])
-  tipoPermiso    String  @db.VarChar(20)
-  restriccionId  String?
-  restriccion    Restriccion? @relation(fields: [restriccionId], references: [id])
-
-  // Relaciones
-  rolPermisos    RolPermiso[]
-
-  @@index([recursoId])
-  @@index([operacionId])
-  @@map("permisos")
-}
-
-model RolPermiso {
-  id        String  @id @default(cuid())
-  rolId     String
-  rol       Rol     @relation(fields: [rolId], references: [id])
-  permisoId String
-  permiso   Permiso @relation(fields: [permisoId], references: [id])
-
-  @@index([rolId])
-  @@index([permisoId])
-  @@map("roles_permisos")
-}
-
 model RegistroAuditoria {
   id                String   @id @default(cuid())
   organizacionId    String
   organizacion      Organizacion @relation(fields: [organizacionId], references: [id])
   sesionId          String?
-  sesion            Sesion?  @relation(fields: [sesionId], references: [id])
   ejecutadoPorId    String
   ejecutadoPor      Usuario  @relation("ejecutor", fields: [ejecutadoPorId], references: [id])
   usuarioAfectadoId String?
@@ -228,9 +135,6 @@ model Recurso {
   refColor        RefColor?
   recursoRef      RecursoRef?
 
-  // Permisos
-  permisos        Permiso[]
-
   @@index([organizacionId])
   @@index([tipoRecurso])
   @@map("recursos")
@@ -249,12 +153,15 @@ model RecursoRef {
 model RefColor {
   id          String  @id
   recurso     Recurso @relation(fields: [id], references: [id], onDelete: Cascade)
+  usuarioId   String
+  usuario     Usuario @relation(fields: [usuarioId], references: [id])
   titulo      String  @db.VarChar(50)
   codigoHexa  String  @db.VarChar(7)
 
   // Relaciones
   tareasAsignadas TareaAsignacion[]
 
+  @@index([usuarioId])
   @@map("ref_colores")
 }
 
@@ -385,7 +292,7 @@ model VencimientoOcurrencia {
   vencimientoId    String
   vencimiento      Vencimiento @relation(fields: [vencimientoId], references: [id], onDelete: Cascade)
   fechaVencimiento DateTime    @db.Date
-  estado           String      @default("PENDIENTE") @db.VarChar(20)
+  estado           String      @default("ACTIVA") @db.VarChar(20)
 
   @@index([vencimientoId])
   @@index([fechaVencimiento])

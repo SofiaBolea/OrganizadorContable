@@ -119,7 +119,8 @@ export async function POST(req: Request) {
       if (!org) return;
 
       const usuario = await tx.usuario.findUnique({
-        where: { clerkId_organizacionId: { clerkId: public_user_data.user_id, organizacionId: org.id } }
+        where: { clerkId_organizacionId: { clerkId: public_user_data.user_id, organizacionId: org.id } },
+        select: { id: true }
       });
 
       if (usuario) {
@@ -127,12 +128,27 @@ export async function POST(req: Request) {
           where: { usuarioId: usuario.id, fechaBaja: null },
           data: { fechaBaja: new Date() },
         });
-        console.log(`🗑️ Baja registrada para ${usuario.email}`);
+        
+        
+        await tx.tareaAsignacion.updateMany({
+          where: { asignadoId: usuario.id },
+          data: { estado: 'REVOCADA' },
+        });
+
+        const asignaciones = await tx.tareaAsignacion.findMany({
+          where: { asignadoId: usuario.id },
+          select: {id: true}
+        })
+
+        await tx.ocurrencia.updateMany({
+          where: { tareaAsignacionId: { in: asignaciones.map(a => a.id) } },
+          data: { estado: 'CANCELADA' },})
+        
       }
     });
     return new Response('Baja procesada', { status: 200 });
   }
-  // --- DENTRO DEL POST ---
+
   if (eventType === "user.updated") {
     const { id, first_name, last_name, email_addresses } = evt.data;
     const email = email_addresses[0].email_address;
