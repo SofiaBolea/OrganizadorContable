@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { ShieldAlert, Lock } from "lucide-react";
 import { getTareasAsignadasAdmin, getTareasAsignadasAsistente } from "@/lib/tareas";
-import { Permisos } from "@/lib/permisos";
+import { Permisos } from "@/lib/permisos/permisos";
 import Link from "next/link";
 import { Button } from "../components/Button";
 import TareasTableClient from "./components/TareasTableClient";
