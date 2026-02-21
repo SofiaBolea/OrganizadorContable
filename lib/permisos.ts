@@ -167,6 +167,7 @@ export class Permisos {
     const tienePermiso = has({ permission: "org:asistentes:ver_asistentes" });
     return tienePermiso;
   }
+
   static async obtenerContextoUsuario() {
     const { userId, orgId, has } = await auth();
     if (!userId || !orgId) return null;
@@ -183,26 +184,46 @@ export class Permisos {
     });
     if (!usuario) return null;
 
-    return { userId, orgId, esAdmin, organizacion, usuario };
+    return { userId, orgId, has, esAdmin, organizacion, usuario };
   }
 
   static async puedeCrearTareaAsignada() {
     const ctx = await this.obtenerContextoUsuario();
     if (!ctx) return false;
-    return ctx.esAdmin;
+    const tienePermiso = ctx.has({ permission: "org:tareas:crear_tarea" });
+    return ctx.esAdmin || tienePermiso;
+  }
+
+  static async puedeVerTareaAsignada() {
+    const ctx = await this.obtenerContextoUsuario();
+    if (!ctx) return false;
+    const tienePermiso = ctx.has({ permission: "org:tareas:ver_tareas" });
+    return ctx.esAdmin || tienePermiso;
   }
 
   static async puedeModificarTareaAsignada() {
     const ctx = await this.obtenerContextoUsuario();
     if (!ctx) return false;
-    return ctx.esAdmin;
+    const tienePermiso = ctx.has({ permission: "org:tareas:modificar_tarea" });
+    return ctx.esAdmin || tienePermiso;
   }
 
   static async puedeEliminarTareaAsignada() {
     const ctx = await this.obtenerContextoUsuario();
     if (!ctx) return false;
-    return ctx.esAdmin;
+    const tienePermiso = ctx.has({ permission: "org:tareas:eliminar_tarea" });
+    return ctx.esAdmin || tienePermiso;
   }
+
+  static async puedeCambiarEstadoTareaAsignada() {
+    const ctx = await this.obtenerContextoUsuario();
+    if (!ctx) return false;
+    const tienePermiso = ctx.has({ permission: "org:tareas:cambiar_estado" });
+    return ctx.esAdmin || tienePermiso;
+  }
+
+
+  // ── Asistentes ──────────────────────────────────────────────
 
   static async puedeVerAsistentes() {
     const { userId, orgId, has } = await auth();

@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { materializarOcurrencia, cancelarDesdeAqui } from "@/lib/tareas";
+import { Permisos } from "@/lib/permisos";
 
 // POST: Materializar una ocurrencia
 export async function POST(request: NextRequest) {
@@ -14,6 +15,11 @@ export async function POST(request: NextRequest) {
 
     if (!tareaAsignacionId || !fechaOriginal) {
       return NextResponse.json({ error: "Datos requeridos: tareaAsignacionId, fechaOriginal" }, { status: 400 });
+    }
+
+    const puedeModificar = await Permisos.puedeCambiarEstadoTareaAsignada();
+    if (!puedeModificar) {
+      return NextResponse.json({ error: "No tienes permisos para cambiar el estado de tareas asignadas" }, { status: 403 });
     }
 
     const ocurrencia = await materializarOcurrencia(
@@ -45,6 +51,11 @@ export async function PATCH(request: NextRequest) {
 
     if (!tareaAsignacionId || !fechaDesde) {
       return NextResponse.json({ error: "Datos requeridos: tareaAsignacionId, fechaDesde" }, { status: 400 });
+    }
+
+    const puedeEliminar = await Permisos.puedeEliminarTareaAsignada();
+    if (!puedeEliminar) {
+      return NextResponse.json({ error: "No tienes permisos para eliminar tareas asignadas" }, { status: 403 });
     }
 
     const resultado = await cancelarDesdeAqui(tareaAsignacionId, fechaDesde);

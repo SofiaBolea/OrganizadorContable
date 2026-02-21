@@ -21,6 +21,11 @@ export async function GET(
       return NextResponse.json({ error: "Tarea no encontrada" }, { status: 404 });
     }
 
+    const puedeVer = await Permisos.puedeVerTareaAsignada();
+    if (!puedeVer) {
+      return NextResponse.json({ error: "No tienes permisos" }, { status: 403 });
+    }
+
     return NextResponse.json(tarea);
   } catch (error) {
     console.error("Error obteniendo tarea:", error);
