@@ -185,7 +185,8 @@ exports.Prisma.RecursoRefScalarFieldEnum = {
   id: 'id',
   titulo: 'titulo',
   url: 'url',
-  tipo: 'tipo'
+  tipo: 'tipo',
+  usuarioId: 'usuarioId'
 };
 
 exports.Prisma.RefColorScalarFieldEnum = {

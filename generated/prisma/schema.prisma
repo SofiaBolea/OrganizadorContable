@@ -47,6 +47,7 @@ model Usuario {
   telefono           String?      @db.VarChar(50)
   permisoClientes    Boolean      @default(false)
   permisoVencimiento Boolean      @default(false)
+  recursosRefPropios RecursoRef[] @relation("PropietarioReferencia")
 
   // Relaciones
   roles                UsuarioRol[]
@@ -138,11 +139,13 @@ model Recurso {
 }
 
 model RecursoRef {
-  id      String  @id
-  recurso Recurso @relation(fields: [id], references: [id], onDelete: Cascade)
-  titulo  String  @db.VarChar(100)
-  url     String  @db.VarChar(255)
-  tipo    String  @db.VarChar(50)
+  id        String  @id
+  recurso   Recurso @relation(fields: [id], references: [id], onDelete: Cascade)
+  titulo    String  @db.VarChar(100)
+  url       String  @db.VarChar(255)
+  tipo      String  @db.VarChar(50)
+  usuarioId String
+  usuario   Usuario @relation("PropietarioReferencia", fields: [usuarioId], references: [id])
 
   @@map("recursos_ref")
 }

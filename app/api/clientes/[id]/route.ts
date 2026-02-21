@@ -1,7 +1,7 @@
 // app/api/clientes/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { Permisos } from "@/lib/permisos/permisos";
+import { Permisos } from "@/lib/permisos";
 import { eliminarClienteService, modificarCliente } from "../../../../lib/clientes"; // Importamos la función de negocio
 import { revalidatePath } from "next/cache";
 

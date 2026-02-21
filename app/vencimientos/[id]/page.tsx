@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import VencimientoInputs from "@/app/vencimientos/components/VencimientoInputs";
-import { Permisos } from "@/lib/permisos/permisos";
+import { Permisos } from "@/lib/permisos";
 
 interface PageProps {
   params: Promise<{ id: string }>;

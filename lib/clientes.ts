@@ -1,6 +1,6 @@
 "use server";
 import { NextRequest, NextResponse } from "next/server";
-import { Permisos } from "@/lib/permisos/permisos";
+import { Permisos } from "@/lib/permisos";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { validarYLimpiarDatos } from "../lib/validarYLimpiarDatos"; // Importamos la función de validación desde actions.ts

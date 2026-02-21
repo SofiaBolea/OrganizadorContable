@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { actualizarEstadoAsignacion, eliminarTareaAsignacion, actualizarRefColorAsignacion } from "@/lib/tareas";
-import { Permisos } from "@/lib/permisos/permisos";
+import { Permisos } from "@/lib/permisos";
 
 // PUT: Actualizar estado o refColor de una asignación
 export async function PUT(

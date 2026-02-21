@@ -47,6 +47,7 @@ model Usuario {
   telefono        String? @db.VarChar(50)
   permisoClientes     Boolean @default(false)
   permisoVencimiento  Boolean @default(false)
+  recursosRefPropios  RecursoRef[] @relation("PropietarioReferencia")
 
   // Relaciones
   roles                   UsuarioRol[]
@@ -57,6 +58,7 @@ model Usuario {
   vencimientosCreados     Vencimiento[]
   clientesAsignados       ClienteAsignacion[]
   refColores              RefColor[]
+  
 
   @@index([organizacionId])
   @@map("usuarios")
@@ -146,6 +148,8 @@ model RecursoRef {
   titulo  String  @db.VarChar(100)
   url     String  @db.VarChar(255)
   tipo    String  @db.VarChar(50)
+  usuarioId        String
+  usuario          Usuario @relation("PropietarioReferencia", fields: [usuarioId], references: [id])
 
   @@map("recursos_ref")
 }
