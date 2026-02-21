@@ -82,7 +82,10 @@ export interface TareaDisplayRow {
 const MAX_OCURRENCIAS_VIRTUALES = 200;
 
 const DIAS_SEMANA_MAP: Record<string, number> = {
+  // 2 letras (legacy)
   DO: 0, LU: 1, MA: 2, MI: 3, JU: 4, VI: 5, SA: 6,
+  // 3 letras (usadas por el form)
+  DOM: 0, LUN: 1, MAR: 2, MIE: 3, JUE: 4, VIE: 5, SAB: 6,
 };
 
 export function formatDateISO(d: Date): string {
@@ -270,7 +273,7 @@ export function expandirTareasADisplayRows(
         fechaAsignacion: t.fechaAsignacion,
         refColorId: t.refColorId,
         refColorTitulo: t.refColorTitulo,
-        refColorHexa: t.refColorHexa,
+        refColorHexa: mat?.colorOverride || t.refColorHexa,
         tieneRecurrencia: false,
         frecuencia: null,
       });
@@ -346,7 +349,7 @@ export function expandirTareasADisplayRows(
           fechaAsignacion: t.fechaAsignacion,
           refColorId: t.refColorId,
           refColorTitulo: t.refColorTitulo,
-          refColorHexa: t.refColorHexa,
+          refColorHexa: mat?.colorOverride || t.refColorHexa,
           tieneRecurrencia: true,
           frecuencia: t.recurrencia!.frecuencia,
         });
@@ -379,7 +382,7 @@ export function expandirTareasADisplayRows(
           fechaAsignacion: t.fechaAsignacion,
           refColorId: t.refColorId,
           refColorTitulo: t.refColorTitulo,
-          refColorHexa: t.refColorHexa,
+          refColorHexa: mat.colorOverride || t.refColorHexa,
           tieneRecurrencia: true,
           frecuencia: t.recurrencia!.frecuencia,
         });

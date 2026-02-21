@@ -48,11 +48,19 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
   const router = useRouter();
   const [titulo, setTitulo] = useState(initialData?.titulo || "");
   const [prioridad, setPrioridad] = useState(initialData?.prioridad || "MEDIA");
-  const [fechaVencimiento, setFechaVencimiento] = useState(
+  // Fecha de la ocurrencia específica desde la que se llegó
+  const fechaOcurrenciaInicial = ocurrenciaContext?.fechaOcurrencia?.split("T")[0] || "";
+  // Fecha base de la tarea (editable)
+  const [fechaBaseOriginal, setFechaBaseOriginal] = useState(
     initialData?.fechaVencimientoBase?.split("T")[0] || ""
+  );
+  // Fecha de la ocurrencia que se está editando (para override en guardarSoloEsta)
+  const [fechaVencimiento, setFechaVencimiento] = useState(
+    fechaOcurrenciaInicial || initialData?.fechaVencimientoBase?.split("T")[0] || ""
   );
   const [descripcion, setDescripcion] = useState(initialData?.descripcion || "");
   const [refColorId, setRefColorId] = useState<string | null>(initialData?.refColorId || null);
+  const [refColorHexa, setRefColorHexa] = useState<string | null>(null);
 
   // Recurrencia
   const [esRecurrente, setEsRecurrente] = useState(!!initialData?.recurrencia);
@@ -67,8 +75,8 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
   // Cuando se activa recurrencia y no hay fecha, poner hoy como default
   const handleToggleRecurrente = (checked: boolean) => {
     setEsRecurrente(checked);
-    if (checked && !fechaVencimiento) {
-      setFechaVencimiento(hoyISO);
+    if (checked && !fechaBaseOriginal) {
+      setFechaBaseOriginal(hoyISO);
     }
   };
   const [frecuencia, setFrecuencia] = useState(initialData?.recurrencia?.frecuencia || "SEMANAL");
@@ -166,7 +174,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
       return;
     }
 
-    if (!esRecurrente && !fechaVencimiento) {
+    if (!esRecurrente && !fechaBaseOriginal) {
       setError("La fecha límite es obligatoria para tareas no recurrentes");
       return;
     }
@@ -192,7 +200,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
         titulo,
         prioridad,
         tipoTarea,
-        fechaVencimientoBase: fechaVencimiento || null,
+        fechaVencimientoBase: fechaBaseOriginal || null,
         descripcion: descripcion || null,
         refColorId: tipoTarea === "PROPIA" ? refColorId : null,
       };
@@ -247,6 +255,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
     try {
       const tituloOriginal = initialData?.titulo || "";
       const fechaOriginal = ocurrenciaContext.fechaOcurrencia;
+      const colorIdOriginal = initialData?.refColorId || null;
 
       const res = await fetch("/api/tareas/ocurrencias", {
         method: "POST",
@@ -254,8 +263,10 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
         body: JSON.stringify({
           tareaAsignacionId: ocurrenciaContext.tareaAsignacionId,
           fechaOriginal,
-          tituloOverride: titulo !== tituloOriginal ? titulo : null,
-          fechaOverride: fechaVencimiento !== fechaOriginal.split("T")[0] ? fechaVencimiento : null,
+          // undefined se omite de JSON → el server sabe que no cambió
+          tituloOverride: titulo !== tituloOriginal ? titulo : undefined,
+          fechaOverride: fechaVencimiento !== fechaOcurrenciaInicial ? fechaVencimiento : undefined,
+          colorOverride: refColorId !== colorIdOriginal ? (refColorHexa ?? null) : undefined,
         }),
       });
       if (!res.ok) {
@@ -282,7 +293,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
         titulo,
         prioridad,
         tipoTarea,
-        fechaVencimientoBase: fechaVencimiento || null,
+        fechaVencimientoBase: fechaBaseOriginal || null,
         descripcion: descripcion || null,
         refColorId: tipoTarea === "PROPIA" ? refColorId : null,
       };
@@ -328,21 +339,36 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
     <>
     <form onSubmit={handleSubmit}>
       <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-8 max-w-3xl mx-auto">
-        <h2 className="text-xl font-bold text-text mb-6">
-          {isViewMode
-            ? "Detalle de Tarea"
-            : isCreateMode
-              ? tipoTarea === "ASIGNADA" ? "Asignar Nueva Tarea" : "Nueva Tarea"
-              : "Modificar Tarea"}
+        <h2 className="text-xl font-bold text-text mb-6 flex items-center gap-3">
+          <span>
+            {isViewMode
+              ? "Detalle de Tarea"
+              : isCreateMode
+                ? tipoTarea === "ASIGNADA" ? "Asignar Nueva Tarea" : "Nueva Tarea"
+                : "Modificar Tarea"}
+          </span>
           {ocurrenciaContext?.fechaOcurrencia && (() => {
-            const raw = ocurrenciaContext.fechaOcurrencia;
-            const dateOnly = raw.includes("T") ? raw.split("T")[0] : raw;
-            const d = new Date(dateOnly + "T00:00:00");
-            if (isNaN(d.getTime())) return null;
+            if (isViewMode) {
+              const raw = ocurrenciaContext.fechaOcurrencia;
+              const dateOnly = raw.includes("T") ? raw.split("T")[0] : raw;
+              const d = new Date(dateOnly + "T00:00:00");
+              if (isNaN(d.getTime())) return null;
+              return (
+                <span className="text-base font-normal text-muted-foreground">
+                  — {d.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                </span>
+              );
+            }
             return (
-              <span className="ml-2 text-base font-normal text-muted-foreground">
-                — {d.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-base font-normal text-muted-foreground">—</span>
+                <input
+                  type="date"
+                  value={fechaVencimiento || ""}
+                  onChange={(e) => setFechaVencimiento(e.target.value)}
+                  className="bg-[#e9e8e0] p-1.5 px-3 rounded-full outline-none text-sm text-text focus:ring-2 focus:ring-primary transition-all"
+                />
+              </div>
             );
           })()}
         </h2>
@@ -488,13 +514,14 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
             
             <input
               type="date"
-              value={fechaVencimiento}
-              onChange={(e) => setFechaVencimiento(e.target.value)}
+              value={fechaBaseOriginal || ""}
+              onChange={(e) => setFechaBaseOriginal(e.target.value)}
               disabled={isViewMode}
               required={!esRecurrente}
               className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text focus:ring-2 focus:ring-primary transition-all"
             />
           </div>
+
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
               Prioridad
@@ -667,7 +694,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
           <div className="mb-6">
             <RefColorSelector
               selectedId={refColorId}
-              onChange={setRefColorId}
+              onChange={(id, hexa) => { setRefColorId(id); setRefColorHexa(hexa); }}
               disabled={isViewMode}
             />
           </div>

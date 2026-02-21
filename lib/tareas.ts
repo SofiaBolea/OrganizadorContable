@@ -618,10 +618,12 @@ export async function materializarOcurrencia(
     resultado = await prisma.ocurrencia.update({
       where: { id: existente.id },
       data: {
-        estado: datos.estado ?? existente.estado,
-        fechaOverride: datos.fechaOverride ? new Date(datos.fechaOverride) : existente.fechaOverride,
-        tituloOverride: datos.tituloOverride ?? existente.tituloOverride,
-        colorOverride: datos.colorOverride ?? existente.colorOverride,
+        estado: datos.estado !== undefined ? datos.estado : existente.estado,
+        fechaOverride: datos.fechaOverride !== undefined
+          ? (datos.fechaOverride ? new Date(datos.fechaOverride) : null)
+          : existente.fechaOverride,
+        tituloOverride: datos.tituloOverride !== undefined ? datos.tituloOverride : existente.tituloOverride,
+        colorOverride: datos.colorOverride !== undefined ? datos.colorOverride : existente.colorOverride,
         fechaEjecucion: datos.estado === "COMPLETADA" ? new Date() : existente.fechaEjecucion,
       },
     });
@@ -633,7 +635,7 @@ export async function materializarOcurrencia(
         estado: datos.estado || "PENDIENTE",
         fechaOverride: datos.fechaOverride ? new Date(datos.fechaOverride) : null,
         tituloOverride: datos.tituloOverride || null,
-        colorOverride: datos.colorOverride || null,
+        colorOverride: datos.colorOverride !== undefined ? datos.colorOverride : null,
         fechaEjecucion: datos.estado === "COMPLETADA" ? new Date() : null,
       },
     });

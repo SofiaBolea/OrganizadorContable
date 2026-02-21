@@ -11,7 +11,7 @@ interface RefColor {
 
 interface RefColorSelectorProps {
   selectedId: string | null;
-  onChange: (id: string | null) => void;
+  onChange: (id: string | null, hexa: string | null) => void;
   disabled?: boolean;
 }
 
@@ -111,7 +111,7 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
         if (res.ok) {
           const { data } = await res.json();
           setColores((prev) => [...prev, data]);
-          onChange(data.id);
+          onChange(data.id, data.codigoHexa);
           closeModal();
         } else {
           alert("Error al crear color");
@@ -151,7 +151,7 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
       });
       if (res.ok) {
         setColores((prev) => prev.filter((c) => c.id !== deleteConfirm.id));
-        if (selectedId === deleteConfirm.id) onChange(null);
+        if (selectedId === deleteConfirm.id) onChange(null, null);
         setDeleteConfirm(null);
       } else {
         alert("Error al eliminar color");
@@ -202,7 +202,7 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
             {selectedId !== null && (
               <button
                 type="button"
-                onClick={() => { onChange(null); setIsOpen(false); }}
+                onClick={() => { onChange(null, null); setIsOpen(false); }}
                 className="w-full text-left px-5 py-3 text-sm text-text/50 hover:bg-black/[0.02] transition-colors border-b border-text/5"
               >
                 Sin color
@@ -220,7 +220,7 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
                 {/* Clickable area for selection */}
                 <button
                   type="button"
-                  onClick={() => { onChange(c.id); setIsOpen(false); }}
+                  onClick={() => { onChange(c.id, c.codigoHexa); setIsOpen(false); }}
                   className="flex items-center gap-3 flex-1 text-left"
                 >
                   <span className="text-sm font-semibold text-text">{c.titulo}</span>

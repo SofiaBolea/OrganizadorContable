@@ -2,53 +2,127 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Protect } from "@clerk/nextjs"
+import {
+  LayoutGrid,
+  Users,
+  UserCog,
+  Building2,
+  Calendar,
+  ClipboardList,
+  CheckSquare
+} from "lucide-react"
+import { LucideIcon } from "lucide-react"
+import Image from "next/image"
 
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+
+
+type NavItemProps = {
+  href: string
+  icon: LucideIcon
+  label: string
+}
+
+function NavItem({ href, icon: Icon, label }: NavItemProps) {
   const pathname = usePathname()
-  const isActive = pathname.startsWith(href)
+
+  const isActive =
+    href === "/"
+      ? pathname === "/"
+      : pathname.startsWith(href)
 
   return (
     <Link
       href={href}
       className={`
-        px-4 py-2 rounded-md text-sm transition-colors
+        group flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-all duration-200
         ${isActive
-          ? "bg-white text-[#2C2C2C] font-semibold"
+          ? "bg-white text-[#2C2C2C] font-semibold shadow-sm"
           : "text-white/70 hover:bg-white/10 hover:text-white"
         }
       `}
     >
-      {children}
+      <Icon
+        size={18}
+        className={`transition-colors ${
+          isActive ? "text-[#2C2C2C]" : "text-white/60 group-hover:text-white"
+        }`}
+      />
+      {label}
     </Link>
   )
 }
 
 export default function Sidebar() {
   return (
-    <aside className="w-64 bg-[#2C2C2C] text-white p-6 flex flex-col">
+    <aside className="w-64 bg-[#2C2C2C] text-white flex flex-col px-6 py-8">
 
+      {/* Logo */}
+      <div className="mb-10">
+        <div className="flex flex-col items-center mb-4">
+          <Image
+            src="/logoOrg.png"
+            alt="Estudio Contable"
+            width={100}
+            height={40}
+            className="object-contain"
+            priority
+          />
+        </div>
+        <h1 className="text-m text-center font-light tracking-wide text-white/80">
+          ESTUDIO CONTABLE
+        </h1>
+      </div>
 
-      <Link href="/" className="text-lg font-semibold mb-8">
-        Organizador Contable
-      </Link>
-
+      {/* Navegación */}
       <nav className="flex flex-col gap-2">
-        <NavLink href="/">Inicio</NavLink>
 
-        <NavLink href="/clientes">Clientes</NavLink>
+        <NavItem
+          href="/"
+          icon={LayoutGrid}
+          label="Tablero General"
+        />
 
-        <NavLink href="/asistentes">Asistentes</NavLink>
+        <NavItem
+          href="/clientes"
+          icon={Users}
+          label="Clientes"
+        />
 
-        <NavLink href="/organizacion">Organización</NavLink>
+        <NavItem
+          href="/asistentes"
+          icon={UserCog}
+          label="Asistentes"
+        />
 
-        <NavLink href="/vencimientos">Vencimientos</NavLink>
+        <NavItem
+          href="/organizacion"
+          icon={Building2}
+          label="Organización"
+        />
 
-        <NavLink href="/tareas-asignadas">Tareas Asignadas</NavLink>
+        <NavItem
+          href="/vencimientos"
+          icon={Calendar}
+          label="Vencimientos"
+        />
 
-        <NavLink href="/tareas-propias">Mis Tareas</NavLink>
+        <NavItem
+          href="/tareas-asignadas"
+          icon={ClipboardList}
+          label="Tareas Asignadas"
+        />
+
+        <NavItem
+          href="/tareas-propias"
+          icon={CheckSquare}
+          label="Mis Tareas"
+        />
 
       </nav>
+
+      <div className="mt-auto pt-8 text-xs text-white/40">
+        © {new Date().getFullYear()} Estudio
+      </div>
 
     </aside>
   )
