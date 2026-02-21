@@ -85,14 +85,14 @@ const DIAS_SEMANA_MAP: Record<string, number> = {
   DO: 0, LU: 1, MA: 2, MI: 3, JU: 4, VI: 5, SA: 6,
 };
 
-function formatDateISO(d: Date): string {
+export function formatDateISO(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
 
-function generarFechasRecurrencia(
+export function generarFechasRecurrencia(
   rec: RecurrenciaData,
   fechaBase: string | null,
   limite: number = MAX_OCURRENCIAS_VIRTUALES
@@ -228,6 +228,17 @@ export function expandirTareasADisplayRows(
 ): TareaDisplayRow[] {
   const rows: TareaDisplayRow[] = [];
 
+  // Fecha de hoy para detectar ocurrencias vencidas
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const hoyStr = hoy.toISOString().split("T")[0];
+
+  /** Estado para una ocurrencia sin materializar según su fecha */
+  const estadoVirtualPorFecha = (fechaStr: string | null): string => {
+    if (!fechaStr) return "PENDIENTE";
+    return fechaStr.split("T")[0] < hoyStr ? "VENCIDA" : "PENDIENTE";
+  };
+
   for (const t of tareas) {
     if (!t.recurrencia) {
       // Tarea única: buscar ocurrencia materializada (si existe)
@@ -255,7 +266,7 @@ export function expandirTareasADisplayRows(
         asignadoNombre: t.asignadoNombre,
         asignadoPorId: t.asignadoPorId,
         asignadoPorNombre: t.asignadoPorNombre,
-        estado: mat?.estado || "PENDIENTE",
+        estado: mat?.estado || estadoVirtualPorFecha(mat?.fechaOverride || mat?.fechaOriginal || t.fechaVencimientoBase),
         fechaAsignacion: t.fechaAsignacion,
         refColorId: t.refColorId,
         refColorTitulo: t.refColorTitulo,
@@ -331,7 +342,7 @@ export function expandirTareasADisplayRows(
           asignadoNombre: t.asignadoNombre,
           asignadoPorId: t.asignadoPorId,
           asignadoPorNombre: t.asignadoPorNombre,
-          estado: mat?.estado || "PENDIENTE",
+          estado: mat?.estado || estadoVirtualPorFecha(mat?.fechaOverride || mat?.fechaOriginal || fechaStr),
           fechaAsignacion: t.fechaAsignacion,
           refColorId: t.refColorId,
           refColorTitulo: t.refColorTitulo,

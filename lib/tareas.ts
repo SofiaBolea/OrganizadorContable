@@ -1,5 +1,6 @@
 import prisma from "./prisma";
 import type { OcurrenciaMaterializada, RecurrenciaData, TareaAsignacionRow } from "./tareas-shared";
+import { generarFechasRecurrencia, formatDateISO } from "./tareas-shared";
 
 // Re-exportar tipos y funciones puras para que los server components
 // puedan seguir importando desde "@/lib/tareas"
@@ -734,14 +735,20 @@ export async function cancelarDesdeAqui(
 // REF COLORES
 // ═══════════════════════════════════════
 
-export async function getRefColores(orgId: string) {
+export async function getRefColores(orgId: string, clerkUserId: string) {
   const organizacion = await prisma.organizacion.findUnique({
     where: { clerkOrganizationId: orgId },
   });
   if (!organizacion) return [];
 
+  const usuario = await prisma.usuario.findUnique({
+    where: { clerkId_organizacionId: { clerkId: clerkUserId, organizacionId: organizacion.id } },
+  });
+  if (!usuario) return [];
+
   return await prisma.refColor.findMany({
     where: {
+      usuarioId: usuario.id,
       recurso: { organizacionId: organizacion.id },
     },
     select: {
@@ -755,6 +762,7 @@ export async function getRefColores(orgId: string) {
 
 export async function crearRefColor(
   orgId: string,
+  clerkUserId: string,
   titulo: string,
   codigoHexa: string
 ) {
@@ -762,6 +770,11 @@ export async function crearRefColor(
     where: { clerkOrganizationId: orgId },
   });
   if (!organizacion) throw new Error("Organización no encontrada");
+
+  const usuario = await prisma.usuario.findUnique({
+    where: { clerkId_organizacionId: { clerkId: clerkUserId, organizacionId: organizacion.id } },
+  });
+  if (!usuario) throw new Error("Usuario no encontrado");
 
   const recurso = await prisma.recurso.create({
     data: {
@@ -772,6 +785,7 @@ export async function crearRefColor(
         create: {
           titulo,
           codigoHexa,
+          usuarioId: usuario.id,
         },
       },
     },
@@ -779,6 +793,63 @@ export async function crearRefColor(
   });
 
   return recurso.refColor!;
+}
+
+export async function actualizarRefColor(
+  orgId: string,
+  clerkUserId: string,
+  refColorId: string,
+  titulo: string,
+  codigoHexa: string
+) {
+  const organizacion = await prisma.organizacion.findUnique({
+    where: { clerkOrganizationId: orgId },
+  });
+  if (!organizacion) throw new Error("Organización no encontrada");
+
+  const usuario = await prisma.usuario.findUnique({
+    where: { clerkId_organizacionId: { clerkId: clerkUserId, organizacionId: organizacion.id } },
+  });
+  if (!usuario) throw new Error("Usuario no encontrado");
+
+  // Verificar que pertenece al usuario
+  const refColor = await prisma.refColor.findFirst({
+    where: { id: refColorId, usuarioId: usuario.id, recurso: { organizacionId: organizacion.id } },
+  });
+  if (!refColor) throw new Error("Color de referencia no encontrado");
+
+  const updated = await prisma.refColor.update({
+    where: { id: refColorId },
+    data: { titulo, codigoHexa },
+  });
+
+  // Actualizar nombre del recurso también
+  await prisma.recurso.update({
+    where: { id: refColorId },
+    data: { nombre: titulo },
+  });
+
+  return updated;
+}
+
+export async function eliminarRefColor(orgId: string, clerkUserId: string, refColorId: string) {
+  const organizacion = await prisma.organizacion.findUnique({
+    where: { clerkOrganizationId: orgId },
+  });
+  if (!organizacion) throw new Error("Organización no encontrada");
+
+  const usuario = await prisma.usuario.findUnique({
+    where: { clerkId_organizacionId: { clerkId: clerkUserId, organizacionId: organizacion.id } },
+  });
+  if (!usuario) throw new Error("Usuario no encontrado");
+
+  const refColor = await prisma.refColor.findFirst({
+    where: { id: refColorId, usuarioId: usuario.id, recurso: { organizacionId: organizacion.id } },
+  });
+  if (!refColor) throw new Error("Color de referencia no encontrado");
+
+  // Al borrar el recurso, se borra en cascada el refColor
+  await prisma.recurso.delete({ where: { id: refColorId } });
 }
 
 // ═══════════════════════════════════════
@@ -865,6 +936,43 @@ async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
             asigIndex: i,
           });
         }
+      }
+    }
+
+    // Para tareas CON recurrencia: materializar ocurrencias virtuales vencidas
+    if (tieneRecurrencia && asig.estado === "ACTIVA" && asig.tarea.recurrencia) {
+      const rec = asig.tarea.recurrencia;
+      const recData: RecurrenciaData = {
+        frecuencia: rec.frecuencia,
+        intervalo: rec.intervalo,
+        diaSemana: rec.diaSemana,
+        diaDelMes: rec.diaDelMes,
+        mesDelAnio: rec.mesDelAnio,
+        hastaFecha: rec.hastaFecha ? rec.hastaFecha.toISOString() : null,
+        conteoMaximo: rec.conteoMaximo,
+      };
+      const fechaBaseStr = asig.tarea.fechaVencimientoBase
+        ? asig.tarea.fechaVencimientoBase.toISOString()
+        : null;
+      const fechasGeneradas = generarFechasRecurrencia(recData, fechaBaseStr);
+      const hoyStr = formatDateISO(hoy);
+      const ocurrencias = asig.ocurrencias || [];
+
+      // Índice de ocurrencias materializadas por fechaOriginal (YYYY-MM-DD)
+      const matPorFecha = new Map<string, any>();
+      for (const oc of ocurrencias) {
+        const key = formatDateISO(new Date(oc.fechaOriginal));
+        matPorFecha.set(key, oc);
+      }
+
+      for (const fechaStr of fechasGeneradas) {
+        if (fechaStr >= hoyStr) break; // Solo fechas pasadas
+        if (matPorFecha.has(fechaStr)) continue; // Ya materializada
+        ocurrenciasACrear.push({
+          tareaAsignacionId: asig.id,
+          fechaOriginal: new Date(fechaStr + "T12:00:00"),
+          asigIndex: i,
+        });
       }
     }
   }

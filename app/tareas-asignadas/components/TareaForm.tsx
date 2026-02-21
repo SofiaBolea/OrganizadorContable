@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
 import RefColorSelector from "./RefColorSelector";
 
 interface Asistente {
@@ -22,6 +23,7 @@ interface TareaFormProps {
   basePath: string; // "/tareas-asignadas" o "/tareas-propias"
   /** Si se llegó desde una ocurrencia específica en la tabla */
   ocurrenciaContext?: OcurrenciaContext | null;
+  esAdmin?: boolean;
   initialData?: {
     id: string;
     titulo: string;
@@ -42,9 +44,8 @@ interface TareaFormProps {
   };
 }
 
-export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocurrenciaContext }: TareaFormProps) {
+export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocurrenciaContext, esAdmin }: TareaFormProps) {
   const router = useRouter();
-
   const [titulo, setTitulo] = useState(initialData?.titulo || "");
   const [prioridad, setPrioridad] = useState(initialData?.prioridad || "MEDIA");
   const [fechaVencimiento, setFechaVencimiento] = useState(
@@ -81,6 +82,37 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
     initialData?.recurrencia?.conteoMaximo || ""
   );
 
+  // Finaliza tipo (para recurrencia)
+  const [finalizaTipo, setFinalizaTipo] = useState<"nunca" | "fecha" | "ocurrencias">(
+    initialData?.recurrencia?.hastaFecha ? "fecha" :
+    initialData?.recurrencia?.conteoMaximo ? "ocurrencias" : "nunca"
+  );
+
+  // Búsqueda de asistentes
+  const [busquedaAsistente, setBusquedaAsistente] = useState("");
+  const [showBusqueda, setShowBusqueda] = useState(false);
+
+  // Helpers para días de la semana (toggle buttons)
+  const diasSemanaOpciones = ["LUN", "MAR", "MIE", "JUE", "VIE", "SAB", "DOM"];
+  const diasSeleccionados = diaSemana ? diaSemana.split(",").map((d) => d.trim()).filter(Boolean) : [];
+  const toggleDiaSemana = (dia: string) => {
+    if (isViewMode) return;
+    const actual = diaSemana ? diaSemana.split(",").map((d) => d.trim()).filter(Boolean) : [];
+    if (actual.includes(dia)) {
+      setDiaSemana(actual.filter((d) => d !== dia).join(","));
+    } else {
+      setDiaSemana([...actual, dia].join(","));
+    }
+  };
+
+  // Frecuencia opciones para dropdown
+  const frecuenciaOpciones = [
+    { value: "DIARIA", label: "Día" },
+    { value: "SEMANAL", label: "Semana" },
+    { value: "MENSUAL", label: "Mes" },
+    { value: "ANUAL", label: "Año" },
+  ];
+
   // Asignación (solo para ASIGNADA)
   const [asistentes, setAsistentes] = useState<Asistente[]>([]);
   const [asignadoIds, setAsignadoIds] = useState<string[]>(initialData?.asignadoIds || []);
@@ -110,8 +142,21 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
     );
   };
 
+  const toggleAsignarTodos = () => {
+    if (asignadoIds.length === asistentes.length) {
+      setAsignadoIds([]);
+    } else {
+      setAsignadoIds(asistentes.map((a) => a.id));
+    }
+  };
+
+  const asistentesFiltrados = asistentes.filter(
+    (a) =>
+      a.nombreCompleto.toLowerCase().includes(busquedaAsistente.toLowerCase()) ||
+      a.email.toLowerCase().includes(busquedaAsistente.toLowerCase())
+  );
+
   const prioridades = ["ALTA", "MEDIA", "BAJA"];
-  const frecuencias = ["DIARIA", "SEMANAL", "MENSUAL", "ANUAL"];
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -156,10 +201,10 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
         body.recurrencia = {
           frecuencia,
           intervalo,
-          diaSemana: diaSemana || null,
-          diaDelMes: diaDelMes || null,
-          hastaFecha: hastaFecha || null,
-          conteoMaximo: conteoMaximo || null,
+          diaSemana: frecuencia === "SEMANAL" ? (diaSemana || null) : null,
+          diaDelMes: frecuencia === "MENSUAL" ? (diaDelMes || null) : null,
+          hastaFecha: finalizaTipo === "fecha" ? (hastaFecha || null) : null,
+          conteoMaximo: finalizaTipo === "ocurrencias" ? (conteoMaximo || null) : null,
         };
       } else {
         body.recurrencia = null;
@@ -246,10 +291,10 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
         body.recurrencia = {
           frecuencia,
           intervalo,
-          diaSemana: diaSemana || null,
-          diaDelMes: diaDelMes || null,
-          hastaFecha: hastaFecha || null,
-          conteoMaximo: conteoMaximo || null,
+          diaSemana: frecuencia === "SEMANAL" ? (diaSemana || null) : null,
+          diaDelMes: frecuencia === "MENSUAL" ? (diaDelMes || null) : null,
+          hastaFecha: finalizaTipo === "fecha" ? (hastaFecha || null) : null,
+          conteoMaximo: finalizaTipo === "ocurrencias" ? (conteoMaximo || null) : null,
         };
       } else {
         body.recurrencia = null;
@@ -287,8 +332,19 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
           {isViewMode
             ? "Detalle de Tarea"
             : isCreateMode
-              ? "Nueva Tarea"
+              ? tipoTarea === "ASIGNADA" ? "Asignar Nueva Tarea" : "Nueva Tarea"
               : "Modificar Tarea"}
+          {ocurrenciaContext?.fechaOcurrencia && (() => {
+            const raw = ocurrenciaContext.fechaOcurrencia;
+            const dateOnly = raw.includes("T") ? raw.split("T")[0] : raw;
+            const d = new Date(dateOnly + "T00:00:00");
+            if (isNaN(d.getTime())) return null;
+            return (
+              <span className="ml-2 text-base font-normal text-muted-foreground">
+                — {d.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })}
+              </span>
+            );
+          })()}
         </h2>
 
         {error && (
@@ -301,7 +357,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
         <div className="mb-4">
           <input
             type="text"
-            placeholder="Título de la tarea"
+            placeholder="Titulo de Tarea"
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
             disabled={isViewMode}
@@ -313,7 +369,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
         {/* Descripción */}
         <div className="mb-6">
           <textarea
-            placeholder="Descripción (opcional)"
+            placeholder="Descripción de la tarea"
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
             disabled={isViewMode}
@@ -322,52 +378,143 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
           />
         </div>
 
-        {/* Prioridad */}
-        <div className="mb-6">
-          <label className="block text-sm font-bold text-text mb-3">Prioridad</label>
-          <div className="flex bg-[#e9e8e0] rounded-full p-1">
-            {prioridades.map((p) => (
-              <button
-                key={p}
-                type="button"
-                disabled={isViewMode}
-                onClick={() => setPrioridad(p)}
-                className={`flex-1 py-2.5 text-sm font-semibold rounded-full transition-all
-                  ${prioridad === p
-                    ? "bg-card text-text shadow-sm"
-                    : "text-text/50 hover:text-text/70"
-                  } ${isViewMode ? "cursor-default" : "cursor-pointer"}`}
-              >
-                {p}
-              </button>
-            ))}
+        {/* Asignación de Asistentes (solo ASIGNADA) */}
+        {tipoTarea === "ASIGNADA" && esAdmin &&(
+          <div className="mb-6 border border-text/10 rounded-2xl overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3 border-b border-text/10">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-text">Asistentes asignados</span>
+                <button
+                  type="button"
+                  onClick={() => setShowBusqueda(!showBusqueda)}
+                  className="text-text/40 hover:text-text/70 transition-colors"
+                >
+                  <Search size={16} />
+                </button>
+              </div>
+              {!isViewMode && asistentes.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-text/60">Asignar a todos</span>
+                  <button
+                    type="button"
+                    onClick={toggleAsignarTodos}
+                    className={`relative w-11 h-6 rounded-full transition-colors ${
+                      asignadoIds.length === asistentes.length && asistentes.length > 0
+                        ? "bg-primary-foreground"
+                        : "bg-text/20"
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+                        asignadoIds.length === asistentes.length && asistentes.length > 0
+                          ? "translate-x-5"
+                          : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Búsqueda */}
+            {showBusqueda && (
+              <div className="px-5 py-2 border-b border-text/10">
+                <input
+                  type="text"
+                  placeholder="Buscar asistente..."
+                  value={busquedaAsistente}
+                  onChange={(e) => setBusquedaAsistente(e.target.value)}
+                  className="w-full bg-transparent outline-none text-sm text-text placeholder:text-text/40"
+                  autoFocus
+                />
+              </div>
+            )}
+
+            {/* Lista */}
+            {loadingAsistentes ? (
+              <p className="text-text/50 text-sm p-5">Cargando asistentes...</p>
+            ) : asistentes.length === 0 ? (
+              <p className="text-text/50 text-sm p-5">
+                No hay asistentes disponibles. Invitá colaboradores desde la sección Equipo.
+              </p>
+            ) : (
+              <div className="max-h-60 overflow-y-auto">
+                {asistentesFiltrados.map((a, i) => (
+                  <label
+                    key={a.id}
+                    className={`flex items-center justify-between px-5 py-3 transition-colors hover:bg-black/[0.02] ${
+                      i < asistentesFiltrados.length - 1 ? "border-b border-text/5" : ""
+                    } ${isViewMode ? "cursor-default" : "cursor-pointer"}`}
+                  >
+                    <div>
+                      <span className="text-sm font-medium text-text">{a.nombreCompleto}</span>
+                      <span className="text-xs text-text/50 ml-2">{a.email}</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={asignadoIds.includes(a.id)}
+                      onChange={() => !isViewMode && toggleAsignado(a.id)}
+                      disabled={isViewMode}
+                      className="w-5 h-5 accent-primary-foreground rounded"
+                    />
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
+        )}
+
+        <div className="flex flex-row mb-6 mt-4 items-center">
+          <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+            Informacion general de la tarea
+          </label>
+          
         </div>
 
-        {/* Fecha Vencimiento / Fecha Base */}
-        <div className="mb-6">
-          <label className="block text-sm font-bold text-text mb-3">
-            {esRecurrente ? "Fecha Base" : "Fecha Límite"}
-            {!esRecurrente && <span className="text-danger-foreground ml-1">*</span>}
-          </label>
-          {esRecurrente && (
-            <p className="text-xs text-text/50 mb-2">
-              Fecha a partir de la cual se generan las ocurrencias recurrentes
-            </p>
-          )}
-          <input
-            type="date"
-            value={fechaVencimiento}
-            onChange={(e) => setFechaVencimiento(e.target.value)}
+        {/* Fecha + Prioridad en fila */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="flex flex-col gap-1.5">
+            <div className="flex flex-row gap-3 items-baseline">
+              <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+              {esRecurrente ? "Fecha Base" : "Fecha"}
+              </label>
+              {esRecurrente && (
+              <p className="text-[11px] text-text/40 -mt-1">
+                A partir de la cual se generan las ocurrencias
+              </p>
+            )}
+            </div>
+            
+            <input
+              type="date"
+              value={fechaVencimiento}
+              onChange={(e) => setFechaVencimiento(e.target.value)}
+              disabled={isViewMode}
+              required={!esRecurrente}
+              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text focus:ring-2 focus:ring-primary transition-all"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+              Prioridad
+            </label>
+            <select
+            value={prioridad}
+            onChange={(e) => setPrioridad(e.target.value)}
             disabled={isViewMode}
-            required={!esRecurrente}
-            className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text focus:ring-2 focus:ring-primary transition-all"
-          />
+            className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text focus:ring-2 focus:ring-primary transition-all appearance-none cursor-pointer"
+          >
+            {prioridades.map((p) => (
+              <option key={p} value={p}>{p === "ALTA" ? "Prioridad Alta" : p === "MEDIA" ? "Prioridad Media" : "Prioridad Baja"}</option>
+            ))}
+          </select>
+          </div>
         </div>
 
         {/* Recurrencia */}
         <div className="mb-6">
-          <label className="flex items-center gap-3 mb-4 cursor-pointer">
+          <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="checkbox"
               checked={esRecurrente}
@@ -379,104 +526,136 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
           </label>
 
           {esRecurrente && (
-            <div className="bg-[#e9e8e0] rounded-2xl p-5 space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-text/60 uppercase tracking-wide mb-2">
-                  Frecuencia
-                </label>
-                <div className="flex bg-white rounded-full p-1">
-                  {frecuencias.map((f) => (
-                    <button
-                      key={f}
-                      type="button"
-                      disabled={isViewMode}
-                      onClick={() => setFrecuencia(f)}
-                      className={`flex-1 py-2 text-xs font-semibold rounded-full transition-all
-                        ${frecuencia === f
-                          ? "bg-primary/30 text-text shadow-sm"
-                          : "text-text/50 hover:text-text/70"
-                        } ${isViewMode ? "cursor-default" : "cursor-pointer"}`}
-                    >
-                      {f}
-                    </button>
+            <div className="bg-[#e9e8e0] rounded-2xl p-6 mt-4 space-y-5">
+              <h3 className="text-lg font-semibold text-text">Recurrencia Personalizada</h3>
+
+              {/* Repetir - Botones de días (solo SEMANAL) */}
+              {frecuencia === "SEMANAL" && (
+                <div>
+                  <h4 className="text-sm font-bold text-primary-foreground mb-3">Repetir</h4>
+                  <div className="flex gap-2 flex-wrap">
+                    {diasSemanaOpciones.map((dia) => {
+                      const sel = diasSeleccionados.includes(dia);
+                      return (
+                        <button
+                          key={dia}
+                          type="button"
+                          disabled={isViewMode}
+                          onClick={() => toggleDiaSemana(dia)}
+                          className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                            sel
+                              ? "bg-primary-foreground text-white"
+                              : "bg-white text-text/60 hover:bg-white/80"
+                          } ${isViewMode ? "cursor-default" : "cursor-pointer"}`}
+                        >
+                          {dia}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Día del mes (solo MENSUAL) */}
+              {frecuencia === "MENSUAL" && (
+                <div>
+                  <h4 className="text-sm font-bold text-primary-foreground mb-3">Día del mes</h4>
+                  <input
+                    type="text"
+                    placeholder="1,15..."
+                    value={diaDelMes}
+                    onChange={(e) => setDiaDelMes(e.target.value)}
+                    disabled={isViewMode}
+                    className="w-32 bg-white p-2 px-4 rounded-full outline-none text-sm text-text placeholder:text-text/40"
+                  />
+                </div>
+              )}
+
+              {/* Cada N [frecuencia] */}
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-sm font-medium text-text">Cada</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={intervalo}
+                  onChange={(e) => setIntervalo(Number(e.target.value) || 1)}
+                  disabled={isViewMode}
+                  className="w-16 bg-white p-2 px-3 rounded-full outline-none text-sm text-text text-center"
+                />
+                <select
+                  value={frecuencia}
+                  onChange={(e) => setFrecuencia(e.target.value)}
+                  disabled={isViewMode}
+                  className="bg-white p-2 px-4 rounded-full outline-none text-sm text-text appearance-none cursor-pointer pr-8"
+                >
+                  {frecuenciaOpciones.map((f) => (
+                    <option key={f.value} value={f.value}>{f.label}</option>
                   ))}
-                </div>
+                </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-text/60 uppercase tracking-wide mb-2">
-                    Cada (intervalo)
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={intervalo}
-                    onChange={(e) => setIntervalo(Number(e.target.value) || 1)}
-                    disabled={isViewMode}
-                    className="w-full bg-white p-2 px-4 rounded-full outline-none text-sm text-text"
-                  />
-                </div>
-
-                {frecuencia === "SEMANAL" && (
-                  <div>
-                    <label className="block text-xs font-semibold text-text/60 uppercase tracking-wide mb-2">
-                      Días de la semana
-                    </label>
+              {/* Finaliza */}
+              <div>
+                <h4 className="text-sm font-bold text-text mb-3">Finaliza</h4>
+                <div className="space-y-4">
+                  <label className="flex items-center gap-3 cursor-pointer">
                     <input
-                      type="text"
-                      placeholder="LU,MA,MI..."
-                      value={diaSemana}
-                      onChange={(e) => setDiaSemana(e.target.value)}
+                      type="radio"
+                      name="finalizaTipo"
+                      checked={finalizaTipo === "nunca"}
+                      onChange={() => setFinalizaTipo("nunca")}
                       disabled={isViewMode}
-                      className="w-full bg-white p-2 px-4 rounded-full outline-none text-sm text-text placeholder:text-text/40"
+                      className="w-4 h-4 accent-primary-foreground"
                     />
-                  </div>
-                )}
+                    <span className="text-sm text-text">Nunca</span>
+                  </label>
 
-                {frecuencia === "MENSUAL" && (
-                  <div>
-                    <label className="block text-xs font-semibold text-text/60 uppercase tracking-wide mb-2">
-                      Día del mes
-                    </label>
+                  <label className="flex items-center gap-3 cursor-pointer">
                     <input
-                      type="text"
-                      placeholder="1,15..."
-                      value={diaDelMes}
-                      onChange={(e) => setDiaDelMes(e.target.value)}
+                      type="radio"
+                      name="finalizaTipo"
+                      checked={finalizaTipo === "fecha"}
+                      onChange={() => setFinalizaTipo("fecha")}
                       disabled={isViewMode}
-                      className="w-full bg-white p-2 px-4 rounded-full outline-none text-sm text-text placeholder:text-text/40"
+                      className="w-4 h-4 accent-primary-foreground"
                     />
-                  </div>
-                )}
-              </div>
+                    <span className="text-sm text-text">El</span>
+                    <input
+                      type="date"
+                      value={hastaFecha}
+                      onChange={(e) => {
+                        setHastaFecha(e.target.value);
+                        setFinalizaTipo("fecha");
+                      }}
+                      disabled={isViewMode || finalizaTipo !== "fecha"}
+                      className="bg-white p-2 px-4 rounded-full outline-none text-sm text-text disabled:opacity-50"
+                    />
+                  </label>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-text/60 uppercase tracking-wide mb-2">
-                    Hasta fecha (opcional)
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="finalizaTipo"
+                      checked={finalizaTipo === "ocurrencias"}
+                      onChange={() => setFinalizaTipo("ocurrencias")}
+                      disabled={isViewMode}
+                      className="w-4 h-4 accent-primary-foreground"
+                    />
+                    <span className="text-sm text-text">Despues de</span>
+                    <input
+                      type="number"
+                      min={1}
+                      value={conteoMaximo}
+                      onChange={(e) => {
+                        setConteoMaximo(e.target.value ? Number(e.target.value) : "");
+                        setFinalizaTipo("ocurrencias");
+                      }}
+                      disabled={isViewMode || finalizaTipo !== "ocurrencias"}
+                      placeholder="1"
+                      className="w-16 bg-white p-2 px-3 rounded-full outline-none text-sm text-text text-center disabled:opacity-50"
+                    />
+                    <span className="text-sm text-text">ocurrencias</span>
                   </label>
-                  <input
-                    type="date"
-                    value={hastaFecha}
-                    onChange={(e) => setHastaFecha(e.target.value)}
-                    disabled={isViewMode}
-                    className="w-full bg-white p-2 px-4 rounded-full outline-none text-sm text-text"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-text/60 uppercase tracking-wide mb-2">
-                    Máx. repeticiones (opcional)
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={conteoMaximo}
-                    onChange={(e) => setConteoMaximo(e.target.value ? Number(e.target.value) : "")}
-                    disabled={isViewMode}
-                    placeholder="Sin límite"
-                    className="w-full bg-white p-2 px-4 rounded-full outline-none text-sm text-text placeholder:text-text/40"
-                  />
                 </div>
               </div>
             </div>
@@ -491,48 +670,6 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
               onChange={setRefColorId}
               disabled={isViewMode}
             />
-          </div>
-        )}
-
-        {/* Asignación de Asistentes (solo ASIGNADA) */}
-        {tipoTarea === "ASIGNADA" && (
-          <div className="mb-6">
-            <label className="block text-sm font-bold text-text mb-3">
-              Asignar a Asistentes
-            </label>
-
-            {loadingAsistentes ? (
-              <p className="text-text/50 text-sm">Cargando asistentes...</p>
-            ) : asistentes.length === 0 ? (
-              <p className="text-text/50 text-sm">
-                No hay asistentes disponibles. Invitá colaboradores desde la sección Asistentes.
-              </p>
-            ) : (
-              <div className="bg-[#e9e8e0] rounded-2xl p-4 space-y-2 max-h-60 overflow-y-auto">
-                {asistentes.map((a) => (
-                  <label
-                    key={a.id}
-                    className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${
-                      asignadoIds.includes(a.id)
-                        ? "bg-primary/20 border border-primary/40"
-                        : "bg-white/50 border border-transparent hover:bg-white"
-                    } ${isViewMode ? "cursor-default" : "cursor-pointer"}`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={asignadoIds.includes(a.id)}
-                      onChange={() => !isViewMode && toggleAsignado(a.id)}
-                      disabled={isViewMode}
-                      className="w-4 h-4 accent-primary-foreground"
-                    />
-                    <div>
-                      <span className="text-sm font-semibold text-text">{a.nombreCompleto}</span>
-                      <span className="text-xs text-text/50 ml-2">{a.email}</span>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            )}
           </div>
         )}
 

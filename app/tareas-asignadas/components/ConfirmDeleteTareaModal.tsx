@@ -61,7 +61,7 @@ export default function ConfirmDeleteTareaModal({
               className="w-4 h-4 accent-primary-foreground"
             />
             <span className="text-text/80 group-hover:text-text transition-colors">
-              Eliminar la tarea completa (todas las asignaciones)
+              Cancelar esta y todas las ocurrencias futuras
             </span>
           </label>
         </div>

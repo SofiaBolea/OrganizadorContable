@@ -26,18 +26,21 @@ export type AggregateRefColor = {
 
 export type RefColorMinAggregateOutputType = {
   id: string | null
+  usuarioId: string | null
   titulo: string | null
   codigoHexa: string | null
 }
 
 export type RefColorMaxAggregateOutputType = {
   id: string | null
+  usuarioId: string | null
   titulo: string | null
   codigoHexa: string | null
 }
 
 export type RefColorCountAggregateOutputType = {
   id: number
+  usuarioId: number
   titulo: number
   codigoHexa: number
   _all: number
@@ -46,18 +49,21 @@ export type RefColorCountAggregateOutputType = {
 
 export type RefColorMinAggregateInputType = {
   id?: true
+  usuarioId?: true
   titulo?: true
   codigoHexa?: true
 }
 
 export type RefColorMaxAggregateInputType = {
   id?: true
+  usuarioId?: true
   titulo?: true
   codigoHexa?: true
 }
 
 export type RefColorCountAggregateInputType = {
   id?: true
+  usuarioId?: true
   titulo?: true
   codigoHexa?: true
   _all?: true
@@ -137,6 +143,7 @@ export type RefColorGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type RefColorGroupByOutputType = {
   id: string
+  usuarioId: string
   titulo: string
   codigoHexa: string
   _count: RefColorCountAggregateOutputType | null
@@ -164,17 +171,21 @@ export type RefColorWhereInput = {
   OR?: Prisma.RefColorWhereInput[]
   NOT?: Prisma.RefColorWhereInput | Prisma.RefColorWhereInput[]
   id?: Prisma.StringFilter<"RefColor"> | string
+  usuarioId?: Prisma.StringFilter<"RefColor"> | string
   titulo?: Prisma.StringFilter<"RefColor"> | string
   codigoHexa?: Prisma.StringFilter<"RefColor"> | string
   recurso?: Prisma.XOR<Prisma.RecursoScalarRelationFilter, Prisma.RecursoWhereInput>
+  usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
   tareasAsignadas?: Prisma.TareaAsignacionListRelationFilter
 }
 
 export type RefColorOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   titulo?: Prisma.SortOrder
   codigoHexa?: Prisma.SortOrder
   recurso?: Prisma.RecursoOrderByWithRelationInput
+  usuario?: Prisma.UsuarioOrderByWithRelationInput
   tareasAsignadas?: Prisma.TareaAsignacionOrderByRelationAggregateInput
 }
 
@@ -183,14 +194,17 @@ export type RefColorWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.RefColorWhereInput | Prisma.RefColorWhereInput[]
   OR?: Prisma.RefColorWhereInput[]
   NOT?: Prisma.RefColorWhereInput | Prisma.RefColorWhereInput[]
+  usuarioId?: Prisma.StringFilter<"RefColor"> | string
   titulo?: Prisma.StringFilter<"RefColor"> | string
   codigoHexa?: Prisma.StringFilter<"RefColor"> | string
   recurso?: Prisma.XOR<Prisma.RecursoScalarRelationFilter, Prisma.RecursoWhereInput>
+  usuario?: Prisma.XOR<Prisma.UsuarioScalarRelationFilter, Prisma.UsuarioWhereInput>
   tareasAsignadas?: Prisma.TareaAsignacionListRelationFilter
 }, "id">
 
 export type RefColorOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   titulo?: Prisma.SortOrder
   codigoHexa?: Prisma.SortOrder
   _count?: Prisma.RefColorCountOrderByAggregateInput
@@ -203,6 +217,7 @@ export type RefColorScalarWhereWithAggregatesInput = {
   OR?: Prisma.RefColorScalarWhereWithAggregatesInput[]
   NOT?: Prisma.RefColorScalarWhereWithAggregatesInput | Prisma.RefColorScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"RefColor"> | string
+  usuarioId?: Prisma.StringWithAggregatesFilter<"RefColor"> | string
   titulo?: Prisma.StringWithAggregatesFilter<"RefColor"> | string
   codigoHexa?: Prisma.StringWithAggregatesFilter<"RefColor"> | string
 }
@@ -211,11 +226,13 @@ export type RefColorCreateInput = {
   titulo: string
   codigoHexa: string
   recurso: Prisma.RecursoCreateNestedOneWithoutRefColorInput
+  usuario: Prisma.UsuarioCreateNestedOneWithoutRefColoresInput
   tareasAsignadas?: Prisma.TareaAsignacionCreateNestedManyWithoutRefColorInput
 }
 
 export type RefColorUncheckedCreateInput = {
   id: string
+  usuarioId: string
   titulo: string
   codigoHexa: string
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutRefColorInput
@@ -225,11 +242,13 @@ export type RefColorUpdateInput = {
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   codigoHexa?: Prisma.StringFieldUpdateOperationsInput | string
   recurso?: Prisma.RecursoUpdateOneRequiredWithoutRefColorNestedInput
+  usuario?: Prisma.UsuarioUpdateOneRequiredWithoutRefColoresNestedInput
   tareasAsignadas?: Prisma.TareaAsignacionUpdateManyWithoutRefColorNestedInput
 }
 
 export type RefColorUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  usuarioId?: Prisma.StringFieldUpdateOperationsInput | string
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   codigoHexa?: Prisma.StringFieldUpdateOperationsInput | string
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutRefColorNestedInput
@@ -237,6 +256,7 @@ export type RefColorUncheckedUpdateInput = {
 
 export type RefColorCreateManyInput = {
   id: string
+  usuarioId: string
   titulo: string
   codigoHexa: string
 }
@@ -248,8 +268,19 @@ export type RefColorUpdateManyMutationInput = {
 
 export type RefColorUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  usuarioId?: Prisma.StringFieldUpdateOperationsInput | string
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   codigoHexa?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type RefColorListRelationFilter = {
+  every?: Prisma.RefColorWhereInput
+  some?: Prisma.RefColorWhereInput
+  none?: Prisma.RefColorWhereInput
+}
+
+export type RefColorOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type RefColorNullableScalarRelationFilter = {
@@ -259,20 +290,65 @@ export type RefColorNullableScalarRelationFilter = {
 
 export type RefColorCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   titulo?: Prisma.SortOrder
   codigoHexa?: Prisma.SortOrder
 }
 
 export type RefColorMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   titulo?: Prisma.SortOrder
   codigoHexa?: Prisma.SortOrder
 }
 
 export type RefColorMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  usuarioId?: Prisma.SortOrder
   titulo?: Prisma.SortOrder
   codigoHexa?: Prisma.SortOrder
+}
+
+export type RefColorCreateNestedManyWithoutUsuarioInput = {
+  create?: Prisma.XOR<Prisma.RefColorCreateWithoutUsuarioInput, Prisma.RefColorUncheckedCreateWithoutUsuarioInput> | Prisma.RefColorCreateWithoutUsuarioInput[] | Prisma.RefColorUncheckedCreateWithoutUsuarioInput[]
+  connectOrCreate?: Prisma.RefColorCreateOrConnectWithoutUsuarioInput | Prisma.RefColorCreateOrConnectWithoutUsuarioInput[]
+  createMany?: Prisma.RefColorCreateManyUsuarioInputEnvelope
+  connect?: Prisma.RefColorWhereUniqueInput | Prisma.RefColorWhereUniqueInput[]
+}
+
+export type RefColorUncheckedCreateNestedManyWithoutUsuarioInput = {
+  create?: Prisma.XOR<Prisma.RefColorCreateWithoutUsuarioInput, Prisma.RefColorUncheckedCreateWithoutUsuarioInput> | Prisma.RefColorCreateWithoutUsuarioInput[] | Prisma.RefColorUncheckedCreateWithoutUsuarioInput[]
+  connectOrCreate?: Prisma.RefColorCreateOrConnectWithoutUsuarioInput | Prisma.RefColorCreateOrConnectWithoutUsuarioInput[]
+  createMany?: Prisma.RefColorCreateManyUsuarioInputEnvelope
+  connect?: Prisma.RefColorWhereUniqueInput | Prisma.RefColorWhereUniqueInput[]
+}
+
+export type RefColorUpdateManyWithoutUsuarioNestedInput = {
+  create?: Prisma.XOR<Prisma.RefColorCreateWithoutUsuarioInput, Prisma.RefColorUncheckedCreateWithoutUsuarioInput> | Prisma.RefColorCreateWithoutUsuarioInput[] | Prisma.RefColorUncheckedCreateWithoutUsuarioInput[]
+  connectOrCreate?: Prisma.RefColorCreateOrConnectWithoutUsuarioInput | Prisma.RefColorCreateOrConnectWithoutUsuarioInput[]
+  upsert?: Prisma.RefColorUpsertWithWhereUniqueWithoutUsuarioInput | Prisma.RefColorUpsertWithWhereUniqueWithoutUsuarioInput[]
+  createMany?: Prisma.RefColorCreateManyUsuarioInputEnvelope
+  set?: Prisma.RefColorWhereUniqueInput | Prisma.RefColorWhereUniqueInput[]
+  disconnect?: Prisma.RefColorWhereUniqueInput | Prisma.RefColorWhereUniqueInput[]
+  delete?: Prisma.RefColorWhereUniqueInput | Prisma.RefColorWhereUniqueInput[]
+  connect?: Prisma.RefColorWhereUniqueInput | Prisma.RefColorWhereUniqueInput[]
+  update?: Prisma.RefColorUpdateWithWhereUniqueWithoutUsuarioInput | Prisma.RefColorUpdateWithWhereUniqueWithoutUsuarioInput[]
+  updateMany?: Prisma.RefColorUpdateManyWithWhereWithoutUsuarioInput | Prisma.RefColorUpdateManyWithWhereWithoutUsuarioInput[]
+  deleteMany?: Prisma.RefColorScalarWhereInput | Prisma.RefColorScalarWhereInput[]
+}
+
+export type RefColorUncheckedUpdateManyWithoutUsuarioNestedInput = {
+  create?: Prisma.XOR<Prisma.RefColorCreateWithoutUsuarioInput, Prisma.RefColorUncheckedCreateWithoutUsuarioInput> | Prisma.RefColorCreateWithoutUsuarioInput[] | Prisma.RefColorUncheckedCreateWithoutUsuarioInput[]
+  connectOrCreate?: Prisma.RefColorCreateOrConnectWithoutUsuarioInput | Prisma.RefColorCreateOrConnectWithoutUsuarioInput[]
+  upsert?: Prisma.RefColorUpsertWithWhereUniqueWithoutUsuarioInput | Prisma.RefColorUpsertWithWhereUniqueWithoutUsuarioInput[]
+  createMany?: Prisma.RefColorCreateManyUsuarioInputEnvelope
+  set?: Prisma.RefColorWhereUniqueInput | Prisma.RefColorWhereUniqueInput[]
+  disconnect?: Prisma.RefColorWhereUniqueInput | Prisma.RefColorWhereUniqueInput[]
+  delete?: Prisma.RefColorWhereUniqueInput | Prisma.RefColorWhereUniqueInput[]
+  connect?: Prisma.RefColorWhereUniqueInput | Prisma.RefColorWhereUniqueInput[]
+  update?: Prisma.RefColorUpdateWithWhereUniqueWithoutUsuarioInput | Prisma.RefColorUpdateWithWhereUniqueWithoutUsuarioInput[]
+  updateMany?: Prisma.RefColorUpdateManyWithWhereWithoutUsuarioInput | Prisma.RefColorUpdateManyWithWhereWithoutUsuarioInput[]
+  deleteMany?: Prisma.RefColorScalarWhereInput | Prisma.RefColorScalarWhereInput[]
 }
 
 export type RefColorCreateNestedOneWithoutRecursoInput = {
@@ -323,13 +399,65 @@ export type RefColorUpdateOneWithoutTareasAsignadasNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.RefColorUpdateToOneWithWhereWithoutTareasAsignadasInput, Prisma.RefColorUpdateWithoutTareasAsignadasInput>, Prisma.RefColorUncheckedUpdateWithoutTareasAsignadasInput>
 }
 
+export type RefColorCreateWithoutUsuarioInput = {
+  titulo: string
+  codigoHexa: string
+  recurso: Prisma.RecursoCreateNestedOneWithoutRefColorInput
+  tareasAsignadas?: Prisma.TareaAsignacionCreateNestedManyWithoutRefColorInput
+}
+
+export type RefColorUncheckedCreateWithoutUsuarioInput = {
+  id: string
+  titulo: string
+  codigoHexa: string
+  tareasAsignadas?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutRefColorInput
+}
+
+export type RefColorCreateOrConnectWithoutUsuarioInput = {
+  where: Prisma.RefColorWhereUniqueInput
+  create: Prisma.XOR<Prisma.RefColorCreateWithoutUsuarioInput, Prisma.RefColorUncheckedCreateWithoutUsuarioInput>
+}
+
+export type RefColorCreateManyUsuarioInputEnvelope = {
+  data: Prisma.RefColorCreateManyUsuarioInput | Prisma.RefColorCreateManyUsuarioInput[]
+  skipDuplicates?: boolean
+}
+
+export type RefColorUpsertWithWhereUniqueWithoutUsuarioInput = {
+  where: Prisma.RefColorWhereUniqueInput
+  update: Prisma.XOR<Prisma.RefColorUpdateWithoutUsuarioInput, Prisma.RefColorUncheckedUpdateWithoutUsuarioInput>
+  create: Prisma.XOR<Prisma.RefColorCreateWithoutUsuarioInput, Prisma.RefColorUncheckedCreateWithoutUsuarioInput>
+}
+
+export type RefColorUpdateWithWhereUniqueWithoutUsuarioInput = {
+  where: Prisma.RefColorWhereUniqueInput
+  data: Prisma.XOR<Prisma.RefColorUpdateWithoutUsuarioInput, Prisma.RefColorUncheckedUpdateWithoutUsuarioInput>
+}
+
+export type RefColorUpdateManyWithWhereWithoutUsuarioInput = {
+  where: Prisma.RefColorScalarWhereInput
+  data: Prisma.XOR<Prisma.RefColorUpdateManyMutationInput, Prisma.RefColorUncheckedUpdateManyWithoutUsuarioInput>
+}
+
+export type RefColorScalarWhereInput = {
+  AND?: Prisma.RefColorScalarWhereInput | Prisma.RefColorScalarWhereInput[]
+  OR?: Prisma.RefColorScalarWhereInput[]
+  NOT?: Prisma.RefColorScalarWhereInput | Prisma.RefColorScalarWhereInput[]
+  id?: Prisma.StringFilter<"RefColor"> | string
+  usuarioId?: Prisma.StringFilter<"RefColor"> | string
+  titulo?: Prisma.StringFilter<"RefColor"> | string
+  codigoHexa?: Prisma.StringFilter<"RefColor"> | string
+}
+
 export type RefColorCreateWithoutRecursoInput = {
   titulo: string
   codigoHexa: string
+  usuario: Prisma.UsuarioCreateNestedOneWithoutRefColoresInput
   tareasAsignadas?: Prisma.TareaAsignacionCreateNestedManyWithoutRefColorInput
 }
 
 export type RefColorUncheckedCreateWithoutRecursoInput = {
+  usuarioId: string
   titulo: string
   codigoHexa: string
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedCreateNestedManyWithoutRefColorInput
@@ -354,10 +482,12 @@ export type RefColorUpdateToOneWithWhereWithoutRecursoInput = {
 export type RefColorUpdateWithoutRecursoInput = {
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   codigoHexa?: Prisma.StringFieldUpdateOperationsInput | string
+  usuario?: Prisma.UsuarioUpdateOneRequiredWithoutRefColoresNestedInput
   tareasAsignadas?: Prisma.TareaAsignacionUpdateManyWithoutRefColorNestedInput
 }
 
 export type RefColorUncheckedUpdateWithoutRecursoInput = {
+  usuarioId?: Prisma.StringFieldUpdateOperationsInput | string
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   codigoHexa?: Prisma.StringFieldUpdateOperationsInput | string
   tareasAsignadas?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutRefColorNestedInput
@@ -367,10 +497,12 @@ export type RefColorCreateWithoutTareasAsignadasInput = {
   titulo: string
   codigoHexa: string
   recurso: Prisma.RecursoCreateNestedOneWithoutRefColorInput
+  usuario: Prisma.UsuarioCreateNestedOneWithoutRefColoresInput
 }
 
 export type RefColorUncheckedCreateWithoutTareasAsignadasInput = {
   id: string
+  usuarioId: string
   titulo: string
   codigoHexa: string
 }
@@ -395,9 +527,37 @@ export type RefColorUpdateWithoutTareasAsignadasInput = {
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   codigoHexa?: Prisma.StringFieldUpdateOperationsInput | string
   recurso?: Prisma.RecursoUpdateOneRequiredWithoutRefColorNestedInput
+  usuario?: Prisma.UsuarioUpdateOneRequiredWithoutRefColoresNestedInput
 }
 
 export type RefColorUncheckedUpdateWithoutTareasAsignadasInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  usuarioId?: Prisma.StringFieldUpdateOperationsInput | string
+  titulo?: Prisma.StringFieldUpdateOperationsInput | string
+  codigoHexa?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type RefColorCreateManyUsuarioInput = {
+  id: string
+  titulo: string
+  codigoHexa: string
+}
+
+export type RefColorUpdateWithoutUsuarioInput = {
+  titulo?: Prisma.StringFieldUpdateOperationsInput | string
+  codigoHexa?: Prisma.StringFieldUpdateOperationsInput | string
+  recurso?: Prisma.RecursoUpdateOneRequiredWithoutRefColorNestedInput
+  tareasAsignadas?: Prisma.TareaAsignacionUpdateManyWithoutRefColorNestedInput
+}
+
+export type RefColorUncheckedUpdateWithoutUsuarioInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  titulo?: Prisma.StringFieldUpdateOperationsInput | string
+  codigoHexa?: Prisma.StringFieldUpdateOperationsInput | string
+  tareasAsignadas?: Prisma.TareaAsignacionUncheckedUpdateManyWithoutRefColorNestedInput
+}
+
+export type RefColorUncheckedUpdateManyWithoutUsuarioInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   codigoHexa?: Prisma.StringFieldUpdateOperationsInput | string
@@ -436,54 +596,66 @@ export type RefColorCountOutputTypeCountTareasAsignadasArgs<ExtArgs extends runt
 
 export type RefColorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  usuarioId?: boolean
   titulo?: boolean
   codigoHexa?: boolean
   recurso?: boolean | Prisma.RecursoDefaultArgs<ExtArgs>
+  usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
   tareasAsignadas?: boolean | Prisma.RefColor$tareasAsignadasArgs<ExtArgs>
   _count?: boolean | Prisma.RefColorCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["refColor"]>
 
 export type RefColorSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  usuarioId?: boolean
   titulo?: boolean
   codigoHexa?: boolean
   recurso?: boolean | Prisma.RecursoDefaultArgs<ExtArgs>
+  usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["refColor"]>
 
 export type RefColorSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  usuarioId?: boolean
   titulo?: boolean
   codigoHexa?: boolean
   recurso?: boolean | Prisma.RecursoDefaultArgs<ExtArgs>
+  usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["refColor"]>
 
 export type RefColorSelectScalar = {
   id?: boolean
+  usuarioId?: boolean
   titulo?: boolean
   codigoHexa?: boolean
 }
 
-export type RefColorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "titulo" | "codigoHexa", ExtArgs["result"]["refColor"]>
+export type RefColorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "usuarioId" | "titulo" | "codigoHexa", ExtArgs["result"]["refColor"]>
 export type RefColorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recurso?: boolean | Prisma.RecursoDefaultArgs<ExtArgs>
+  usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
   tareasAsignadas?: boolean | Prisma.RefColor$tareasAsignadasArgs<ExtArgs>
   _count?: boolean | Prisma.RefColorCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RefColorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recurso?: boolean | Prisma.RecursoDefaultArgs<ExtArgs>
+  usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }
 export type RefColorIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recurso?: boolean | Prisma.RecursoDefaultArgs<ExtArgs>
+  usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
 }
 
 export type $RefColorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "RefColor"
   objects: {
     recurso: Prisma.$RecursoPayload<ExtArgs>
+    usuario: Prisma.$UsuarioPayload<ExtArgs>
     tareasAsignadas: Prisma.$TareaAsignacionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    usuarioId: string
     titulo: string
     codigoHexa: string
   }, ExtArgs["result"]["refColor"]>
@@ -881,6 +1053,7 @@ readonly fields: RefColorFieldRefs;
 export interface Prisma__RefColorClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   recurso<T extends Prisma.RecursoDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RecursoDefaultArgs<ExtArgs>>): Prisma.Prisma__RecursoClient<runtime.Types.Result.GetResult<Prisma.$RecursoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  usuario<T extends Prisma.UsuarioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UsuarioDefaultArgs<ExtArgs>>): Prisma.Prisma__UsuarioClient<runtime.Types.Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   tareasAsignadas<T extends Prisma.RefColor$tareasAsignadasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RefColor$tareasAsignadasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TareaAsignacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -912,6 +1085,7 @@ export interface Prisma__RefColorClient<T, Null = never, ExtArgs extends runtime
  */
 export interface RefColorFieldRefs {
   readonly id: Prisma.FieldRef<"RefColor", 'String'>
+  readonly usuarioId: Prisma.FieldRef<"RefColor", 'String'>
   readonly titulo: Prisma.FieldRef<"RefColor", 'String'>
   readonly codigoHexa: Prisma.FieldRef<"RefColor", 'String'>
 }

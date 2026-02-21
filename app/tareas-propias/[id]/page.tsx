@@ -5,9 +5,10 @@ import TareaForm from "@/app/tareas-asignadas/components/TareaForm";
 
 interface PageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ fechaOc?: string }>;
 }
 
-export default async function DetalleMiTareaPage({ params }: PageProps) {
+export default async function DetalleMiTareaPage({ params, searchParams }: PageProps) {
   const { orgId } = await auth();
 
   if (!orgId) {
@@ -15,6 +16,7 @@ export default async function DetalleMiTareaPage({ params }: PageProps) {
   }
 
   const { id } = await params;
+  const { fechaOc } = await searchParams;
   const tarea = await getTareaDetalle(id);
 
   if (!tarea) {
@@ -57,6 +59,7 @@ export default async function DetalleMiTareaPage({ params }: PageProps) {
           asignadoIds: tarea.asignaciones.map((a) => a.asignadoId),
           refColorId: tarea.asignaciones[0]?.refColor?.id || null,
         }}
+        ocurrenciaContext={fechaOc ? { tareaAsignacionId: "", fechaOcurrencia: fechaOc } : null}
       />
     </main>
   );

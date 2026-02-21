@@ -2,15 +2,15 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { getRefColores, crearRefColor } from "@/lib/tareas";
 
-// GET: Obtener colores de referencia
+// GET: Obtener colores de referencia del usuario actual
 export async function GET() {
   try {
-    const { orgId } = await auth();
-    if (!orgId) {
+    const { orgId, userId } = await auth();
+    if (!orgId || !userId) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const colores = await getRefColores(orgId);
+    const colores = await getRefColores(orgId, userId);
     return NextResponse.json(colores);
   } catch (error) {
     console.error("Error obteniendo colores:", error);
@@ -18,11 +18,11 @@ export async function GET() {
   }
 }
 
-// POST: Crear nuevo color de referencia
+// POST: Crear nuevo color de referencia para el usuario actual
 export async function POST(request: NextRequest) {
   try {
-    const { orgId } = await auth();
-    if (!orgId) {
+    const { orgId, userId } = await auth();
+    if (!orgId || !userId) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Se requiere titulo y codigoHexa" }, { status: 400 });
     }
 
-    const refColor = await crearRefColor(orgId, titulo, codigoHexa);
+    const refColor = await crearRefColor(orgId, userId, titulo, codigoHexa);
 
     return NextResponse.json(
       { message: "Color creado exitosamente", data: refColor },
