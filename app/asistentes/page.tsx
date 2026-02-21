@@ -12,7 +12,6 @@ export default async function AsistentesPage({ searchParams }: { searchParams: R
     return (
       <main className="flex min-h-[80vh] items-center justify-center p-6 bg-app">
         <div className="bg-card border border-black/5 p-12 rounded-xl text-center max-w-sm shadow-sm">
-          <span className="w-12 h-12 text-primary mx-auto mb-6">⚠️</span>
           <h2 className="text-xl font-bold text-text mb-2">Organización Requerida</h2>
           <p className="text-sm text-text/60 leading-relaxed">Seleccioná un espacio de trabajo.</p>
         </div>
