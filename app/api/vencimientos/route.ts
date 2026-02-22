@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { crearVencimiento } from "@/lib/vencimientos";
-import { Permisos } from "@/lib/permisos/permisos";
+import { Permisos } from "@/lib/permisos";
 
 export async function POST(request: NextRequest) {
   try {

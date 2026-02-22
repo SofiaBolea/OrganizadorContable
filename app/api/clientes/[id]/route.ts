@@ -1,7 +1,7 @@
 // app/api/clientes/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { Permisos } from "@/lib/permisos/permisos";
+import { Permisos } from "@/lib/permisos";
 import { eliminarClienteService, modificarCliente } from "../../../../lib/clientes"; // Importamos la función de negocio
 import { revalidatePath } from "next/cache";
 
@@ -37,9 +37,11 @@ export async function PUT(
 
   } catch (error: any) {
     console.error("Error en API PUT Cliente:", error);
+    // Si el error tiene un mensaje específico (por ejemplo, de validación), lo devolvemos
+    const errorMsg = error?.message || "Error al intentar actualizar el cliente.";
     return NextResponse.json(
-      { success: false, error: "Error al intentar actualizar el cliente." },
-      { status: 500 }
+      { success: false, error: errorMsg },
+      { status: 400 }
     );
   }
 }

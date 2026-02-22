@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getTareaDetalle } from "@/lib/tareas";
-import { Permisos } from "@/lib/permisos/permisos";
+import { Permisos } from "@/lib/permisos";
 import TareaForm from "@/app/tareas-asignadas/components/TareaForm";
 
 interface PageProps {

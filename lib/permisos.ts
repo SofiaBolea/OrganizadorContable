@@ -246,4 +246,32 @@ export class Permisos {
     return tienePermiso;
   }
 
+  static async puedeVerRecursosReferenciaPropio() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:recursos_de_referencia:ver_recurso_ref" });
+    return tienePermiso;
+  }
+
+  static async puedeCrearRecursosReferenciaPropio() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:recursos_de_referencia:crear_recurso_ref" });
+    return tienePermiso;
+  }
+
+  static async puedeModificarRecursosReferenciaPropio() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:recursos_de_referencia:modificar_recurso_ref" });
+    return tienePermiso;
+  }
+
+  static async puedeEliminarRecursosReferenciaPropio() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:recursos_de_referencia:eliminar_recurso_ref" });
+    return tienePermiso;
+  }
+
 }

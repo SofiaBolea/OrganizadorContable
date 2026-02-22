@@ -176,7 +176,6 @@ exports.Prisma.RegistroAuditoriaScalarFieldEnum = {
 exports.Prisma.RecursoScalarFieldEnum = {
   id: 'id',
   organizacionId: 'organizacionId',
-  nombre: 'nombre',
   descripcion: 'descripcion',
   tipoRecurso: 'tipoRecurso'
 };
@@ -185,7 +184,8 @@ exports.Prisma.RecursoRefScalarFieldEnum = {
   id: 'id',
   titulo: 'titulo',
   url: 'url',
-  tipo: 'tipo'
+  tipo: 'tipo',
+  usuarioId: 'usuarioId'
 };
 
 exports.Prisma.RefColorScalarFieldEnum = {
@@ -250,7 +250,8 @@ exports.Prisma.OcurrenciaScalarFieldEnum = {
   fechaOverride: 'fechaOverride',
   tituloOverride: 'tituloOverride',
   estado: 'estado',
-  colorOverride: 'colorOverride'
+  colorOverride: 'colorOverride',
+  prioridadOverride: 'prioridadOverride'
 };
 
 exports.Prisma.VencimientoScalarFieldEnum = {

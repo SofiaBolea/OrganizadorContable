@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { actualizarVencimiento } from "@/lib/vencimientos";
-import { Permisos } from "@/lib/permisos/permisos";
+import { Permisos } from "@/lib/permisos";
 
 export async function PUT(
   req: Request,

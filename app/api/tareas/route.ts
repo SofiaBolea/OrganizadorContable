@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { crearTarea, getTareasAsignadasAdmin, getTareasAsignadasAsistente, getTareasPropias } from "@/lib/tareas";
-import { Permisos } from "@/lib/permisos/permisos";
+import { Permisos } from "@/lib/permisos";
 
 // POST: Crear nueva tarea
 export async function POST(request: NextRequest) {

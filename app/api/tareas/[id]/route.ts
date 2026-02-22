@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { actualizarTarea, eliminarTareaCompleta, getTareaDetalle } from "@/lib/tareas";
-import { Permisos } from "@/lib/permisos/permisos";
+import { Permisos } from "@/lib/permisos";
 
 // GET: Detalle de tarea
 export async function GET(
