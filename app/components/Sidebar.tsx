@@ -126,7 +126,15 @@ export default function Sidebar() {
           label="Mis Tareas"
         />
 
+        <NavItem
+          href="/calendario"
+          icon={Calendar}
+          label="Calendario"
+        />
+        
+
       </nav>
+      
 
       <div className="mt-auto pt-8 text-xs text-white/40">
         © {new Date().getFullYear()} Estudio
