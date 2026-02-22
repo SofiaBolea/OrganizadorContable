@@ -14,6 +14,11 @@ export async function PUT(
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
+    const puedeModificar = await Permisos.puedeModificarTareaAsignada();
+    if (!puedeModificar) {
+      return NextResponse.json({ error: "No tienes permisos para modificar tareas asignadas" }, { status: 403 });
+    }
+
     const { id } = await params;
     const body = await request.json();
 
@@ -44,6 +49,11 @@ export async function DELETE(
     const { orgId } = await auth();
     if (!orgId) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    }
+
+    const puedeEliminar = await Permisos.puedeEliminarTareaAsignada();
+    if (!puedeEliminar) {
+      return NextResponse.json({ error: "No tienes permisos para eliminar tareas asignadas" }, { status: 403 });
     }
 
     const { id } = await params;

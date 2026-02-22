@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { cancelarOcurrencia } from "@/lib/tareas";
+import { Permisos } from "@/lib/permisos";
 
 // DELETE: Cancelar una ocurrencia materializada (marca como CANCELADA)
 export async function DELETE(
@@ -11,6 +12,11 @@ export async function DELETE(
     const { orgId } = await auth();
     if (!orgId) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    }
+
+    const puedeEliminar = await Permisos.puedeEliminarTareaAsignada();
+    if (!puedeEliminar) {
+      return NextResponse.json({ error: "No tienes permisos para eliminar tareas asignadas" }, { status: 403 });
     }
 
     const { id } = await params;

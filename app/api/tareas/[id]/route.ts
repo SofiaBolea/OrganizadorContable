@@ -21,9 +21,17 @@ export async function GET(
       return NextResponse.json({ error: "Tarea no encontrada" }, { status: 404 });
     }
 
-    const puedeVer = await Permisos.puedeVerTareaAsignada();
-    if (!puedeVer) {
-      return NextResponse.json({ error: "No tienes permisos" }, { status: 403 });
+    // Validar permisos según tipo de tarea
+    if (tarea.tipoTarea === "ASIGNADA") {
+      const puedeVer = await Permisos.puedeVerTareaAsignada();
+      if (!puedeVer) {
+        return NextResponse.json({ error: "No tienes permisos para ver tareas asignadas" }, { status: 403 });
+      }
+    } else {
+      const puedeVer = await Permisos.puedeVerTarea();
+      if (!puedeVer) {
+        return NextResponse.json({ error: "No tienes permisos para ver tareas" }, { status: 403 });
+      }
     }
 
     return NextResponse.json(tarea);
@@ -56,7 +64,12 @@ export async function PUT(
     if (tarea.tipoTarea === "ASIGNADA") {
       const puedeModificar = await Permisos.puedeModificarTareaAsignada();
       if (!puedeModificar) {
-        return NextResponse.json({ error: "No tienes permisos" }, { status: 403 });
+        return NextResponse.json({ error: "No tienes permisos para modificar tareas asignadas" }, { status: 403 });
+      }
+    } else {
+      const puedeModificar = await Permisos.puedeModificarTarea();
+      if (!puedeModificar) {
+        return NextResponse.json({ error: "No tienes permisos para modificar tareas" }, { status: 403 });
       }
     }
 
@@ -94,7 +107,12 @@ export async function DELETE(
     if (tarea.tipoTarea === "ASIGNADA") {
       const puedeEliminar = await Permisos.puedeEliminarTareaAsignada();
       if (!puedeEliminar) {
-        return NextResponse.json({ error: "No tienes permisos" }, { status: 403 });
+        return NextResponse.json({ error: "No tienes permisos para eliminar tareas asignadas" }, { status: 403 });
+      }
+    } else {
+      const puedeEliminar = await Permisos.puedeEliminarTarea();
+      if (!puedeEliminar) {
+        return NextResponse.json({ error: "No tienes permisos para eliminar tareas" }, { status: 403 });
       }
     }
 

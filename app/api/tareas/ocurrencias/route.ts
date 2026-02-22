@@ -79,6 +79,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
+    const puedeVer = await Permisos.puedeVerTareaAsignada();
+    if (!puedeVer) {
+      return NextResponse.json({ error: "No tienes permisos para ver tareas asignadas" }, { status: 403 });
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const tareaAsignacionId = searchParams.get("tareaAsignacionId");
     const fechaOcurrencia = searchParams.get("fechaOcurrencia");
