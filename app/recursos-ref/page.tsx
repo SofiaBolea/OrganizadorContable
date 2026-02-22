@@ -2,14 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Search, ExternalLink, Pencil, Trash2, FolderOpen } from "lucide-react";
-import FormularioCrearRecurso from "./formularioCrearRecurso"; //
 import FormularioEditarRecurso from "./formularioEditarRecursoRef";
 import { Button } from "../components/Button";
+import FormularioCrearRecurso from "./formularioCrearRecurso";
+
+
 
 export default function RecursosPage() {
   const [recursos, setRecursos] = useState([]);
   const [loading, setLoading] = useState(true);
   
+   
   // Estados para creación
   const [isModalOpen, setIsModalOpen] = useState(false);
   
@@ -129,7 +132,7 @@ export default function RecursosPage() {
       </div>
 
       {/* MODAL CREAR */}
-      {isModalOpen && (
+      {isModalOpen  && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <FormularioCrearRecurso 
             onClose={() => setIsModalOpen(false)} 

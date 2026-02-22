@@ -57,7 +57,9 @@ export async function crearRecursoRef(req: NextRequest) {
 
 export async function modificarRecursoPropio(req: NextRequest) {
   // 1. Validar autenticación y organización
-  const { userId, orgId } = await auth();
+  const { userId, orgId, has } = await auth();
+  const isAdmin = has({ permission: "org:admin" });
+  
   if (!userId || !orgId) {
     throw new Error("No autorizado");
   }
@@ -83,32 +85,31 @@ export async function modificarRecursoPropio(req: NextRequest) {
   if (!usuarioCreador) {
     throw new Error("Usuario no encontrado en la organización");
   }
-  const nuevoRecursoPrivado = await prisma.$transaction(async (tx) => {
-    // 1. Actualizar el Recurso Base
+  const recursoExistente = await prisma.recursoRef.findUnique({
+    where: { id: body.id }
+  });
+
+  if (!isAdmin) {
+    if (recursoExistente?.tipo === "GLOBAL") throw new Error("No tienes permiso para editar recursos globales");
+    if (recursoExistente?.usuarioId !== usuarioCreador?.id) throw new Error("No puedes editar recursos de otros usuarios");
+  }
+
+  // Lógica de update (se mantiene el transaction existente)
+  return await prisma.$transaction(async (tx) => {
     const recursoBase = await tx.recurso.update({
       where: { id: body.id },
-      data: {
-        descripcion: descripcion || "",
-        tipoRecurso: "RECURSO DE REFERENCIA",
-      },
+      data: { descripcion: body.descripcion || "" },
     });
-    // 2. Actualizar el Recurso de Referencia vinculado
     const detalleReferencia = await tx.recursoRef.update({
-      where: { id: recursoBase.id },
+      where: { id: body.id },
       data: {
-        id: recursoBase.id,
-        titulo: titulo,
-        url: url,
-        tipo: "PROPIO",
-        usuarioId: usuarioCreador.id,
+        titulo: body.titulo,
+        url: body.url,
+        tipo: body.tipo || recursoExistente?.tipo,
       },
     });
-    return {
-      ...recursoBase,
-      recursoRef: detalleReferencia,
-    };
+    return { ...recursoBase, recursoRef: detalleReferencia };
   });
-  return nuevoRecursoPrivado;
 }
 
 export async function listarRecursosPropios() {
@@ -135,17 +136,14 @@ export async function listarRecursosPropios() {
     throw new Error("Usuario no encontrado");
   }
 
-  // Obtenemos los recursos de tipo "PROPIO" para este usuario
   return await prisma.recursoRef.findMany({
     where: {
-      usuarioId: usuario.id,
-      tipo: "PROPIO",
+      OR: [
+        { usuarioId: usuario.id, tipo: "PROPIO" },
+        { tipo: "GLOBAL", recurso: { organizacionId: orgLocal?.id } }
+      ]
     },
-    include: {
-      recurso: true // Para obtener la descripción que está en la tabla base
-    },
-    orderBy: {
-      id: 'desc'
-    }
+    include: { recurso: true },
+    orderBy: { id: 'desc' }
   });
 }

@@ -7,7 +7,7 @@ import TableCliente from "./tableClientes";
 import { Permisos } from "@/lib/permisos";
 
 export default async function ClientesPage() {
-  const { userId, orgId, has } = await auth();
+  const { userId, orgId } = await auth();
 
   if (!userId || !orgId) redirect("/");
 

@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^5.1.6",
-    "@clerk/localizations": "^3.36.0",
-    "@clerk/nextjs": "^6.37.3",
+    "@clerk/localizations": "^3.37.0",
+    "@clerk/nextjs": "^6.38.1",
     "@prisma/adapter-pg": "^7.4.0",
     "@prisma/client": "^7.4.0",
     "dotenv": "^17.3.1",
