@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { crearRecursoPropio, modificarRecursoPropio, listarRecursosPropio } from "@/lib/recursosRef";
+import { crearRecursoRef, modificarRecursoPropio, listarRecursosPropio } from "@/lib/recursosRef";
 import { request } from "http";
 
 export async function GET() {
@@ -14,7 +14,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const result = await crearRecursoPropio(request);
+    const result = await crearRecursoRef(request);
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("[RECURSO_REF_POST]", error);

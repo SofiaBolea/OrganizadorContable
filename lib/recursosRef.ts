@@ -41,55 +41,51 @@ export async function listarRecursosPropios(request: NextRequest) {
 }
 
 
-export async function crearRecursoPropio(req: NextRequest) {
-  // 1. Validar autenticación y organización
+export async function crearRecursoRef(req: NextRequest) {
   const { userId, orgId } = await auth();
-  if (!userId || !orgId) {
-    throw new Error("No autorizado");
-  }
-  // 2. Extraer datos del formulario (JSON)
+  if (!userId || !orgId) throw new Error("No autorizado");
+
   const body = await req.json();
-  const { titulo, url, tipo, descripcion } = body;
-  if (!titulo || !url) {
+  const { titulo, url, tipo, descripcion } = body; // Recibimos 'tipo' del body
+
+  if (!titulo || !url || !tipo) {
     throw new Error("Faltan campos obligatorios");
   }
-  const usuarioCreador = await prisma.usuario.findFirst({
-    where: { clerkId: userId, organizacionId: orgId },
+
+  const orgLocal = await prisma.organizacion.findUnique({
+    where: { clerkOrganizationId: orgId },
     select: { id: true }
   });
-  if (!usuarioCreador) {
-    throw new Error("Usuario no encontrado en la organización");
-  }
-  // 3. Crear Recurso + RecursoRef en una sola operación (Nested Write)
-  // Esto garantiza que si falla uno, no se cree el otro (Transaccionalidad)
-  const nuevoRecursoPrivado = await prisma.$transaction(async (tx) => {
-    // 1. Crear el Recurso Base
-    // Esta tabla contiene los datos comunes y genera el ID (cuid)
+  if (!orgLocal) throw new Error("Organización no encontrada");
+
+  const usuarioCreador = await prisma.usuario.findFirst({
+    where: { clerkId: userId, organizacionId: orgLocal.id },
+    select: { id: true }
+  });
+
+  if (!usuarioCreador) throw new Error("Usuario no encontrado");
+
+  return await prisma.$transaction(async (tx) => {
     const recursoBase = await tx.recurso.create({
       data: {
         descripcion: descripcion || "",
         tipoRecurso: "RECURSO DE REFERENCIA",
-        organizacionId: orgId,
+        organizacionId: orgLocal.id,
       },
     });
-    // 2. Crear el Recurso de Referencia vinculado
-    // IMPORTANTE: En TPT, el ID del hijo debe ser el mismo que el del padre
+
     const detalleReferencia = await tx.recursoRef.create({
       data: {
         id: recursoBase.id,
         titulo: titulo,
         url: url,
-        tipo: "PROPIO",
+        tipo: tipo, // Usamos el tipo dinámico (PROPIO o GLOBAL)
         usuarioId: usuarioCreador.id,
       },
     });
-    // Devolvemos el objeto combinado para que la respuesta sea igual a la anterior
-    return {
-      ...recursoBase,
-      recursoRef: detalleReferencia,
-    };
+
+    return { ...recursoBase, recursoRef: detalleReferencia };
   });
-  return nuevoRecursoPrivado;
 }
 
 export async function modificarRecursoPropio(req: NextRequest) {
