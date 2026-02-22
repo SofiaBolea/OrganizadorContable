@@ -13,7 +13,7 @@ export async function crearRecursoRef(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { titulo, url, tipo, descripcion } = body; // Recibimos 'tipo' del body
+  const { titulo, url, tipo} = body; // Recibimos 'tipo' del body
 
   if (!titulo || !url || !tipo) {
     throw new Error("Faltan campos obligatorios");
@@ -35,7 +35,6 @@ export async function crearRecursoRef(req: NextRequest) {
   return await prisma.$transaction(async (tx) => {
     const recursoBase = await tx.recurso.create({
       data: {
-        descripcion: descripcion || "",
         tipoRecurso: "RECURSO DE REFERENCIA",
         organizacionId: orgLocal.id,
       },
@@ -69,7 +68,7 @@ export async function modificarRecursoPropio(req: NextRequest) {
 
   // 2. Extraer datos del formulario (JSON)
   const body = await req.json();
-  const { titulo, url, descripcion, tipo } = body;
+  const { titulo, url} = body;
   if (!titulo || !url) {
     throw new Error("Faltan campos obligatorios");
   }
@@ -96,10 +95,7 @@ export async function modificarRecursoPropio(req: NextRequest) {
 
   // Lógica de update (se mantiene el transaction existente)
   return await prisma.$transaction(async (tx) => {
-    const recursoBase = await tx.recurso.update({
-      where: { id: body.id },
-      data: { descripcion: body.descripcion || "" },
-    });
+
     const detalleReferencia = await tx.recursoRef.update({
       where: { id: body.id },
       data: {
@@ -108,7 +104,7 @@ export async function modificarRecursoPropio(req: NextRequest) {
         tipo: body.tipo || recursoExistente?.tipo,
       },
     });
-    return { ...recursoBase, recursoRef: detalleReferencia };
+    return { recursoRef: detalleReferencia };
   });
 }
 
