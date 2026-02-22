@@ -8468,7 +8468,6 @@ export namespace Prisma {
   export type RecursoMinAggregateOutputType = {
     id: string | null
     organizacionId: string | null
-    nombre: string | null
     descripcion: string | null
     tipoRecurso: string | null
   }
@@ -8476,7 +8475,6 @@ export namespace Prisma {
   export type RecursoMaxAggregateOutputType = {
     id: string | null
     organizacionId: string | null
-    nombre: string | null
     descripcion: string | null
     tipoRecurso: string | null
   }
@@ -8484,7 +8482,6 @@ export namespace Prisma {
   export type RecursoCountAggregateOutputType = {
     id: number
     organizacionId: number
-    nombre: number
     descripcion: number
     tipoRecurso: number
     _all: number
@@ -8494,7 +8491,6 @@ export namespace Prisma {
   export type RecursoMinAggregateInputType = {
     id?: true
     organizacionId?: true
-    nombre?: true
     descripcion?: true
     tipoRecurso?: true
   }
@@ -8502,7 +8498,6 @@ export namespace Prisma {
   export type RecursoMaxAggregateInputType = {
     id?: true
     organizacionId?: true
-    nombre?: true
     descripcion?: true
     tipoRecurso?: true
   }
@@ -8510,7 +8505,6 @@ export namespace Prisma {
   export type RecursoCountAggregateInputType = {
     id?: true
     organizacionId?: true
-    nombre?: true
     descripcion?: true
     tipoRecurso?: true
     _all?: true
@@ -8591,7 +8585,6 @@ export namespace Prisma {
   export type RecursoGroupByOutputType = {
     id: string
     organizacionId: string
-    nombre: string
     descripcion: string | null
     tipoRecurso: string
     _count: RecursoCountAggregateOutputType | null
@@ -8616,7 +8609,6 @@ export namespace Prisma {
   export type RecursoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     organizacionId?: boolean
-    nombre?: boolean
     descripcion?: boolean
     tipoRecurso?: boolean
     organizacion?: boolean | OrganizacionDefaultArgs<ExtArgs>
@@ -8630,7 +8622,6 @@ export namespace Prisma {
   export type RecursoSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     organizacionId?: boolean
-    nombre?: boolean
     descripcion?: boolean
     tipoRecurso?: boolean
     organizacion?: boolean | OrganizacionDefaultArgs<ExtArgs>
@@ -8639,7 +8630,6 @@ export namespace Prisma {
   export type RecursoSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     organizacionId?: boolean
-    nombre?: boolean
     descripcion?: boolean
     tipoRecurso?: boolean
     organizacion?: boolean | OrganizacionDefaultArgs<ExtArgs>
@@ -8648,12 +8638,11 @@ export namespace Prisma {
   export type RecursoSelectScalar = {
     id?: boolean
     organizacionId?: boolean
-    nombre?: boolean
     descripcion?: boolean
     tipoRecurso?: boolean
   }
 
-  export type RecursoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizacionId" | "nombre" | "descripcion" | "tipoRecurso", ExtArgs["result"]["recurso"]>
+  export type RecursoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizacionId" | "descripcion" | "tipoRecurso", ExtArgs["result"]["recurso"]>
   export type RecursoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organizacion?: boolean | OrganizacionDefaultArgs<ExtArgs>
     cliente?: boolean | Recurso$clienteArgs<ExtArgs>
@@ -8682,7 +8671,6 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       organizacionId: string
-      nombre: string
       descripcion: string | null
       tipoRecurso: string
     }, ExtArgs["result"]["recurso"]>
@@ -9116,7 +9104,6 @@ export namespace Prisma {
   interface RecursoFieldRefs {
     readonly id: FieldRef<"Recurso", 'String'>
     readonly organizacionId: FieldRef<"Recurso", 'String'>
-    readonly nombre: FieldRef<"Recurso", 'String'>
     readonly descripcion: FieldRef<"Recurso", 'String'>
     readonly tipoRecurso: FieldRef<"Recurso", 'String'>
   }
@@ -17383,6 +17370,7 @@ export namespace Prisma {
     tituloOverride: string | null
     estado: string | null
     colorOverride: string | null
+    prioridadOverride: string | null
   }
 
   export type OcurrenciaMaxAggregateOutputType = {
@@ -17394,6 +17382,7 @@ export namespace Prisma {
     tituloOverride: string | null
     estado: string | null
     colorOverride: string | null
+    prioridadOverride: string | null
   }
 
   export type OcurrenciaCountAggregateOutputType = {
@@ -17405,6 +17394,7 @@ export namespace Prisma {
     tituloOverride: number
     estado: number
     colorOverride: number
+    prioridadOverride: number
     _all: number
   }
 
@@ -17418,6 +17408,7 @@ export namespace Prisma {
     tituloOverride?: true
     estado?: true
     colorOverride?: true
+    prioridadOverride?: true
   }
 
   export type OcurrenciaMaxAggregateInputType = {
@@ -17429,6 +17420,7 @@ export namespace Prisma {
     tituloOverride?: true
     estado?: true
     colorOverride?: true
+    prioridadOverride?: true
   }
 
   export type OcurrenciaCountAggregateInputType = {
@@ -17440,6 +17432,7 @@ export namespace Prisma {
     tituloOverride?: true
     estado?: true
     colorOverride?: true
+    prioridadOverride?: true
     _all?: true
   }
 
@@ -17524,6 +17517,7 @@ export namespace Prisma {
     tituloOverride: string | null
     estado: string
     colorOverride: string | null
+    prioridadOverride: string | null
     _count: OcurrenciaCountAggregateOutputType | null
     _min: OcurrenciaMinAggregateOutputType | null
     _max: OcurrenciaMaxAggregateOutputType | null
@@ -17552,6 +17546,7 @@ export namespace Prisma {
     tituloOverride?: boolean
     estado?: boolean
     colorOverride?: boolean
+    prioridadOverride?: boolean
     tareaAsignacion?: boolean | TareaAsignacionDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["ocurrencia"]>
 
@@ -17564,6 +17559,7 @@ export namespace Prisma {
     tituloOverride?: boolean
     estado?: boolean
     colorOverride?: boolean
+    prioridadOverride?: boolean
     tareaAsignacion?: boolean | TareaAsignacionDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["ocurrencia"]>
 
@@ -17576,6 +17572,7 @@ export namespace Prisma {
     tituloOverride?: boolean
     estado?: boolean
     colorOverride?: boolean
+    prioridadOverride?: boolean
     tareaAsignacion?: boolean | TareaAsignacionDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["ocurrencia"]>
 
@@ -17588,9 +17585,10 @@ export namespace Prisma {
     tituloOverride?: boolean
     estado?: boolean
     colorOverride?: boolean
+    prioridadOverride?: boolean
   }
 
-  export type OcurrenciaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "tareaAsignacionId" | "fechaOriginal" | "fechaEjecucion" | "fechaOverride" | "tituloOverride" | "estado" | "colorOverride", ExtArgs["result"]["ocurrencia"]>
+  export type OcurrenciaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "tareaAsignacionId" | "fechaOriginal" | "fechaEjecucion" | "fechaOverride" | "tituloOverride" | "estado" | "colorOverride" | "prioridadOverride", ExtArgs["result"]["ocurrencia"]>
   export type OcurrenciaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tareaAsignacion?: boolean | TareaAsignacionDefaultArgs<ExtArgs>
   }
@@ -17615,6 +17613,7 @@ export namespace Prisma {
       tituloOverride: string | null
       estado: string
       colorOverride: string | null
+      prioridadOverride: string | null
     }, ExtArgs["result"]["ocurrencia"]>
     composites: {}
   }
@@ -18047,6 +18046,7 @@ export namespace Prisma {
     readonly tituloOverride: FieldRef<"Ocurrencia", 'String'>
     readonly estado: FieldRef<"Ocurrencia", 'String'>
     readonly colorOverride: FieldRef<"Ocurrencia", 'String'>
+    readonly prioridadOverride: FieldRef<"Ocurrencia", 'String'>
   }
     
 
@@ -20713,7 +20713,6 @@ export namespace Prisma {
   export const RecursoScalarFieldEnum: {
     id: 'id',
     organizacionId: 'organizacionId',
-    nombre: 'nombre',
     descripcion: 'descripcion',
     tipoRecurso: 'tipoRecurso'
   };
@@ -20812,7 +20811,8 @@ export namespace Prisma {
     fechaOverride: 'fechaOverride',
     tituloOverride: 'tituloOverride',
     estado: 'estado',
-    colorOverride: 'colorOverride'
+    colorOverride: 'colorOverride',
+    prioridadOverride: 'prioridadOverride'
   };
 
   export type OcurrenciaScalarFieldEnum = (typeof OcurrenciaScalarFieldEnum)[keyof typeof OcurrenciaScalarFieldEnum]
@@ -21333,7 +21333,6 @@ export namespace Prisma {
     NOT?: RecursoWhereInput | RecursoWhereInput[]
     id?: StringFilter<"Recurso"> | string
     organizacionId?: StringFilter<"Recurso"> | string
-    nombre?: StringFilter<"Recurso"> | string
     descripcion?: StringNullableFilter<"Recurso"> | string | null
     tipoRecurso?: StringFilter<"Recurso"> | string
     organizacion?: XOR<OrganizacionScalarRelationFilter, OrganizacionWhereInput>
@@ -21347,7 +21346,6 @@ export namespace Prisma {
   export type RecursoOrderByWithRelationInput = {
     id?: SortOrder
     organizacionId?: SortOrder
-    nombre?: SortOrder
     descripcion?: SortOrderInput | SortOrder
     tipoRecurso?: SortOrder
     organizacion?: OrganizacionOrderByWithRelationInput
@@ -21364,7 +21362,6 @@ export namespace Prisma {
     OR?: RecursoWhereInput[]
     NOT?: RecursoWhereInput | RecursoWhereInput[]
     organizacionId?: StringFilter<"Recurso"> | string
-    nombre?: StringFilter<"Recurso"> | string
     descripcion?: StringNullableFilter<"Recurso"> | string | null
     tipoRecurso?: StringFilter<"Recurso"> | string
     organizacion?: XOR<OrganizacionScalarRelationFilter, OrganizacionWhereInput>
@@ -21378,7 +21375,6 @@ export namespace Prisma {
   export type RecursoOrderByWithAggregationInput = {
     id?: SortOrder
     organizacionId?: SortOrder
-    nombre?: SortOrder
     descripcion?: SortOrderInput | SortOrder
     tipoRecurso?: SortOrder
     _count?: RecursoCountOrderByAggregateInput
@@ -21392,7 +21388,6 @@ export namespace Prisma {
     NOT?: RecursoScalarWhereWithAggregatesInput | RecursoScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Recurso"> | string
     organizacionId?: StringWithAggregatesFilter<"Recurso"> | string
-    nombre?: StringWithAggregatesFilter<"Recurso"> | string
     descripcion?: StringNullableWithAggregatesFilter<"Recurso"> | string | null
     tipoRecurso?: StringWithAggregatesFilter<"Recurso"> | string
   }
@@ -21860,6 +21855,7 @@ export namespace Prisma {
     tituloOverride?: StringNullableFilter<"Ocurrencia"> | string | null
     estado?: StringFilter<"Ocurrencia"> | string
     colorOverride?: StringNullableFilter<"Ocurrencia"> | string | null
+    prioridadOverride?: StringNullableFilter<"Ocurrencia"> | string | null
     tareaAsignacion?: XOR<TareaAsignacionScalarRelationFilter, TareaAsignacionWhereInput>
   }
 
@@ -21872,6 +21868,7 @@ export namespace Prisma {
     tituloOverride?: SortOrderInput | SortOrder
     estado?: SortOrder
     colorOverride?: SortOrderInput | SortOrder
+    prioridadOverride?: SortOrderInput | SortOrder
     tareaAsignacion?: TareaAsignacionOrderByWithRelationInput
   }
 
@@ -21887,6 +21884,7 @@ export namespace Prisma {
     tituloOverride?: StringNullableFilter<"Ocurrencia"> | string | null
     estado?: StringFilter<"Ocurrencia"> | string
     colorOverride?: StringNullableFilter<"Ocurrencia"> | string | null
+    prioridadOverride?: StringNullableFilter<"Ocurrencia"> | string | null
     tareaAsignacion?: XOR<TareaAsignacionScalarRelationFilter, TareaAsignacionWhereInput>
   }, "id">
 
@@ -21899,6 +21897,7 @@ export namespace Prisma {
     tituloOverride?: SortOrderInput | SortOrder
     estado?: SortOrder
     colorOverride?: SortOrderInput | SortOrder
+    prioridadOverride?: SortOrderInput | SortOrder
     _count?: OcurrenciaCountOrderByAggregateInput
     _max?: OcurrenciaMaxOrderByAggregateInput
     _min?: OcurrenciaMinOrderByAggregateInput
@@ -21916,6 +21915,7 @@ export namespace Prisma {
     tituloOverride?: StringNullableWithAggregatesFilter<"Ocurrencia"> | string | null
     estado?: StringWithAggregatesFilter<"Ocurrencia"> | string
     colorOverride?: StringNullableWithAggregatesFilter<"Ocurrencia"> | string | null
+    prioridadOverride?: StringNullableWithAggregatesFilter<"Ocurrencia"> | string | null
   }
 
   export type VencimientoWhereInput = {
@@ -22461,7 +22461,6 @@ export namespace Prisma {
 
   export type RecursoCreateInput = {
     id?: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     organizacion: OrganizacionCreateNestedOneWithoutRecursosInput
@@ -22475,7 +22474,6 @@ export namespace Prisma {
   export type RecursoUncheckedCreateInput = {
     id?: string
     organizacionId: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     cliente?: ClienteUncheckedCreateNestedOneWithoutRecursoInput
@@ -22487,7 +22485,6 @@ export namespace Prisma {
 
   export type RecursoUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     organizacion?: OrganizacionUpdateOneRequiredWithoutRecursosNestedInput
@@ -22501,7 +22498,6 @@ export namespace Prisma {
   export type RecursoUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     organizacionId?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     cliente?: ClienteUncheckedUpdateOneWithoutRecursoNestedInput
@@ -22514,14 +22510,12 @@ export namespace Prisma {
   export type RecursoCreateManyInput = {
     id?: string
     organizacionId: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
   }
 
   export type RecursoUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
   }
@@ -22529,7 +22523,6 @@ export namespace Prisma {
   export type RecursoUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     organizacionId?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
   }
@@ -22983,6 +22976,7 @@ export namespace Prisma {
     tituloOverride?: string | null
     estado?: string
     colorOverride?: string | null
+    prioridadOverride?: string | null
     tareaAsignacion: TareaAsignacionCreateNestedOneWithoutOcurrenciasInput
   }
 
@@ -22995,6 +22989,7 @@ export namespace Prisma {
     tituloOverride?: string | null
     estado?: string
     colorOverride?: string | null
+    prioridadOverride?: string | null
   }
 
   export type OcurrenciaUpdateInput = {
@@ -23005,6 +23000,7 @@ export namespace Prisma {
     tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
     tareaAsignacion?: TareaAsignacionUpdateOneRequiredWithoutOcurrenciasNestedInput
   }
 
@@ -23017,6 +23013,7 @@ export namespace Prisma {
     tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type OcurrenciaCreateManyInput = {
@@ -23028,6 +23025,7 @@ export namespace Prisma {
     tituloOverride?: string | null
     estado?: string
     colorOverride?: string | null
+    prioridadOverride?: string | null
   }
 
   export type OcurrenciaUpdateManyMutationInput = {
@@ -23038,6 +23036,7 @@ export namespace Prisma {
     tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type OcurrenciaUncheckedUpdateManyInput = {
@@ -23049,6 +23048,7 @@ export namespace Prisma {
     tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type VencimientoCreateInput = {
@@ -23627,7 +23627,6 @@ export namespace Prisma {
   export type RecursoCountOrderByAggregateInput = {
     id?: SortOrder
     organizacionId?: SortOrder
-    nombre?: SortOrder
     descripcion?: SortOrder
     tipoRecurso?: SortOrder
   }
@@ -23635,7 +23634,6 @@ export namespace Prisma {
   export type RecursoMaxOrderByAggregateInput = {
     id?: SortOrder
     organizacionId?: SortOrder
-    nombre?: SortOrder
     descripcion?: SortOrder
     tipoRecurso?: SortOrder
   }
@@ -23643,7 +23641,6 @@ export namespace Prisma {
   export type RecursoMinOrderByAggregateInput = {
     id?: SortOrder
     organizacionId?: SortOrder
-    nombre?: SortOrder
     descripcion?: SortOrder
     tipoRecurso?: SortOrder
   }
@@ -23949,6 +23946,7 @@ export namespace Prisma {
     tituloOverride?: SortOrder
     estado?: SortOrder
     colorOverride?: SortOrder
+    prioridadOverride?: SortOrder
   }
 
   export type OcurrenciaMaxOrderByAggregateInput = {
@@ -23960,6 +23958,7 @@ export namespace Prisma {
     tituloOverride?: SortOrder
     estado?: SortOrder
     colorOverride?: SortOrder
+    prioridadOverride?: SortOrder
   }
 
   export type OcurrenciaMinOrderByAggregateInput = {
@@ -23971,6 +23970,7 @@ export namespace Prisma {
     tituloOverride?: SortOrder
     estado?: SortOrder
     colorOverride?: SortOrder
+    prioridadOverride?: SortOrder
   }
 
   export type VencimientoOcurrenciaListRelationFilter = {
@@ -25698,7 +25698,6 @@ export namespace Prisma {
 
   export type RecursoCreateWithoutOrganizacionInput = {
     id?: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     cliente?: ClienteCreateNestedOneWithoutRecursoInput
@@ -25710,7 +25709,6 @@ export namespace Prisma {
 
   export type RecursoUncheckedCreateWithoutOrganizacionInput = {
     id?: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     cliente?: ClienteUncheckedCreateNestedOneWithoutRecursoInput
@@ -25840,7 +25838,6 @@ export namespace Prisma {
     NOT?: RecursoScalarWhereInput | RecursoScalarWhereInput[]
     id?: StringFilter<"Recurso"> | string
     organizacionId?: StringFilter<"Recurso"> | string
-    nombre?: StringFilter<"Recurso"> | string
     descripcion?: StringNullableFilter<"Recurso"> | string | null
     tipoRecurso?: StringFilter<"Recurso"> | string
   }
@@ -27301,7 +27298,6 @@ export namespace Prisma {
 
   export type RecursoCreateWithoutRecursoRefInput = {
     id?: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     organizacion: OrganizacionCreateNestedOneWithoutRecursosInput
@@ -27314,7 +27310,6 @@ export namespace Prisma {
   export type RecursoUncheckedCreateWithoutRecursoRefInput = {
     id?: string
     organizacionId: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     cliente?: ClienteUncheckedCreateNestedOneWithoutRecursoInput
@@ -27388,7 +27383,6 @@ export namespace Prisma {
 
   export type RecursoUpdateWithoutRecursoRefInput = {
     id?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     organizacion?: OrganizacionUpdateOneRequiredWithoutRecursosNestedInput
@@ -27401,7 +27395,6 @@ export namespace Prisma {
   export type RecursoUncheckedUpdateWithoutRecursoRefInput = {
     id?: StringFieldUpdateOperationsInput | string
     organizacionId?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     cliente?: ClienteUncheckedUpdateOneWithoutRecursoNestedInput
@@ -27465,7 +27458,6 @@ export namespace Prisma {
 
   export type RecursoCreateWithoutRefColorInput = {
     id?: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     organizacion: OrganizacionCreateNestedOneWithoutRecursosInput
@@ -27478,7 +27470,6 @@ export namespace Prisma {
   export type RecursoUncheckedCreateWithoutRefColorInput = {
     id?: string
     organizacionId: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     cliente?: ClienteUncheckedCreateNestedOneWithoutRecursoInput
@@ -27582,7 +27573,6 @@ export namespace Prisma {
 
   export type RecursoUpdateWithoutRefColorInput = {
     id?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     organizacion?: OrganizacionUpdateOneRequiredWithoutRecursosNestedInput
@@ -27595,7 +27585,6 @@ export namespace Prisma {
   export type RecursoUncheckedUpdateWithoutRefColorInput = {
     id?: StringFieldUpdateOperationsInput | string
     organizacionId?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     cliente?: ClienteUncheckedUpdateOneWithoutRecursoNestedInput
@@ -27675,7 +27664,6 @@ export namespace Prisma {
 
   export type RecursoCreateWithoutClienteInput = {
     id?: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     organizacion: OrganizacionCreateNestedOneWithoutRecursosInput
@@ -27688,7 +27676,6 @@ export namespace Prisma {
   export type RecursoUncheckedCreateWithoutClienteInput = {
     id?: string
     organizacionId: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     tarea?: TareaUncheckedCreateNestedOneWithoutRecursoInput
@@ -27737,7 +27724,6 @@ export namespace Prisma {
 
   export type RecursoUpdateWithoutClienteInput = {
     id?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     organizacion?: OrganizacionUpdateOneRequiredWithoutRecursosNestedInput
@@ -27750,7 +27736,6 @@ export namespace Prisma {
   export type RecursoUncheckedUpdateWithoutClienteInput = {
     id?: StringFieldUpdateOperationsInput | string
     organizacionId?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     tarea?: TareaUncheckedUpdateOneWithoutRecursoNestedInput
@@ -27929,7 +27914,6 @@ export namespace Prisma {
 
   export type RecursoCreateWithoutTareaInput = {
     id?: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     organizacion: OrganizacionCreateNestedOneWithoutRecursosInput
@@ -27942,7 +27926,6 @@ export namespace Prisma {
   export type RecursoUncheckedCreateWithoutTareaInput = {
     id?: string
     organizacionId: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     cliente?: ClienteUncheckedCreateNestedOneWithoutRecursoInput
@@ -28028,7 +28011,6 @@ export namespace Prisma {
 
   export type RecursoUpdateWithoutTareaInput = {
     id?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     organizacion?: OrganizacionUpdateOneRequiredWithoutRecursosNestedInput
@@ -28041,7 +28023,6 @@ export namespace Prisma {
   export type RecursoUncheckedUpdateWithoutTareaInput = {
     id?: StringFieldUpdateOperationsInput | string
     organizacionId?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     cliente?: ClienteUncheckedUpdateOneWithoutRecursoNestedInput
@@ -28297,6 +28278,7 @@ export namespace Prisma {
     tituloOverride?: string | null
     estado?: string
     colorOverride?: string | null
+    prioridadOverride?: string | null
   }
 
   export type OcurrenciaUncheckedCreateWithoutTareaAsignacionInput = {
@@ -28307,6 +28289,7 @@ export namespace Prisma {
     tituloOverride?: string | null
     estado?: string
     colorOverride?: string | null
+    prioridadOverride?: string | null
   }
 
   export type OcurrenciaCreateOrConnectWithoutTareaAsignacionInput = {
@@ -28507,6 +28490,7 @@ export namespace Prisma {
     tituloOverride?: StringNullableFilter<"Ocurrencia"> | string | null
     estado?: StringFilter<"Ocurrencia"> | string
     colorOverride?: StringNullableFilter<"Ocurrencia"> | string | null
+    prioridadOverride?: StringNullableFilter<"Ocurrencia"> | string | null
   }
 
   export type TareaAsignacionCreateWithoutOcurrenciasInput = {
@@ -28567,7 +28551,6 @@ export namespace Prisma {
 
   export type RecursoCreateWithoutVencimientoInput = {
     id?: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     organizacion: OrganizacionCreateNestedOneWithoutRecursosInput
@@ -28580,7 +28563,6 @@ export namespace Prisma {
   export type RecursoUncheckedCreateWithoutVencimientoInput = {
     id?: string
     organizacionId: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
     cliente?: ClienteUncheckedCreateNestedOneWithoutRecursoInput
@@ -28676,7 +28658,6 @@ export namespace Prisma {
 
   export type RecursoUpdateWithoutVencimientoInput = {
     id?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     organizacion?: OrganizacionUpdateOneRequiredWithoutRecursosNestedInput
@@ -28689,7 +28670,6 @@ export namespace Prisma {
   export type RecursoUncheckedUpdateWithoutVencimientoInput = {
     id?: StringFieldUpdateOperationsInput | string
     organizacionId?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     cliente?: ClienteUncheckedUpdateOneWithoutRecursoNestedInput
@@ -28853,7 +28833,6 @@ export namespace Prisma {
 
   export type RecursoCreateManyOrganizacionInput = {
     id?: string
-    nombre: string
     descripcion?: string | null
     tipoRecurso: string
   }
@@ -28944,7 +28923,6 @@ export namespace Prisma {
 
   export type RecursoUpdateWithoutOrganizacionInput = {
     id?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     cliente?: ClienteUpdateOneWithoutRecursoNestedInput
@@ -28956,7 +28934,6 @@ export namespace Prisma {
 
   export type RecursoUncheckedUpdateWithoutOrganizacionInput = {
     id?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
     cliente?: ClienteUncheckedUpdateOneWithoutRecursoNestedInput
@@ -28968,7 +28945,6 @@ export namespace Prisma {
 
   export type RecursoUncheckedUpdateManyWithoutOrganizacionInput = {
     id?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
     descripcion?: NullableStringFieldUpdateOperationsInput | string | null
     tipoRecurso?: StringFieldUpdateOperationsInput | string
   }
@@ -29439,6 +29415,7 @@ export namespace Prisma {
     tituloOverride?: string | null
     estado?: string
     colorOverride?: string | null
+    prioridadOverride?: string | null
   }
 
   export type OcurrenciaUpdateWithoutTareaAsignacionInput = {
@@ -29449,6 +29426,7 @@ export namespace Prisma {
     tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type OcurrenciaUncheckedUpdateWithoutTareaAsignacionInput = {
@@ -29459,6 +29437,7 @@ export namespace Prisma {
     tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type OcurrenciaUncheckedUpdateManyWithoutTareaAsignacionInput = {
@@ -29469,6 +29448,7 @@ export namespace Prisma {
     tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type VencimientoOcurrenciaCreateManyVencimientoInput = {

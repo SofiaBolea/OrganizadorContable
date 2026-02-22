@@ -34,7 +34,6 @@ export async function crearCliente(body: any) {
       const recurso = await tx.recurso.create({
         data: {
           organizacionId: orgLocal.id,
-          nombre: datos.nombreCompleto,
           tipoRecurso: "CLIENTE",
         },
       });
@@ -131,21 +130,15 @@ export async function listarClientes(request: NextRequest) {
 /*----------- Modificar Clientes ------------- */
 /* ------------------------------------------- */
 
-interface DatosUpdateCliente {
-  nombreCompleto: string;
-  cuit?: string;
-  email?: string;
-  telefono?: string;
-  asistentesIds: string[];
-}
+// Eliminada la interfaz DatosUpdateCliente, ahora se valida igual que en crearCliente
 
-export async function modificarCliente(id: string, datos: DatosUpdateCliente) {
+export async function modificarCliente(id: string, body: any) {
+  // Validar y limpiar datos igual que en crearCliente
+  const { esValido, errorMsg, datos } = validarYLimpiarDatos(body);
+  if (!esValido) throw new Error(`INVALID: ${errorMsg}`);
+
   return await prisma.$transaction(async (tx) => {
     // 1. Actualizar el Recurso asociado (Nombre)
-    await tx.recurso.update({
-      where: { id },
-      data: { nombre: datos.nombreCompleto },
-    });
 
     // 2. Actualizar los datos del Cliente
     const clienteActualizado = await tx.cliente.update({

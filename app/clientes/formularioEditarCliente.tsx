@@ -97,7 +97,12 @@ export function FormularioEditarCliente({ cliente, onClose }: FormularioEditarPr
         router.refresh();
         onClose();
       } else {
-        setErrorMsg(res.error || "Ocurrió un error al intentar actualizar el cliente.");
+        // Si el error es por CUIT inválido, mostrar el mismo mensaje que crear
+        if (res.error && res.error.includes("CUIT debe tener exactamente 11 dígitos")) {
+          setErrorMsg("El CUIT debe tener exactamente 11 dígitos numéricos.");
+        } else {
+          setErrorMsg(res.error || "Ocurrió un error al intentar actualizar el cliente.");
+        }
       }
     } catch (err) {
       setErrorMsg("Error de red o servidor.");

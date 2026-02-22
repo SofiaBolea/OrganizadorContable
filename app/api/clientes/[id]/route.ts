@@ -37,9 +37,11 @@ export async function PUT(
 
   } catch (error: any) {
     console.error("Error en API PUT Cliente:", error);
+    // Si el error tiene un mensaje específico (por ejemplo, de validación), lo devolvemos
+    const errorMsg = error?.message || "Error al intentar actualizar el cliente.";
     return NextResponse.json(
-      { success: false, error: "Error al intentar actualizar el cliente." },
-      { status: 500 }
+      { success: false, error: errorMsg },
+      { status: 400 }
     );
   }
 }

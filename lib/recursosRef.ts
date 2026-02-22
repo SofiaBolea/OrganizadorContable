@@ -1,61 +1,105 @@
-import { NextRequest, NextResponse } from "next/server";
+
+import { NextRequest } from "next/server";
 import { Permisos } from "@/lib/permisos";
 import { auth } from "@clerk/nextjs/server";
-import { validarYLimpiarDatos } from "../lib/validarYLimpiarDatos"; // Importamos la función de validación desde actions.ts
+import { validarYLimpiarDatos } from "../lib/validarYLimpiarDatos";
 import prisma from "./prisma";
 
 export async function crearRecursoPropio(req: NextRequest) {
-  try {
-    // 1. Validar autenticación y organización
-    const { userId, orgId } = await auth();
-
-    if (!userId || !orgId) {
-      return new NextResponse("No autorizado", { status: 401 });
-    }
-
-    // 2. Extraer datos del formulario (JSON)
-    const body = await req.json();
-    const { titulo, url, tipo, descripcion } = body;
-
-    if (!titulo || !url) {
-      return new NextResponse("Faltan campos obligatorios", { status: 400 });
-    }
-
-    const usuarioCreador = await prisma.usuario.findFirst({
-      where: { clerkId: userId, organizacionId: orgId },
-      select: { id: true }
-    });
-
-    if (!usuarioCreador) {
-      return new NextResponse("Usuario no encontrado en la organización", { status: 404 });
-    }
-
-    // 3. Crear Recurso + RecursoRef en una sola operación (Nested Write)
-    // Esto garantiza que si falla uno, no se cree el otro (Transaccionalidad)
-    const nuevoRecursoPrivado = await prisma.recurso.create({
-      data: {
-        nombre: titulo,
-        descripcion: descripcion || "",
-        tipoRecurso: "REFERENCIA",
-        organizacionId: orgId, // Pertenece a la org, pero...
-        recursoRef: {
-          create: {
-            titulo: titulo,
-            url: url,
-            tipo: "PROPIO",
-            usuarioId: usuarioCreador.id, // ...solo lo verá este usuarioId (Privacidad)
-          },
-        },
-      },
-      include: {
-        recursoRef: true,
-      },
-    });
-
-    return NextResponse.json(nuevoRecursoPrivado, { status: 201 });
-
-  } catch (error) {
-    console.error("[RECURSO_REF_POST]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+  // 1. Validar autenticación y organización
+  const { userId, orgId } = await auth();
+  if (!userId || !orgId) {
+    throw new Error("No autorizado");
   }
+  // 2. Extraer datos del formulario (JSON)
+  const body = await req.json();
+  const { titulo, url, tipo, descripcion } = body;
+  if (!titulo || !url) {
+    throw new Error("Faltan campos obligatorios");
+  }
+  const usuarioCreador = await prisma.usuario.findFirst({
+    where: { clerkId: userId, organizacionId: orgId },
+    select: { id: true }
+  });
+  if (!usuarioCreador) {
+    throw new Error("Usuario no encontrado en la organización");
+  }
+  // 3. Crear Recurso + RecursoRef en una sola operación (Nested Write)
+  // Esto garantiza que si falla uno, no se cree el otro (Transaccionalidad)
+  const nuevoRecursoPrivado = await prisma.$transaction(async (tx) => {
+    // 1. Crear el Recurso Base
+    // Esta tabla contiene los datos comunes y genera el ID (cuid)
+    const recursoBase = await tx.recurso.create({
+      data: {
+        descripcion: descripcion || "",
+        tipoRecurso: "RECURSO DE REFERENCIA",
+        organizacionId: orgId,
+      },
+    });
+    // 2. Crear el Recurso de Referencia vinculado
+    // IMPORTANTE: En TPT, el ID del hijo debe ser el mismo que el del padre
+    const detalleReferencia = await tx.recursoRef.create({
+      data: {
+        id: recursoBase.id,
+        titulo: titulo,
+        url: url,
+        tipo: "PROPIO",
+        usuarioId: usuarioCreador.id,
+      },
+    });
+    // Devolvemos el objeto combinado para que la respuesta sea igual a la anterior
+    return {
+      ...recursoBase,
+      recursoRef: detalleReferencia,
+    };
+  });
+  return nuevoRecursoPrivado;
+}
+
+export async function modificarRecursoPropio(req: NextRequest) {
+  // 1. Validar autenticación y organización
+  const { userId, orgId } = await auth();
+  if (!userId || !orgId) {
+    throw new Error("No autorizado");
+  }
+  // 2. Extraer datos del formulario (JSON)
+  const body = await req.json();
+  const { titulo, url, descripcion } = body;
+  if (!titulo || !url) {
+    throw new Error("Faltan campos obligatorios");
+  }
+  const usuarioCreador = await prisma.usuario.findFirst({
+    where: { clerkId: userId, organizacionId: orgId },
+    select: { id: true }
+  });
+  if (!usuarioCreador) {
+    throw new Error("Usuario no encontrado en la organización");
+  }
+  const nuevoRecursoPrivado = await prisma.$transaction(async (tx) => {
+    // 1. Actualizar el Recurso Base
+    const recursoBase = await tx.recurso.update({
+      where: { id: body.id },
+      data: {
+        descripcion: descripcion || "",
+        tipoRecurso: "RECURSO DE REFERENCIA",
+        organizacionId: orgId,
+      },
+    });
+    // 2. Actualizar el Recurso de Referencia vinculado
+    const detalleReferencia = await tx.recursoRef.update({
+      where: { id: recursoBase.id },
+      data: {
+        id: recursoBase.id,
+        titulo: titulo,
+        url: url,
+        tipo: "PROPIO",
+        usuarioId: usuarioCreador.id,
+      },
+    });
+    return {
+      ...recursoBase,
+      recursoRef: detalleReferencia,
+    };
+  });
+  return nuevoRecursoPrivado;
 }

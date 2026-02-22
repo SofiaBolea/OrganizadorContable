@@ -122,7 +122,6 @@ model Recurso {
   id             String       @id @default(cuid())
   organizacionId String
   organizacion   Organizacion @relation(fields: [organizacionId], references: [id])
-  nombre         String       @db.VarChar(100)
   descripcion    String?      @db.VarChar(255)
   tipoRecurso    String       @db.VarChar(50)
 
@@ -254,12 +253,16 @@ model Ocurrencia {
   id                String          @id @default(cuid())
   tareaAsignacionId String
   tareaAsignacion   TareaAsignacion @relation(fields: [tareaAsignacionId], references: [id], onDelete: Cascade)
-  fechaOriginal     DateTime        @db.Date
-  fechaEjecucion    DateTime?
-  fechaOverride     DateTime?       @db.Date
-  tituloOverride    String?         @db.VarChar(100)
-  estado            String          @default("PENDIENTE") @db.VarChar(20)
-  colorOverride     String?         @db.VarChar(7)
+
+  fechaOriginal  DateTime  @db.Date
+  fechaEjecucion DateTime?
+  fechaOverride  DateTime? @db.Date
+  tituloOverride String?   @db.VarChar(100)
+
+  estado        String  @default("PENDIENTE") @db.VarChar(20)
+  colorOverride String? @db.VarChar(7)
+
+  prioridadOverride String? @db.VarChar(20)
 
   @@index([tareaAsignacionId])
   @@index([fechaOriginal])
