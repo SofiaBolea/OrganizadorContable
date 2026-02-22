@@ -145,9 +145,13 @@ export async function listarRecursosPropio() {
   if (!userId || !orgId) {
     throw new Error("No autorizado");
   }
+  const orgLocal = await prisma.organizacion.findUnique({
+    where: { clerkOrganizationId: orgId },
+    select: { id: true }
+  });
 
   const usuario = await prisma.usuario.findFirst({
-    where: { clerkId: userId, organizacionId: orgId },
+    where: { clerkId: userId, organizacionId: orgLocal?.id },
     select: { id: true }
   });
 
