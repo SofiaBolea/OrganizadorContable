@@ -35,7 +35,7 @@ export function TablaAsistentes({ canInvite }: { canInvite: boolean }) {
                         Gestión de Staff
                     </div>
                     
-                    <h1 className="text-5xl font-black tracking-tighter text-text">Asistentes</h1>
+                    <h1 className="text-5xl font-black tracking-tighter text-text">Asistentes Contables</h1>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-4 bg-card border border-black/5 px-6 py-3 rounded-xl shadow-sm">

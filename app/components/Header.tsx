@@ -29,6 +29,7 @@ export default function Header() {
     if (pathname.startsWith("/organizacion")) return "Organización"
     if (pathname.startsWith("/tareas-asignadas")) return "Tareas Asignadas"
     if (pathname.startsWith("/tareas-propias")) return "Tareas Propias"
+    if (pathname.startsWith("/recursos-ref")) return "Recursos Adicionales"
     return "Tablero General"
   }
 
