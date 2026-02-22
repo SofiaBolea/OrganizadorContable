@@ -24,12 +24,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 7.4.0
- * Query Engine version: ab56fe763f921d033a6c195e7ddeb3e255bdbb57
+ * Prisma Client JS version: 7.4.1
+ * Query Engine version: 55ae170b1ced7fc6ed07a15f110549408c501bb3
  */
 Prisma.prismaVersion = {
-  client: "7.4.0",
-  engine: "ab56fe763f921d033a6c195e7ddeb3e255bdbb57"
+  client: "7.4.1",
+  engine: "55ae170b1ced7fc6ed07a15f110549408c501bb3"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -176,7 +176,6 @@ exports.Prisma.RegistroAuditoriaScalarFieldEnum = {
 exports.Prisma.RecursoScalarFieldEnum = {
   id: 'id',
   organizacionId: 'organizacionId',
-  descripcion: 'descripcion',
   tipoRecurso: 'tipoRecurso'
 };
 
@@ -214,6 +213,7 @@ exports.Prisma.ClienteAsignacionScalarFieldEnum = {
 exports.Prisma.TareaScalarFieldEnum = {
   id: 'id',
   titulo: 'titulo',
+  descripcion: 'descripcion',
   prioridad: 'prioridad',
   fechaVencimientoBase: 'fechaVencimientoBase',
   tipoTarea: 'tipoTarea'
@@ -249,6 +249,7 @@ exports.Prisma.OcurrenciaScalarFieldEnum = {
   fechaEjecucion: 'fechaEjecucion',
   fechaOverride: 'fechaOverride',
   tituloOverride: 'tituloOverride',
+  descripcionOverride: 'descripcionOverride',
   estado: 'estado',
   colorOverride: 'colorOverride',
   prioridadOverride: 'prioridadOverride'
