@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { crearRecursoRef, modificarRecursoPropio, listarRecursosPropio } from "@/lib/recursosRef";
+import { crearRecursoRef, modificarRecursoPropio, listarRecursosPropios } from "@/lib/recursosRef";
 import { request } from "http";
 
 export async function GET() {
   try {
-    const data = await listarRecursosPropio();
+    const data = await listarRecursosPropios();
     return NextResponse.json(data);
   } catch (error: any) {
     console.error("[RECURSO_REF_GET]", error);

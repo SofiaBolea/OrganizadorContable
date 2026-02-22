@@ -246,28 +246,28 @@ export class Permisos {
     return tienePermiso;
   }
 
-  static async puedeVerRecursosReferenciaPropio() {
+  static async puedeVerRecursosReferencia() {
     const { userId, orgId, has } = await auth();
     if (!userId || !orgId) return false;
     const tienePermiso = has({ permission: "org:recursos_de_referencia:ver_recurso_ref" });
     return tienePermiso;
   }
 
-  static async puedeCrearRecursosReferenciaPropio() {
+  static async puedeCrearRecursosReferencia() {
     const { userId, orgId, has } = await auth();
     if (!userId || !orgId) return false;
     const tienePermiso = has({ permission: "org:recursos_de_referencia:crear_recurso_ref" });
     return tienePermiso;
   }
 
-  static async puedeModificarRecursosReferenciaPropio() {
+  static async puedeModificarRecursosReferencia() {
     const { userId, orgId, has } = await auth();
     if (!userId || !orgId) return false;
     const tienePermiso = has({ permission: "org:recursos_de_referencia:modificar_recurso_ref" });
     return tienePermiso;
   }
 
-  static async puedeEliminarRecursosReferenciaPropio() {
+  static async puedeEliminarRecursosReferencia() {
     const { userId, orgId, has } = await auth();
     if (!userId || !orgId) return false;
     const tienePermiso = has({ permission: "org:recursos_de_referencia:eliminar_recurso_ref" });
