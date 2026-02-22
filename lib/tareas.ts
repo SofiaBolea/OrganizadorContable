@@ -602,6 +602,18 @@ export async function materializarOcurrencia(
     colorOverride?: string | null;
   }
 ) {
+  // Validar que la asignación existe antes de crear
+  const asignacionExiste = await prisma.tareaAsignacion.findUnique({
+    where: { id: tareaAsignacionId },
+    select: { id: true },
+  });
+  if (!asignacionExiste) {
+    throw new Error(
+      `TareaAsignacion no encontrada (id: ${tareaAsignacionId}). ` +
+      `Es posible que la asignación fue eliminada o el ID es incorrecto.`
+    );
+  }
+
   // Buscar si ya existe una ocurrencia materializada para esta fecha
   const existente = await prisma.ocurrencia.findFirst({
     where: {
@@ -697,13 +709,17 @@ export async function cancelarDesdeAqui(
     },
   });
 
+
   if (!asignacion) throw new Error("Asignación no encontrada");
   if (!asignacion.tarea.recurrencia) throw new Error("Solo se puede cancelar desde aquí en tareas recurrentes");
 
   // Calcular el día anterior como nueva hastaFecha
-  const fechaCorte = new Date(fechaDesde.split("T")[0] + "T12:00:00");
+  const fechaCorte = new Date(fechaDesde)
+  fechaCorte.setHours(0, 0, 0, 0)
   const diaAnterior = new Date(fechaCorte);
   diaAnterior.setDate(diaAnterior.getDate() - 1);
+
+  console.log(`Cancelando ocurrencias desde ${fechaDesde} en adelante. Nueva hastaFecha: ${diaAnterior.toISOString()}`);
 
   // Actualizar hastaFecha de la recurrencia
   await prisma.recurrencia.update({
@@ -711,20 +727,28 @@ export async function cancelarDesdeAqui(
     data: { hastaFecha: diaAnterior },
   });
 
+  const estados =  true ? ["PENDIENTE", "COMPLETADA"] // Permitir cancelar incluso si ya estaba completada, por si el usuario quiere revertir la completación y cancelar después
+    : ["PENDIENTE"]; // Solo cancelar pendientes, dejar completadas (opción para el futuro)
+
   // Marcar como CANCELADA las ocurrencias materializadas en esa fecha o después
   const ocurrenciasACancelar = asignacion.ocurrencias.filter((oc) => {
     const fechaOc = new Date(oc.fechaOriginal);
     fechaOc.setHours(0, 0, 0, 0);
     fechaCorte.setHours(0, 0, 0, 0);
-    return fechaOc >= fechaCorte && oc.estado === "PENDIENTE";
+    return fechaOc >= fechaCorte && estados.includes(oc.estado); // Permitir cancelar incluso si ya estaba completada, por si el usuario quiere revertir la completación y cancelar después
   });
 
-  if (ocurrenciasACancelar.length > 0) {
-    await prisma.ocurrencia.updateMany({
-      where: { id: { in: ocurrenciasACancelar.map((oc) => oc.id) } },
-      data: { estado: "CANCELADA" },
-    });
-  }
+  await prisma.ocurrencia.updateMany({
+  where: {
+    tareaAsignacionId,
+    fechaOriginal: {
+      gte: fechaCorte,
+    },
+  },
+  data: {
+    estado: "CANCELADA",
+  },
+});
 
   await evaluarEstadoAsignacion(tareaAsignacionId);
 
