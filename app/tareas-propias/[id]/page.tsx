@@ -5,7 +5,7 @@ import TareaForm from "@/app/tareas-asignadas/components/TareaForm";
 
 interface PageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ fechaOc?: string }>;
+  searchParams: Promise<{ taId?: string; fechaOc?: string }>;
 }
 
 export default async function DetalleMiTareaPage({ params, searchParams }: PageProps) {
@@ -16,7 +16,7 @@ export default async function DetalleMiTareaPage({ params, searchParams }: PageP
   }
 
   const { id } = await params;
-  const { fechaOc } = await searchParams;
+  const { taId, fechaOc } = await searchParams;
   const tarea = await getTareaDetalle(id);
 
   if (!tarea) {
@@ -29,6 +29,10 @@ export default async function DetalleMiTareaPage({ params, searchParams }: PageP
       </main>
     );
   }
+
+  // Usar taId si viene del URL, sino usar el primer tareaAsignacionId
+  const tareaAsignacionId = taId || tarea.asignaciones[0]?.id || "";
+  const refColorHexa = tarea.asignaciones[0]?.refColor?.codigoHexa || null;
 
   return (
     <main className="p-8">
@@ -44,7 +48,7 @@ export default async function DetalleMiTareaPage({ params, searchParams }: PageP
           titulo: tarea.titulo,
           prioridad: tarea.prioridad,
           fechaVencimientoBase: tarea.fechaVencimientoBase?.toISOString() || null,
-          descripcion: tarea.recurso?.descripcion || null,
+          descripcion: tarea.descripcion || null,
           recurrencia: tarea.recurrencia
             ? {
                 frecuencia: tarea.recurrencia.frecuencia,
@@ -58,8 +62,9 @@ export default async function DetalleMiTareaPage({ params, searchParams }: PageP
             : null,
           asignadoIds: tarea.asignaciones.map((a) => a.asignadoId),
           refColorId: tarea.asignaciones[0]?.refColor?.id || null,
+          refColorHexa: refColorHexa,
         }}
-        ocurrenciaContext={fechaOc ? { tareaAsignacionId: "", fechaOcurrencia: fechaOc } : null}
+        ocurrenciaContext={fechaOc && tareaAsignacionId ? { tareaAsignacionId, fechaOcurrencia: fechaOc } : null}
       />
     </main>
   );

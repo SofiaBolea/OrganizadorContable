@@ -97,12 +97,13 @@ export default function TareasTableClient({
   }>({ isOpen: false, row: null, nuevoEstado: "" });
 
 
-
   // ─── Expandir tareas a filas de display ───
   const todasLasFilas = useMemo(
     () => expandirTareasADisplayRows(tareasBase),
     [tareasBase]
   );
+
+  console.log("TareasTableClient - tareasBase:", todasLasFilas);
 
   // ─── Asistentes únicos para filtro ───
   const asistentesUnicos = useMemo(() => {
@@ -179,7 +180,8 @@ export default function TareasTableClient({
       setLoading(true);
       try {
         // Siempre materializar ocurrencia (tanto recurrentes como únicas)
-        const fechaOriginal = row.fechaOcurrencia || new Date().toISOString().split("T")[0];
+        // Usar fechaOriginalOcurrencia para buscar la ocurrencia correcta por su fecha original
+        const fechaOriginal = row.fechaOriginalOcurrencia || row.fechaOcurrencia || new Date().toISOString().split("T")[0];
         const res = await fetch("/api/tareas/ocurrencias", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -208,18 +210,29 @@ export default function TareasTableClient({
               ocurrenciasMaterializadas: yaExiste
                 ? t.ocurrenciasMaterializadas.map((o) =>
                     o.fechaOriginal.split("T")[0] === fechaKey
-                      ? { ...o, estado: nuevoEstado, id: ocurrencia.id }
+                      ? {
+                          id: ocurrencia.id,
+                          fechaOriginal: ocurrencia.fechaOriginal,
+                          estado: ocurrencia.estado,
+                          tituloOverride: ocurrencia.tituloOverride,
+                          fechaOverride: ocurrencia.fechaOverride,
+                          colorOverride: ocurrencia.colorOverride,
+                          prioridadOverride: ocurrencia.prioridadOverride,
+                          descripcionOverride: ocurrencia.descripcionOverride,
+                        }
                       : o
                   )
                 : [
                     ...t.ocurrenciasMaterializadas,
                     {
                       id: ocurrencia.id,
-                      fechaOriginal: fechaOriginal,
-                      estado: nuevoEstado,
-                      tituloOverride: null,
-                      fechaOverride: null,
-                      colorOverride: null,
+                      fechaOriginal: ocurrencia.fechaOriginal,
+                      estado: ocurrencia.estado,
+                      tituloOverride: ocurrencia.tituloOverride,
+                      fechaOverride: ocurrencia.fechaOverride,
+                      colorOverride: ocurrencia.colorOverride,
+                      prioridadOverride: ocurrencia.prioridadOverride,
+                      descripcionOverride: ocurrencia.descripcionOverride,
                     },
                   ],
             };
@@ -305,6 +318,8 @@ export default function TareasTableClient({
                     tituloOverride: null,
                     fechaOverride: null,
                     colorOverride: null,
+                    prioridadOverride: null,
+                    descripcionOverride: null,
                   },
                 ],
           };
@@ -417,6 +432,8 @@ export default function TareasTableClient({
                       tituloOverride: null,
                       fechaOverride: null,
                       colorOverride: null,
+                      prioridadOverride: null,
+                      descripcionOverride: null,
                     },
                   ],
             };
@@ -683,7 +700,7 @@ export default function TareasTableClient({
                         {/* Acciones */}
                         <td className="px-4 py-3 flex gap-3 items-center">
                           <Link
-                            href={`${basePath}/${row.tareaId}?fechaOc=${row.fechaOriginalOcurrencia || row.fechaOcurrencia || ""}`}
+                            href={`${basePath}/${row.tareaId}?taId=${row.tareaAsignacionId}&fechaOc=${row.fechaOriginalOcurrencia || row.fechaOcurrencia || ""}`}
                             className="text-text/50 hover:text-text transition-colors"
                             title="Ver detalle"
                           >
@@ -750,6 +767,9 @@ export default function TareasTableClient({
         onClose={() => setEstadoModal({ isOpen: false, row: null, nuevoEstado: "" })}
         onConfirm={handleConfirmEstado}
       />
+
+      {/* Modal Cambiar Prioridad */}
+
 
     </>
   );
