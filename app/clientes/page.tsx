@@ -18,15 +18,6 @@ export default async function ClientesPage() {
 
   if (!orgLocal) return <div>Sincronizando...</div>;
 
-  // Obtenemos asistentes para el formulario y filtros
-  const asistentes = await prisma.usuario.findMany({
-    where: {
-      organizacionId: orgLocal.id,
-      roles: { none: { rol: { nombreRol: { in: ["org:admin", "admin"] } } } }
-    },
-    select: { id: true, nombreCompleto: true }
-  });
-
   // Permisos para la UI
   const puedeCrear = await Permisos.puedeCrearCliente();
   const puedeEditar = await Permisos.puedeEditarCliente();

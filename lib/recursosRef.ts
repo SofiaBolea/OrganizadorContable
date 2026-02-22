@@ -57,8 +57,8 @@ export async function crearRecursoRef(req: NextRequest) {
 
 export async function modificarRecursoPropio(req: NextRequest) {
   // 1. Validar autenticación y organización
-  const { userId, orgId, has } = await auth();
-  const isAdmin = has({ permission: "org:admin" });
+  const { userId, orgId} = await auth();
+  const isAdmin = await Permisos.puedeModificarRecursosRefGlobales();
   
   if (!userId || !orgId) {
     throw new Error("No autorizado");

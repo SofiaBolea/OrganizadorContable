@@ -274,4 +274,18 @@ export class Permisos {
     return tienePermiso;
   }
 
+  static async puedeCrearRecursosRefGlobales() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:recursos_de_referencia_globales:crear" });
+    return tienePermiso;
+  }
+
+  static async puedeModificarRecursosRefGlobales() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    const tienePermiso = has({ permission: "org:recursos_de_referencia_globales:modificar" });
+    return tienePermiso;
+  }
+
 }

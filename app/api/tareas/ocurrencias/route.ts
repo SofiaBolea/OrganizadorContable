@@ -1,7 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { materializarOcurrencia, cancelarDesdeAqui } from "@/lib/tareas";
-import { Permisos } from "../../../../lib/permisos/permisos";
+import { Permisos } from "@/lib/permisos";
+
 
 // POST: Materializar una ocurrencia
 export async function POST(request: NextRequest) {
