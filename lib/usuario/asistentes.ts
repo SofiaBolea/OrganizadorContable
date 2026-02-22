@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { Permisos } from "@/lib/permisos";
-import { request } from "https";
+
 
 export async function updateUsuarioPermission({
   usuarioId,
@@ -13,7 +13,7 @@ export async function updateUsuarioPermission({
   campo: "permisoClientes" | "permisoVencimiento";
   valor: boolean;
 }) {
-  const { userId, orgId} = await auth();
+  const { userId, orgId, sessionId } = await auth();
   const puedeVer = await Permisos.puedeVerAsistentes();
   const canEdit = await Permisos.puedeEditarAsistentes();
   
@@ -48,6 +48,7 @@ export async function updateUsuarioPermission({
     data: {
       organizacionId: orgLocal.id,
       ejecutadoPorId: usuarioEjecutor.id,
+      sesionId: sessionId || undefined,
       usuarioAfectadoId: usuarioId,
       accion: `Cambio de permiso ${campo}`,
       detalleAccion: `El permiso '${campo}' fue cambiado a '${valor ? "habilitado" : "deshabilitado"}' para el usuario ${usuarioActualizado.nombreCompleto} (${usuarioActualizado.email})`,

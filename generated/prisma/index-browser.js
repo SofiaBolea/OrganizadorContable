@@ -176,7 +176,6 @@ exports.Prisma.RegistroAuditoriaScalarFieldEnum = {
 exports.Prisma.RecursoScalarFieldEnum = {
   id: 'id',
   organizacionId: 'organizacionId',
-  descripcion: 'descripcion',
   tipoRecurso: 'tipoRecurso'
 };
 
@@ -214,6 +213,7 @@ exports.Prisma.ClienteAsignacionScalarFieldEnum = {
 exports.Prisma.TareaScalarFieldEnum = {
   id: 'id',
   titulo: 'titulo',
+  descripcion: 'descripcion',
   prioridad: 'prioridad',
   fechaVencimientoBase: 'fechaVencimientoBase',
   tipoTarea: 'tipoTarea'
@@ -249,6 +249,7 @@ exports.Prisma.OcurrenciaScalarFieldEnum = {
   fechaEjecucion: 'fechaEjecucion',
   fechaOverride: 'fechaOverride',
   tituloOverride: 'tituloOverride',
+  descripcionOverride: 'descripcionOverride',
   estado: 'estado',
   colorOverride: 'colorOverride',
   prioridadOverride: 'prioridadOverride'
