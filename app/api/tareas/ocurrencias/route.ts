@@ -13,8 +13,6 @@ export async function POST(request: NextRequest) {
 
     const { tareaAsignacionId, fechaOriginal, estado, fechaOverride, tituloOverride, colorOverride } = await request.json();
 
-    console.log("[POST /api/tareas/ocurrencias] tareaAsignacionId:", tareaAsignacionId, "fechaOriginal:", fechaOriginal);
-
     if (!tareaAsignacionId || !fechaOriginal) {
       return NextResponse.json({ error: "Datos requeridos: tareaAsignacionId, fechaOriginal" }, { status: 400 });
     }
