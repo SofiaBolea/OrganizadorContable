@@ -287,5 +287,11 @@ export class Permisos {
     const tienePermiso = has({ permission: "org:recursos_de_referencia_globales:modificar" });
     return tienePermiso;
   }
+  static async puedeEliminarRecursosRefGlobales() {
+    const { userId, orgId, has } = await auth();
+    if (!userId || !orgId) return false;
+    // Permiso específico para eliminar globales
+    return has({ permission: "org:recursos_de_referencia_globales:eliminar" });
+  }
 
 }

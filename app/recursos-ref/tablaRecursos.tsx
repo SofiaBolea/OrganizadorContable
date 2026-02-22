@@ -1,142 +1,186 @@
+// sofiabolea/organizadorcontable/OrganizadorContable-recRef/app/recursos-ref/tablaRecursos.tsx
+
 "use client";
 
-import { ExternalLink, FolderOpen, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Plus, Search, ExternalLink, Pencil, Trash2, FolderOpen } from "lucide-react";
 import { Button } from "../components/Button";
-import { useEffect, useState } from "react";
+import FormularioCrearRecurso from "./formularioCrearRecurso";
+import FormularioEditarRecurso from "./formularioEditarRecursoRef";
+import { ModalConfirmacionEliminarRecurso } from "./modalConfirmacionEliminarRecurso";
+import { ModalErrorRecurso } from "./modalErrorRecurso";
 
-
-interface Recurso {
-    id: string;
-    titulo: string;
-    tipo: string;
-    url: string;
+interface Props {
+  initialRecursos: any[];
+  permisos: {
+    puedeCrearGlobal: boolean;
+    puedeModificarGlobal: boolean;
+    puedeEliminarGlobal: boolean;
+    puedeCrearPropio: boolean;
+  };
 }
 
-interface TablaRecursosProps {
-    recursos: Recurso[];
-    onEdit: (recurso: Recurso) => void;
-}
+export function TablaRecursos({ initialRecursos, permisos }: Props) {
+  const [recursos, setRecursos] = useState(initialRecursos);
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  // Estados de Modales
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  
+  // Estados de Datos
+  const [recursoSeleccionado, setRecursoSeleccionado] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState("");
 
-export function TablaRecursos() {
-    const [recursos, setRecursos] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const fetchRecursos = async () => {
+    const res = await fetch("/api/recursosRef");
+    const data = await res.json();
+    setRecursos(data);
+  };
 
+  const handleConfirmarEliminacion = async () => {
+    if (!recursoSeleccionado) return;
 
-    // Estados para creación
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    try {
+      const res = await fetch("/api/recursosRef", {
+        method: "DELETE",
+        body: JSON.stringify({ id: recursoSeleccionado.id }),
+      });
 
-    // Estados para edición
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [recursoParaEditar, setRecursoParaEditar] = useState(null);
-
-    const fetchRecursos = () => {
-        setLoading(true);
-        fetch("/api/recursosRef")
-            .then((res) => {
-                if (!res.ok) throw new Error("Error al cargar");
-                return res.json();
-            })
-            .then((data) => {
-                setRecursos(data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.error(err);
-                setLoading(false);
-            });
-    };
-
-    useEffect(() => {
+      if (res.ok) {
+        setIsConfirmModalOpen(false);
         fetchRecursos();
-    }, []);
+      } else {
+        const errorData = await res.json();
+        setErrorMsg(errorData.message || "No se pudo eliminar el recurso.");
+        setIsErrorModalOpen(true);
+      }
+    } catch (err) {
+      setErrorMsg("Ocurrió un error de conexión.");
+      setIsErrorModalOpen(true);
+    }
+  };
 
-    // Función para abrir modal de edición
-    const handleEdit = (recurso: any) => {
-        setRecursoParaEditar(recurso);
-        setIsEditModalOpen(true);
-    };
+  const recursosFiltrados = recursos.filter(r => 
+    r.titulo.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-    return (
-        <>
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Recursos de Referencia</h1>
-                    <p className="text-gray-500">Gestiona tus enlaces y documentos de consulta.</p>
-                </div>
-                {recursos.length > 0 && (
-                    <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2">
-                        <Plus size={18} /> Nuevo Recurso
-                    </Button>
-                )}
-            </div>
-            <div className="bg-white rounded-lg shadow">
-                {loading ? (
-                    <div className="p-10 text-center text-gray-500">Cargando recursos...</div>
-                ) : recursos.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center p-12 text-center">
-                        <div className="bg-gray-100 p-4 rounded-full mb-4">
-                            <FolderOpen size={48} className="text-gray-400" />
-                        </div>
-                        <h2 className="text-xl font-semibold text-gray-700">No hay recursos de referencia cargados aún</h2>
-                        <p className="text-gray-500 mb-6">Comienza a organizar tus enlaces importantes ahora mismo.</p>
-                        <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2">
-                            <Plus size={18} /> Cargar el primero
-                        </Button>
-                    </div>
-                ) : (
-                    <>
-                        <div className="p-4 border-b">
-                            <div className="relative w-full max-w-sm">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                <input
-                                    type="text"
-                                    placeholder="Buscar por título..."
-                                    className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                        </div>
+  return (
+    <>
+      {/* Encabezado y Tabla (Misma lógica visual de antes) */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Recursos de Referencia</h1>
+          <p className="text-gray-500">Gestiona tus enlaces y documentos de consulta.</p>
+        </div>
+        <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2">
+          <Plus size={18} /> Nuevo Recurso
+        </Button>
+      </div>
 
-                        <table className="w-full text-left">
-                            <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
-                                <tr>
-                                    <th className="px-6 py-3 font-semibold">Título</th>
-                                    <th className="px-6 py-3 font-semibold">Tipo</th>
-                                    <th className="px-6 py-3 font-semibold">URL / Link</th>
-                                    <th className="px-6 py-3 font-semibold text-right">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {recursos.map((r: any) => (
-                                    <tr key={r.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 font-medium text-gray-900">{r.titulo}</td>
-                                        <td className="px-6 py-4">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${r.tipo === 'GLOBAL' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
-                                                }`}>
-                                                {r.tipo}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <a href={r.url} target="_blank" className="text-blue-600 flex items-center gap-1 hover:underline">
-                                                Ver link <ExternalLink size={14} />
-                                            </a>
-                                        </td>
-                                        <td className="px-6 py-4 text-right space-x-2">
-                                            {/* ACCIÓN EDITAR: Llama a handleEdit */}
-                                            <button
-                                                onClick={() => handleEdit(r)}
-                                                className="p-1 hover:text-blue-600 transition-colors"
-                                            >
-                                                <Pencil size={18} />
-                                            </button>
-                                            <button className="p-1 hover:text-red-600 transition-colors"><Trash2 size={18} /></button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </>
-                )}
-            </div>
-        </>
-    );
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        {recursos.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-12 text-center">
+            <FolderOpen size={48} className="text-gray-400 mb-4" />
+            <h2 className="text-xl font-semibold text-gray-700">No hay recursos aún</h2>
+            <Button onClick={() => setIsModalOpen(true)} className="mt-4">Cargar el primero</Button>
+          </div>
+        ) : (
+          <>
+            <table className="w-full text-left">
+              <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
+                <tr>
+                  <th className="px-6 py-3">Título</th>
+                  <th className="px-6 py-3">Tipo</th>
+                  <th className="px-6 py-3">URL</th>
+                  <th className="px-6 py-3 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {recursosFiltrados.map((r: any) => {
+                  const esGlobal = r.tipo === "GLOBAL";
+                  const puedeEditar = esGlobal ? permisos.puedeModificarGlobal : true;
+                  const puedeEliminar = esGlobal ? permisos.puedeEliminarGlobal : true;
+
+                  return (
+                    <tr key={r.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 font-medium">{r.titulo}</td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          esGlobal ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+                        }`}>
+                          {r.tipo}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <a href={r.url} target="_blank" className="text-blue-600 flex items-center gap-1">
+                          Ver link <ExternalLink size={14} />
+                        </a>
+                      </td>
+                      <td className="px-6 py-4 text-right space-x-2">
+                        {puedeEditar && (
+                          <button 
+                            onClick={() => { setRecursoSeleccionado(r); setIsEditModalOpen(true); }} 
+                            className="p-1 hover:text-blue-600 transition-colors"
+                          >
+                            <Pencil size={18} />
+                          </button>
+                        )}
+                        {puedeEliminar && (
+                          <button 
+                            onClick={() => { setRecursoSeleccionado(r); setIsConfirmModalOpen(true); }} 
+                            className="p-1 hover:text-red-600 transition-colors"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </>
+        )}
+      </div>
+
+      {/* MODALES DE INTERACCIÓN */}
+      
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <FormularioCrearRecurso 
+            onClose={() => setIsModalOpen(false)} 
+            onSuccess={fetchRecursos} 
+          />
+        </div>
+      )}
+
+      {isEditModalOpen && recursoSeleccionado && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <FormularioEditarRecurso 
+            recurso={recursoSeleccionado}
+            onClose={() => { setIsEditModalOpen(false); setRecursoSeleccionado(null); }} 
+            onSuccess={fetchRecursos} 
+          />
+        </div>
+      )}
+
+      {isConfirmModalOpen && recursoSeleccionado && (
+        <ModalConfirmacionEliminarRecurso
+          tituloRecurso={recursoSeleccionado.titulo}
+          onConfirm={handleConfirmarEliminacion}
+          onCancel={() => { setIsConfirmModalOpen(false); setRecursoSeleccionado(null); }}
+        />
+      )}
+
+      {isErrorModalOpen && (
+        <ModalErrorRecurso
+          mensaje={errorMsg}
+          onClose={() => setIsErrorModalOpen(false)}
+        />
+      )}
+    </>
+  );
 }

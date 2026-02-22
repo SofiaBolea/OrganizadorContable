@@ -69,7 +69,7 @@ export async function modificarRecursoPropio(req: NextRequest) {
 
   // 2. Extraer datos del formulario (JSON)
   const body = await req.json();
-  const { titulo, url, descripcion } = body;
+  const { titulo, url, descripcion, tipo } = body;
   if (!titulo || !url) {
     throw new Error("Faltan campos obligatorios");
   }
@@ -145,5 +145,47 @@ export async function listarRecursosPropios() {
     },
     include: { recurso: true },
     orderBy: { id: 'desc' }
+  });
+}
+
+export async function eliminarRecursoRef(req: NextRequest) {
+  const { userId, orgId } = await auth();
+  if (!userId || !orgId) throw new Error("No autorizado");
+
+  const body = await req.json();
+  const { id } = body;
+
+  const orgLocal = await prisma.organizacion.findUnique({
+    where: { clerkOrganizationId: orgId },
+    select: { id: true }
+  });
+
+  const usuario = await prisma.usuario.findFirst({
+    where: { clerkId: userId, organizacionId: orgLocal?.id },
+    select: { id: true }
+  });
+
+  const recursoExistente = await prisma.recursoRef.findUnique({
+    where: { id }
+  });
+
+  if (!recursoExistente) throw new Error("Recurso no encontrado");
+
+  // Verificación de permisos
+  const puedeBorrarGlobal = await Permisos.puedeEliminarRecursosRefGlobales();
+  
+  if (recursoExistente.tipo === "GLOBAL") {
+    if (!puedeBorrarGlobal) throw new Error("No tienes permiso para eliminar recursos globales");
+  } else {
+    // Si es PROPIO, debe ser el dueño y tener permiso de eliminación genérico
+    const tienePermisoEliminar = await Permisos.puedeEliminarRecursosReferencia();
+    if (!tienePermisoEliminar || recursoExistente.usuarioId !== usuario?.id) {
+      throw new Error("No puedes eliminar este recurso");
+    }
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    await tx.recursoRef.delete({ where: { id } });
+    return await tx.recurso.delete({ where: { id } });
   });
 }
