@@ -151,7 +151,6 @@ export async function crearVencimiento(
     data: {
       organizacionId: organizacion.id,
       tipoRecurso: "VENCIMIENTO",
-      nombre: titulo,
       vencimiento: {
         create: {
           usuarioCreadorId: usuario.id,

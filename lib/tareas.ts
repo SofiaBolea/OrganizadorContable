@@ -82,7 +82,6 @@ export async function crearTarea(
   const recurso = await prisma.recurso.create({
     data: {
       organizacionId: organizacion.id,
-      nombre: titulo,
       descripcion: descripcion || null,
       tipoRecurso: "TAREA",
       tarea: {
@@ -375,7 +374,6 @@ export async function actualizarTarea(
         : tareaExistente.fechaVencimientoBase,
       recurso: {
         update: {
-          nombre: datos.titulo ?? tareaExistente.titulo,
           descripcion: datos.descripcion ?? undefined,
         },
       },
@@ -781,7 +779,6 @@ export async function crearRefColor(
   const recurso = await prisma.recurso.create({
     data: {
       organizacionId: organizacion.id,
-      nombre: titulo,
       tipoRecurso: "REF_COLOR",
       refColor: {
         create: {
@@ -825,12 +822,7 @@ export async function actualizarRefColor(
     data: { titulo, codigoHexa },
   });
 
-  // Actualizar nombre del recurso también
-  await prisma.recurso.update({
-    where: { id: refColorId },
-    data: { nombre: titulo },
-  });
-
+  // Actualizar nombre del recurso tambié
   return updated;
 }
 
