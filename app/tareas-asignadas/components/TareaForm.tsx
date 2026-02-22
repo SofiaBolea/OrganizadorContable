@@ -41,6 +41,7 @@ interface TareaFormProps {
     } | null;
     asignadoIds: string[];
     refColorId: string | null;
+    refColorHexa?: string | null;
   };
 }
 
@@ -60,7 +61,8 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
   );
   const [descripcion, setDescripcion] = useState(initialData?.descripcion || "");
   const [refColorId, setRefColorId] = useState<string | null>(initialData?.refColorId || null);
-  const [refColorHexa, setRefColorHexa] = useState<string | null>(null);
+  const [refColorHexa, setRefColorHexa] = useState<string | null>(initialData?.refColorHexa || null);
+  const [refColorTitulo, setRefColorTitulo] = useState<string | null>(null);
 
   // Recurrencia
   const [esRecurrente, setEsRecurrente] = useState(!!initialData?.recurrencia);
@@ -68,6 +70,17 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
   // Modal de alcance (aparece al guardar si hay ocurrenciaContext)
   const [showAlcanceModal, setShowAlcanceModal] = useState(false);
   const [alcanceModal, setAlcanceModal] = useState<"todas" | "esta">("todas");
+  const [camposModificados, setCamposModificados] = useState<Set<string>>(new Set());
+
+  // Rastrear valores originales de overrides cuando se cargan desde DB
+  const [tituloOverrideOriginal, setTituloOverrideOriginal] = useState<string | null>(null);
+  const [descripcionOverrideOriginal, setDescripcionOverrideOriginal] = useState<string | null>(null);
+  const [prioridadOverrideOriginal, setPrioridadOverrideOriginal] = useState<string | null>(null);
+  const [fechaOverrideOriginal, setFechaOverrideOriginal] = useState<string | null>(null);
+  const [colorOverrideOriginal, setColorOverrideOriginal] = useState<string | null>(null);
+
+  // Rastrear si hay override cargado (para diferenciar entre "no hay override" y "aún no cargó datos")
+  const [ocurrenciaDataLoaded, setOcurrenciaDataLoaded] = useState(false);
 
   // Calcular la fecha de hoy en formato YYYY-MM-DD
   const hoyISO = new Date().toISOString().split("T")[0];
@@ -78,6 +91,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
     if (checked && !fechaBaseOriginal) {
       setFechaBaseOriginal(hoyISO);
     }
+    setCamposModificados(prev => new Set([...prev, "recurrencia"]));
   };
   const [frecuencia, setFrecuencia] = useState(initialData?.recurrencia?.frecuencia || "SEMANAL");
   const [intervalo, setIntervalo] = useState(initialData?.recurrencia?.intervalo || 1);
@@ -95,6 +109,65 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
     initialData?.recurrencia?.hastaFecha ? "fecha" :
     initialData?.recurrencia?.conteoMaximo ? "ocurrencias" : "nunca"
   );
+
+  // Cargar datos de override cuando se abre el formulario para editar una ocurrencia específica
+  useEffect(() => {
+    if (ocurrenciaContext && (mode === "edit" || mode === "view")) {
+      const loadOcurrenciaData = async () => {
+        try {
+          const params = new URLSearchParams({
+            tareaAsignacionId: ocurrenciaContext.tareaAsignacionId,
+            fechaOcurrencia: ocurrenciaContext.fechaOcurrencia,
+          });
+          const res = await fetch(`/api/tareas/ocurrencias?${params}`);
+          if (res.ok) {
+            const data = await res.json();
+            // Cargar overrides si existen, usar valores base si no
+            setTitulo(data.tituloOverride || (initialData?.titulo || ""));
+            setTituloOverrideOriginal(data.tituloOverride || null);
+            
+            setDescripcion(data.descripcionOverride || (initialData?.descripcion || ""));
+            setDescripcionOverrideOriginal(data.descripcionOverride || null);
+            
+            setPrioridad(data.prioridadOverride || (initialData?.prioridad || "MEDIA"));
+            setPrioridadOverrideOriginal(data.prioridadOverride || null);
+            
+            // Para la fecha: mostrar fechaOverride si existe, sino mostrar fechaOcurrencia (que puede ser la original o el base)
+            const fechaAMostrar = data.fechaOverride 
+              ? data.fechaOverride.split("T")[0]
+              : (data.fechaOcurrencia?.split("T")[0] || fechaOcurrenciaInicial);
+            setFechaVencimiento(fechaAMostrar);
+            setFechaOverrideOriginal(data.fechaOverride ? data.fechaOverride.split("T")[0] : null);
+            
+            // Para el color: si hay override, usar ID ficticio para que RefColorSelector muestre el fallback con el hex correcto
+            if (data.colorOverride) {
+              // ID ficticio para que no matchee con ningún color de la lista
+              // Así RefColorSelector usará fallbackColor con el hex del override
+              setRefColorId("__colorOverride__");
+              setRefColorHexa(data.colorOverride);
+              setRefColorTitulo(data.refColorTitulo || null);
+              setColorOverrideOriginal(data.colorOverride);
+            } else {
+              // Sin override, usar el color base normal
+              setRefColorId(initialData?.refColorId || null);
+              setRefColorHexa(data.refColorHexa || initialData?.refColorHexa || null);
+              setRefColorTitulo(null);
+              setColorOverrideOriginal(null);
+            }
+            
+            setOcurrenciaDataLoaded(true);
+          }
+        } catch (err) {
+          console.error("Error loading ocurrencia data:", err);
+          setOcurrenciaDataLoaded(true);
+        }
+      };
+      loadOcurrenciaData();
+    } else {
+      setOcurrenciaDataLoaded(true);
+    }
+  }, [ocurrenciaContext, mode, initialData]);
+
 
   // Búsqueda de asistentes
   const [busquedaAsistente, setBusquedaAsistente] = useState("");
@@ -190,6 +263,25 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
     try {
       // Si estamos editando y hay contexto de ocurrencia → preguntar alcance
       if (!isCreateMode && ocurrenciaContext) {
+        // Detectar qué campos fueron modificados
+        const tituloModificado = titulo !== (initialData?.titulo || "");
+        const descripcionModificada = descripcion !== (initialData?.descripcion || "");
+        const prioridadModificada = prioridad !== (initialData?.prioridad || "MEDIA");
+        const colorModificado = refColorId !== (initialData?.refColorId || null);
+        const fechaBaseModificada = fechaBaseOriginal !== (initialData?.fechaVencimientoBase?.split("T")[0] || "");
+        const fechaOcurrenciaModificada = fechaVencimiento !== fechaOcurrenciaInicial;
+        const recurrenciaModificada = camposModificados.has("recurrencia");
+
+        // Determinar qué opciones mostrar en el modal
+        // Si solo se modificó fecha de esta ocurrencia: solo "esta"
+        // Si se modificó fecha base o recurrencia: solo "todas"
+        // En otros casos: ambas opciones
+        const soloEstOpcion = fechaOcurrenciaModificada && !fechaBaseModificada && !recurrenciaModificada;
+        const soloTodasOpcion = fechaBaseModificada || recurrenciaModificada;
+
+        // Guardar información sobre las opciones disponibles
+        (window as any).__alcanceModalOptions = { soloEstOpcion, soloTodasOpcion };
+
         setLoading(false);
         setShowAlcanceModal(true);
         return;
@@ -238,7 +330,6 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
       }
 
       window.location.href = basePath;
-    } catch {
       setError("Error al conectar con el servidor");
     } finally {
       setLoading(false);
@@ -253,9 +344,14 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
     setError("");
 
     try {
-      const tituloOriginal = initialData?.titulo || "";
       const fechaOriginal = ocurrenciaContext.fechaOcurrencia;
-      const colorIdOriginal = initialData?.refColorId || null;
+      
+      // Comparar contra donde vino: override si existe, base si no
+      const tituloOriginal = tituloOverrideOriginal !== null ? tituloOverrideOriginal : (initialData?.titulo || "");
+      const descripcionOriginal = descripcionOverrideOriginal !== null ? descripcionOverrideOriginal : (initialData?.descripcion || "");
+      const prioridadOriginal = prioridadOverrideOriginal !== null ? prioridadOverrideOriginal : (initialData?.prioridad || "MEDIA");
+      const fechaOriginalOverride = fechaOverrideOriginal !== null ? fechaOverrideOriginal : fechaOcurrenciaInicial;
+      const colorIdOriginal = colorOverrideOriginal !== null ? colorOverrideOriginal : (initialData?.refColorId || null);
 
       const res = await fetch("/api/tareas/ocurrencias", {
         method: "POST",
@@ -265,8 +361,10 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
           fechaOriginal,
           // undefined se omite de JSON → el server sabe que no cambió
           tituloOverride: titulo !== tituloOriginal ? titulo : undefined,
-          fechaOverride: fechaVencimiento !== fechaOcurrenciaInicial ? fechaVencimiento : undefined,
-          colorOverride: refColorId !== colorIdOriginal ? (refColorHexa ?? null) : undefined,
+          descripcionOverride: descripcion !== descripcionOriginal ? descripcion : undefined,
+          prioridadOverride: prioridad !== prioridadOriginal ? prioridad : undefined,
+          fechaOverride: fechaVencimiento !== fechaOriginalOverride ? fechaVencimiento : undefined,
+          colorOverride: refColorHexa !== (colorOverrideOriginal || initialData?.refColorHexa || null) ? (refColorHexa ?? null) : undefined,
         }),
       });
       if (!res.ok) {
@@ -349,7 +447,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
           </span>
           {ocurrenciaContext?.fechaOcurrencia && (() => {
             if (isViewMode) {
-              const raw = ocurrenciaContext.fechaOcurrencia;
+              const raw = fechaVencimiento;
               const dateOnly = raw.includes("T") ? raw.split("T")[0] : raw;
               const d = new Date(dateOnly + "T00:00:00");
               if (isNaN(d.getTime())) return null;
@@ -365,7 +463,10 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
                 <input
                   type="date"
                   value={fechaVencimiento || ""}
-                  onChange={(e) => setFechaVencimiento(e.target.value)}
+                  onChange={(e) => {
+                    setFechaVencimiento(e.target.value);
+                    setCamposModificados(prev => new Set([...prev, "fechaOcurrencia"]));
+                  }}
                   className="bg-[#e9e8e0] p-1.5 px-3 rounded-full outline-none text-sm text-text focus:ring-2 focus:ring-primary transition-all"
                 />
               </div>
@@ -385,7 +486,10 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
             type="text"
             placeholder="Titulo de Tarea"
             value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
+            onChange={(e) => {
+              setTitulo(e.target.value);
+              setCamposModificados(prev => new Set([...prev, "titulo"]));
+            }}
             disabled={isViewMode}
             className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text placeholder:text-text/40 focus:ring-2 focus:ring-primary transition-all"
             required
@@ -397,7 +501,10 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
           <textarea
             placeholder="Descripción de la tarea"
             value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
+            onChange={(e) => {
+              setDescripcion(e.target.value);
+              setCamposModificados(prev => new Set([...prev, "descripcion"]));
+            }}
             disabled={isViewMode}
             rows={3}
             className="w-full bg-[#e9e8e0] p-3 px-5 rounded-2xl outline-none text-text placeholder:text-text/40 focus:ring-2 focus:ring-primary transition-all resize-none"
@@ -515,7 +622,10 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
             <input
               type="date"
               value={fechaBaseOriginal || ""}
-              onChange={(e) => setFechaBaseOriginal(e.target.value)}
+              onChange={(e) => {
+                setFechaBaseOriginal(e.target.value);
+                setCamposModificados(prev => new Set([...prev, "fechaBase"]));
+              }}
               disabled={isViewMode}
               required={!esRecurrente}
               className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text focus:ring-2 focus:ring-primary transition-all"
@@ -528,7 +638,10 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
             </label>
             <select
             value={prioridad}
-            onChange={(e) => setPrioridad(e.target.value)}
+            onChange={(e) => {
+              setPrioridad(e.target.value);
+              setCamposModificados(prev => new Set([...prev, "prioridad"]));
+            }}
             disabled={isViewMode}
             className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text focus:ring-2 focus:ring-primary transition-all appearance-none cursor-pointer"
           >
@@ -694,7 +807,14 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
           <div className="mb-6">
             <RefColorSelector
               selectedId={refColorId}
-              onChange={(id, hexa) => { setRefColorId(id); setRefColorHexa(hexa); }}
+              selectedHexa={refColorHexa}
+              refColorTitulo={refColorTitulo}
+              onChange={(id, hexa) => { 
+                setRefColorId(id); 
+                setRefColorHexa(hexa); 
+                setRefColorTitulo(null);
+                setCamposModificados(prev => new Set([...prev, "refColor"]));
+              }}
               disabled={isViewMode}
             />
           </div>
@@ -724,70 +844,86 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
     </form>
 
     {/* Modal de alcance */}
-    {showAlcanceModal && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-        <div className="bg-card rounded-2xl border border-white shadow-xl p-8 max-w-md w-full mx-4">
-          <h3 className="text-lg font-bold text-text mb-2">¿Aplicar cambios a…?</h3>
-          <p className="text-sm text-text/60 mb-6">
-            Elegí si querés modificar solo esta ocurrencia o todas las ocurrencias de la tarea.
-          </p>
+    {showAlcanceModal && (() => {
+      const options = (window as any).__alcanceModalOptions || { soloEstOpcion: false, soloTodasOpcion: false };
+      const mostrarEstOpcion = !options.soloTodasOpcion;
+      const mostrarTodasOpcion = !options.soloEstOpcion;
+      
+      // Si solo hay una opción, seleccionarla automáticamente
+      const tieneUnaOpcion = (mostrarEstOpcion && !mostrarTodasOpcion) || (!mostrarEstOpcion && mostrarTodasOpcion);
+      if (tieneUnaOpcion && alcanceModal !== (mostrarEstOpcion ? "esta" : "todas")) {
+        setAlcanceModal(mostrarEstOpcion ? "esta" : "todas");
+      }
 
-          <div className="space-y-3">
-            <label className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border-2
-              ${alcanceModal === 'todas' ? 'bg-primary/10 border-primary/40' : 'bg-[#e9e8e0] border-transparent hover:border-text/10'}`}>
-              <input
-                type="radio"
-                name="alcanceModal"
-                checked={alcanceModal === "todas"}
-                onChange={() => setAlcanceModal("todas")}
-                className="w-4 h-4 accent-primary-foreground"
-              />
-              <div>
-                <span className="text-sm font-semibold text-text">Todas las ocurrencias</span>
-                <p className="text-xs text-text/50">
-                  Se modifica la tarea base (título, fecha, prioridad, recurrencia, etc.)
-                </p>
-              </div>
-            </label>
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-card rounded-2xl border border-white shadow-xl p-8 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-text mb-2">¿Aplicar cambios a…?</h3>
+            <p className="text-sm text-text/60 mb-6">
+              Elegí si querés modificar solo esta ocurrencia o todas las ocurrencias de la tarea.
+            </p>
 
-            <label className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border-2
-              ${alcanceModal === 'esta' ? 'bg-primary/10 border-primary/40' : 'bg-[#e9e8e0] border-transparent hover:border-text/10'}`}>
-              <input
-                type="radio"
-                name="alcanceModal"
-                checked={alcanceModal === "esta"}
-                onChange={() => setAlcanceModal("esta")}
-                className="w-4 h-4 accent-primary-foreground"
-              />
-              <div>
-                <span className="text-sm font-semibold text-text">Solo esta ocurrencia</span>
-                <p className="text-xs text-text/50">
-                  Se guardan cambios de título y fecha solo para esta fecha particular
-                </p>
-              </div>
-            </label>
-          </div>
+            <div className="space-y-3">
+              {mostrarTodasOpcion && (
+                <label className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border-2
+                  ${alcanceModal === 'todas' ? 'bg-primary/10 border-primary/40' : 'bg-[#e9e8e0] border-transparent hover:border-text/10'}`}>
+                  <input
+                    type="radio"
+                    name="alcanceModal"
+                    checked={alcanceModal === "todas"}
+                    onChange={() => setAlcanceModal("todas")}
+                    className="w-4 h-4 accent-primary-foreground"
+                  />
+                  <div>
+                    <span className="text-sm font-semibold text-text">Todas las ocurrencias</span>
+                    <p className="text-xs text-text/50">
+                      Se modifica la tarea base (título, fecha, prioridad, recurrencia, etc.)
+                    </p>
+                  </div>
+                </label>
+              )}
 
-          <div className="flex justify-end gap-3 mt-6">
-            <button
-              type="button"
-              onClick={() => setShowAlcanceModal(false)}
-              className="px-6 py-2.5 rounded-xl text-sm font-medium transition-opacity border-[3px] bg-danger text-danger-foreground border-danger-foreground hover:opacity-90"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={() => alcanceModal === "esta" ? guardarSoloEsta() : guardarTodas()}
-              disabled={loading}
-              className="px-6 py-2.5 rounded-xl text-sm font-medium transition-opacity border-[3px] bg-primary text-primary-foreground border-primary-foreground hover:opacity-90 disabled:opacity-50"
-            >
-              {loading ? "Procesando..." : "Aceptar"}
-            </button>
+              {mostrarEstOpcion && (
+                <label className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border-2
+                  ${alcanceModal === 'esta' ? 'bg-primary/10 border-primary/40' : 'bg-[#e9e8e0] border-transparent hover:border-text/10'}`}>
+                  <input
+                    type="radio"
+                    name="alcanceModal"
+                    checked={alcanceModal === "esta"}
+                    onChange={() => setAlcanceModal("esta")}
+                    className="w-4 h-4 accent-primary-foreground"
+                  />
+                  <div>
+                    <span className="text-sm font-semibold text-text">Solo esta ocurrencia</span>
+                    <p className="text-xs text-text/50">
+                      Se guardan cambios de título y fecha solo para esta fecha particular
+                    </p>
+                  </div>
+                </label>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setShowAlcanceModal(false)}
+                className="px-6 py-2.5 rounded-xl text-sm font-medium transition-opacity border-[3px] bg-danger text-danger-foreground border-danger-foreground hover:opacity-90"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => alcanceModal === "esta" ? guardarSoloEsta() : guardarTodas()}
+                disabled={loading}
+                className="px-6 py-2.5 rounded-xl text-sm font-medium transition-opacity border-[3px] bg-primary text-primary-foreground border-primary-foreground hover:opacity-90 disabled:opacity-50"
+              >
+                {loading ? "Procesando..." : "Aceptar"}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      );
+    })()}
     </>
   );
 }

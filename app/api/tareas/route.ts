@@ -18,10 +18,15 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { tipoTarea } = body;
 
+    // Verificar permisos para crear tareas
+    const puedeCrearTarea = await Permisos.puedeCrearTarea();
+    if (!puedeCrearTarea) {
+      return NextResponse.json({ error: "No tienes permisos para crear tareas" }, { status: 403 });
+    }
     // Para tareas ASIGNADA, solo admin puede crear
     if (tipoTarea === "ASIGNADA") {
-      const puedeCrear = await Permisos.puedeCrearTareaAsignada();
-      if (!puedeCrear) {
+      const puedeCrearAsignada = await Permisos.puedeCrearTareaAsignada();
+      if (!puedeCrearAsignada) {
         return NextResponse.json({ error: "No tienes permisos para crear tareas asignadas" }, { status: 403 });
       }
     }
@@ -50,6 +55,19 @@ export async function GET(request: NextRequest) {
 
     const tipo = request.nextUrl.searchParams.get("tipo"); // "asignadas" | "tareas-propias"
     const esAdmin = await Permisos.esAdmin();
+
+    const puedeVerTarea = await Permisos.puedeVerTarea();
+    if (!puedeVerTarea) {
+      return NextResponse.json({ error: "No tienes permisos para ver tareas" }, { status: 403 });
+    }
+
+    if (tipo === "asignadas") {
+      // Verificar permisos para ver tareas
+      const puedeVer = await Permisos.puedeVerTareaAsignada();
+      if (!puedeVer) {
+        return NextResponse.json({ error: "No tienes permisos para ver tareas asignadas" }, { status: 403 });
+      }
+    }
 
     let tareas;
     if (tipo === "asignadas") {

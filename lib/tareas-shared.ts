@@ -10,6 +10,8 @@ export interface OcurrenciaMaterializada {
   tituloOverride: string | null;
   fechaOverride: string | null;
   colorOverride: string | null;
+  descripcionOverride: string | null;
+  prioridadOverride: string | null;
 }
 
 export interface RecurrenciaData {
@@ -242,6 +244,16 @@ export function expandirTareasADisplayRows(
     return fechaStr.split("T")[0] < hoyStr ? "VENCIDA" : "PENDIENTE";
   };
 
+  /** Helper: obtener el valor correcto de prioridad (usa override si existe, sino valor base) */
+  const getPrioridad = (mat: OcurrenciaMaterializada | null | undefined, basePrioridad: string): string => {
+    // Si hay una ocurrencia materializada Y tiene prioridadOverride definido (distinto de null/undefined), usarlo
+    if (mat && mat.prioridadOverride != null && mat.prioridadOverride !== "") {
+      return mat.prioridadOverride;
+    }
+    // Si no hay override, usar la prioridad base de la tarea
+    return basePrioridad;
+  };
+
   for (const t of tareas) {
     if (!t.recurrencia) {
       // Tarea única: buscar ocurrencia materializada (si existe)
@@ -260,11 +272,11 @@ export function expandirTareasADisplayRows(
         esVirtual: !mat,
         titulo: mat?.tituloOverride || t.titulo,
         tituloBase: t.titulo,
-        prioridad: t.prioridad,
+        prioridad: getPrioridad(mat, t.prioridad),
         tipoTarea: t.tipoTarea,
         fechaOcurrencia: mat?.fechaOverride || mat?.fechaOriginal || t.fechaVencimientoBase,
         fechaOriginalOcurrencia: mat?.fechaOriginal || t.fechaVencimientoBase,
-        descripcion: t.descripcion,
+        descripcion: mat?.descripcionOverride || t.descripcion,
         asignadoId: t.asignadoId,
         asignadoNombre: t.asignadoNombre,
         asignadoPorId: t.asignadoPorId,
@@ -336,11 +348,11 @@ export function expandirTareasADisplayRows(
           esVirtual: !mat,
           titulo: mat?.tituloOverride || t.titulo,
           tituloBase: t.titulo,
-          prioridad: t.prioridad,
+          prioridad: getPrioridad(mat, t.prioridad),
           tipoTarea: t.tipoTarea,
           fechaOcurrencia: mat?.fechaOverride || mat?.fechaOriginal || fechaStr,
           fechaOriginalOcurrencia: mat?.fechaOriginal || fechaStr,
-          descripcion: t.descripcion,
+          descripcion: mat?.descripcionOverride || t.descripcion,
           asignadoId: t.asignadoId,
           asignadoNombre: t.asignadoNombre,
           asignadoPorId: t.asignadoPorId,
@@ -369,11 +381,11 @@ export function expandirTareasADisplayRows(
           esVirtual: false,
           titulo: mat.tituloOverride || t.titulo,
           tituloBase: t.titulo,
-          prioridad: t.prioridad,
+        prioridad: getPrioridad(mat, t.prioridad),
           tipoTarea: t.tipoTarea,
           fechaOcurrencia: mat.fechaOverride || fechaKey,
           fechaOriginalOcurrencia: fechaKey,
-          descripcion: t.descripcion,
+          descripcion: mat.descripcionOverride || t.descripcion,
           asignadoId: t.asignadoId,
           asignadoNombre: t.asignadoNombre,
           asignadoPorId: t.asignadoPorId,

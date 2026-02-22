@@ -47,6 +47,7 @@ interface DatosActualizarTarea {
     conteoMaximo?: number | null;
   } | null;
   asignadoIds?: string[];
+  refColorId?: string | null;
 }
 
 // ═══════════════════════════════════════
@@ -181,6 +182,7 @@ export async function getTareasAsignadasAdmin(
           descripcionOverride: true,
           fechaOverride: true,
           colorOverride: true,
+          prioridadOverride: true,
         },
       },
     },
@@ -239,6 +241,7 @@ export async function getTareasAsignadasAsistente(
           descripcionOverride: true,
           fechaOverride: true,
           colorOverride: true,
+          prioridadOverride: true,
         },
       },
     },
@@ -295,6 +298,7 @@ export async function getTareasPropias(
           descripcionOverride: true,
           fechaOverride: true,
           colorOverride: true,
+          prioridadOverride: true,
         },
       },
     },
@@ -466,6 +470,14 @@ export async function actualizarTarea(
     }
   }
 
+  // Actualizar refColorId en asignaciones si es tarea PROPIA y se cambió el color
+  if (datos.refColorId !== undefined && tareaExistente.tipoTarea === "PROPIA") {
+    await prisma.tareaAsignacion.updateMany({
+      where: { tareaId },
+      data: { refColorId: datos.refColorId || null },
+    });
+  }
+
   return await getTareaDetalle(tareaId);
 }
 
@@ -597,8 +609,21 @@ export async function materializarOcurrencia(
     tituloOverride?: string | null;
     descripcionOverride?: string | null;
     colorOverride?: string | null;
+    prioridadOverride?: string | null;
   }
 ) {
+  // Validar que la asignación existe antes de crear
+  const asignacionExiste = await prisma.tareaAsignacion.findUnique({
+    where: { id: tareaAsignacionId },
+    select: { id: true },
+  });
+  if (!asignacionExiste) {
+    throw new Error(
+      `TareaAsignacion no encontrada (id: ${tareaAsignacionId}). ` +
+      `Es posible que la asignación fue eliminada o el ID es incorrecto.`
+    );
+  }
+
   // Buscar si ya existe una ocurrencia materializada para esta fecha
   const existente = await prisma.ocurrencia.findFirst({
     where: {
@@ -620,6 +645,7 @@ export async function materializarOcurrencia(
         tituloOverride: datos.tituloOverride !== undefined ? datos.tituloOverride : existente.tituloOverride,
         colorOverride: datos.colorOverride !== undefined ? datos.colorOverride : existente.colorOverride,
         descripcionOverride: datos.descripcionOverride !== undefined ? datos.descripcionOverride : existente.descripcionOverride,
+        prioridadOverride: datos.prioridadOverride !== undefined ? datos.prioridadOverride : existente.prioridadOverride,
         fechaEjecucion: datos.estado === "COMPLETADA" ? new Date() : existente.fechaEjecucion,
       },
     });
@@ -633,6 +659,7 @@ export async function materializarOcurrencia(
         tituloOverride: datos.tituloOverride || null,
         descripcionOverride: datos.descripcionOverride || null,
         colorOverride: datos.colorOverride !== undefined ? datos.colorOverride : null,
+        prioridadOverride: datos.prioridadOverride || null,
         fechaEjecucion: datos.estado === "COMPLETADA" ? new Date() : null,
       },
     });
@@ -696,13 +723,22 @@ export async function cancelarDesdeAqui(
     },
   });
 
+
   if (!asignacion) throw new Error("Asignación no encontrada");
   if (!asignacion.tarea.recurrencia) throw new Error("Solo se puede cancelar desde aquí en tareas recurrentes");
 
-  // Calcular el día anterior como nueva hastaFecha
-  const fechaCorte = new Date(fechaDesde.split("T")[0] + "T12:00:00");
-  const diaAnterior = new Date(fechaCorte);
-  diaAnterior.setDate(diaAnterior.getDate() - 1);
+  // Parsear fecha manualmente (YYYY-MM-DD o YYYY-MM-DDTHH:mm:ss)
+  // Esto evita problemas de zona horaria que causaban cancelar un día antes de lo esperado
+  const fechaStr = fechaDesde.split('T')[0]; // "2026-02-05"
+  const [año, mes, día] = fechaStr.split('-').map(Number);
+  
+  // Crear fechaCorte a las 00:00:00 en zona local (será interpretado consistentemente en la BD)
+  const fechaCorte = new Date(año, mes - 1, día, 0, 0, 0, 0);
+  
+  // Día anterior a las 00:00:00 (última ocurrencia que NO se cancelará)
+  const diaAnterior = new Date(año, mes - 1, día - 1, 0, 0, 0, 0);
+
+  console.log(`Cancelando ocurrencias desde ${fechaCorte.toISOString()} en adelante. Nueva hastaFecha: ${diaAnterior.toISOString()}`);
 
   // Actualizar hastaFecha de la recurrencia
   await prisma.recurrencia.update({
@@ -710,20 +746,29 @@ export async function cancelarDesdeAqui(
     data: { hastaFecha: diaAnterior },
   });
 
-  // Marcar como CANCELADA las ocurrencias materializadas en esa fecha o después
+  const estados = ["PENDIENTE", "COMPLETADA"];
+
+  // Marcar como CANCELADA todas las ocurrencias desde la fecha indicada en adelante
+  // Comparar normalizando ambas fechas a YYYYMMDD para evitar problemas de zona horaria
+  const fechaCorteNum = fechaCorte.getFullYear() * 10000 + (fechaCorte.getMonth() + 1) * 100 + fechaCorte.getDate();
+  
   const ocurrenciasACancelar = asignacion.ocurrencias.filter((oc) => {
-    const fechaOc = new Date(oc.fechaOriginal);
-    fechaOc.setHours(0, 0, 0, 0);
-    fechaCorte.setHours(0, 0, 0, 0);
-    return fechaOc >= fechaCorte && oc.estado === "PENDIENTE";
+    const ocDate = new Date(oc.fechaOriginal);
+    const ocDateNum = ocDate.getUTCFullYear() * 10000 + (ocDate.getUTCMonth() + 1) * 100 + ocDate.getUTCDate();
+    return ocDateNum >= fechaCorteNum && estados.includes(oc.estado);
   });
 
-  if (ocurrenciasACancelar.length > 0) {
-    await prisma.ocurrencia.updateMany({
-      where: { id: { in: ocurrenciasACancelar.map((oc) => oc.id) } },
-      data: { estado: "CANCELADA" },
-    });
-  }
+  await prisma.ocurrencia.updateMany({
+    where: {
+      tareaAsignacionId,
+      fechaOriginal: {
+        gte: fechaCorte,
+      },
+    },
+    data: {
+      estado: "CANCELADA",
+    },
+  });
 
   await evaluarEstadoAsignacion(tareaAsignacionId);
 
@@ -1055,6 +1100,77 @@ function mapToRow(asignacion: any): TareaAsignacionRow {
       tituloOverride: o.tituloOverride,
       fechaOverride: o.fechaOverride ? o.fechaOverride.toISOString() : null,
       colorOverride: o.colorOverride,
+      prioridadOverride: o.prioridadOverride,
+      descripcionOverride: o.descripcionOverride,
     })),
   };
 }
+
+/**
+ * Obtiene la ocurrencia materializada junto con los datos de la tarea base
+ * Devuelve los overrides si existen, o los valores base si no
+ */
+export async function obtenerOcurrenciaMaterializada(
+  tareaAsignacionId: string,
+  fechaOcurrencia: string
+) {
+  const ocurrencia = await prisma.ocurrencia.findFirst({
+    where: {
+      tareaAsignacionId,
+      fechaOriginal: new Date(fechaOcurrencia),
+    },
+    include: {
+      tareaAsignacion: {
+        include: {
+          tarea: true,
+          refColor: { select: { titulo: true, codigoHexa: true } },
+        },
+      },
+    },
+  });
+
+  if (!ocurrencia || !ocurrencia.tareaAsignacion) {
+    throw new Error("Ocurrencia o asignación no encontrada");
+  }
+
+  const tarea = ocurrencia.tareaAsignacion.tarea;
+  const asignacion = ocurrencia.tareaAsignacion;
+
+  // Si hay colorOverride, usar ese código hex. Si no, usar el color de la asignación
+  let refColorTitulo = asignacion.refColor?.titulo || null;
+  let refColorHexa = asignacion.refColor?.codigoHexa || null;
+  
+  if (ocurrencia.colorOverride) {
+    // colorOverride es el código hex guardado directamente
+    refColorHexa = ocurrencia.colorOverride;
+    // Buscar si existe un RefColor con ese código hex para obtener el nombre
+    try {
+      const colorConEseHex = await prisma.refColor.findFirst({
+        where: { codigoHexa: ocurrencia.colorOverride },
+        select: { titulo: true },
+      });
+      refColorTitulo = colorConEseHex?.titulo || null;
+    } catch {
+      refColorTitulo = null;
+    }
+  }
+
+  return {
+    id: ocurrencia.id,
+    titulo: ocurrencia.tituloOverride || tarea.titulo,
+    descripcion: ocurrencia.descripcionOverride || tarea.descripcion,
+    prioridad: ocurrencia.prioridadOverride || tarea.prioridad,
+    fechaOcurrencia: ocurrencia.fechaOverride
+      ? ocurrencia.fechaOverride.toISOString()
+      : ocurrencia.fechaOriginal.toISOString(),
+    colorOverride: ocurrencia.colorOverride,
+    refColorTitulo: refColorTitulo,
+    refColorHexa: refColorHexa,
+    tituloOverride: ocurrencia.tituloOverride,
+    descripcionOverride: ocurrencia.descripcionOverride,
+    prioridadOverride: ocurrencia.prioridadOverride,
+    fechaOverride: ocurrencia.fechaOverride ? ocurrencia.fechaOverride.toISOString() : null,
+    estado: ocurrencia.estado,
+  };
+}
+
