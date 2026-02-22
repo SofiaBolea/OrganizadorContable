@@ -82,11 +82,11 @@ export async function crearTarea(
   const recurso = await prisma.recurso.create({
     data: {
       organizacionId: organizacion.id,
-      descripcion: descripcion || null,
       tipoRecurso: "TAREA",
       tarea: {
         create: {
           titulo,
+          descripcion: descripcion || null,
           prioridad: prioridad || "MEDIA",
           tipoTarea,
           fechaVencimientoBase: fechaVencimientoBase ? new Date(fechaVencimientoBase) : null,
@@ -166,7 +166,6 @@ export async function getTareasAsignadasAdmin(
       tarea: {
         include: {
           recurrencia: true,
-          recurso: { select: { descripcion: true } },
         },
       },
       asignado: { select: { id: true, nombreCompleto: true } },
@@ -179,6 +178,7 @@ export async function getTareasAsignadasAdmin(
           fechaOriginal: true,
           estado: true,
           tituloOverride: true,
+          descripcionOverride: true,
           fechaOverride: true,
           colorOverride: true,
         },
@@ -224,7 +224,6 @@ export async function getTareasAsignadasAsistente(
       tarea: {
         include: {
           recurrencia: true,
-          recurso: { select: { descripcion: true } },
         },
       },
       asignado: { select: { id: true, nombreCompleto: true } },
@@ -237,6 +236,7 @@ export async function getTareasAsignadasAsistente(
           fechaOriginal: true,
           estado: true,
           tituloOverride: true,
+          descripcionOverride: true,
           fechaOverride: true,
           colorOverride: true,
         },
@@ -280,7 +280,6 @@ export async function getTareasPropias(
       tarea: {
         include: {
           recurrencia: true,
-          recurso: { select: { descripcion: true } },
         },
       },
       asignado: { select: { id: true, nombreCompleto: true } },
@@ -293,6 +292,7 @@ export async function getTareasPropias(
           fechaOriginal: true,
           estado: true,
           tituloOverride: true,
+          descripcionOverride: true,
           fechaOverride: true,
           colorOverride: true,
         },
@@ -315,7 +315,7 @@ export async function getTareaDetalle(tareaId: string) {
   const tarea = await prisma.tarea.findUnique({
     where: { id: tareaId },
     include: {
-      recurso: { select: { organizacionId: true, descripcion: true } },
+      recurso: { select: { organizacionId: true } },
       recurrencia: true,
       asignaciones: {
         include: {
@@ -372,11 +372,7 @@ export async function actualizarTarea(
       fechaVencimientoBase: datos.fechaVencimientoBase !== undefined
         ? (datos.fechaVencimientoBase ? new Date(datos.fechaVencimientoBase) : null)
         : tareaExistente.fechaVencimientoBase,
-      recurso: {
-        update: {
-          descripcion: datos.descripcion ?? undefined,
-        },
-      },
+      descripcion: datos.descripcion ?? undefined,
     },
   });
 
@@ -599,6 +595,7 @@ export async function materializarOcurrencia(
     estado?: string;
     fechaOverride?: string | null;
     tituloOverride?: string | null;
+    descripcionOverride?: string | null;
     colorOverride?: string | null;
   }
 ) {
@@ -622,6 +619,7 @@ export async function materializarOcurrencia(
           : existente.fechaOverride,
         tituloOverride: datos.tituloOverride !== undefined ? datos.tituloOverride : existente.tituloOverride,
         colorOverride: datos.colorOverride !== undefined ? datos.colorOverride : existente.colorOverride,
+        descripcionOverride: datos.descripcionOverride !== undefined ? datos.descripcionOverride : existente.descripcionOverride,
         fechaEjecucion: datos.estado === "COMPLETADA" ? new Date() : existente.fechaEjecucion,
       },
     });
@@ -633,6 +631,7 @@ export async function materializarOcurrencia(
         estado: datos.estado || "PENDIENTE",
         fechaOverride: datos.fechaOverride ? new Date(datos.fechaOverride) : null,
         tituloOverride: datos.tituloOverride || null,
+        descripcionOverride: datos.descripcionOverride || null,
         colorOverride: datos.colorOverride !== undefined ? datos.colorOverride : null,
         fechaEjecucion: datos.estado === "COMPLETADA" ? new Date() : null,
       },
@@ -1028,7 +1027,7 @@ function mapToRow(asignacion: any): TareaAsignacionRow {
     fechaVencimientoBase: asignacion.tarea.fechaVencimientoBase
       ? asignacion.tarea.fechaVencimientoBase.toISOString()
       : null,
-    descripcion: asignacion.tarea.recurso?.descripcion || null,
+    descripcion: asignacion.tarea?.descripcion || null,
     asignadoId: asignacion.asignado.id,
     asignadoNombre: asignacion.asignado.nombreCompleto,
     asignadoPorId: asignacion.asignadoPor.id,
