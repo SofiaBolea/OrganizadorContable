@@ -3,7 +3,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Search, ExternalLink, Pencil, Trash2, FolderOpen } from "lucide-react";
+import { Plus, Search, ExternalLink, Pencil, Trash2, FolderOpen, UserCheck } from "lucide-react";
 import { Button } from "../components/Button";
 import FormularioCrearRecurso from "./formularioCrearRecurso";
 import FormularioEditarRecurso from "./formularioEditarRecursoRef";
@@ -23,13 +23,13 @@ interface Props {
 export function TablaRecursos({ initialRecursos, permisos }: Props) {
   const [recursos, setRecursos] = useState(initialRecursos);
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // Estados de Modales
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
-  
+
   // Estados de Datos
   const [recursoSeleccionado, setRecursoSeleccionado] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState("");
@@ -63,7 +63,7 @@ export function TablaRecursos({ initialRecursos, permisos }: Props) {
     }
   };
 
-  const recursosFiltrados = recursos.filter(r => 
+  const recursosFiltrados = recursos.filter(r =>
     r.titulo.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -72,8 +72,12 @@ export function TablaRecursos({ initialRecursos, permisos }: Props) {
       {/* Encabezado y Tabla (Misma lógica visual de antes) */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Recursos de Referencia</h1>
-          <p className="text-gray-500">Gestiona tus enlaces y documentos de consulta.</p>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-primary-foreground text-[10px] font-black uppercase tracking-widest">
+            <UserCheck className="w-3 h-3" />
+            Links importantes
+          </div>
+          <h1 className="text-5xl font-black tracking-tighter text-text">Recursos de Referencia</h1>
+          <p className="text-gray-500">Gestiona tus enlaces</p>
         </div>
         <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2">
           <Plus size={18} /> Nuevo Recurso
@@ -109,11 +113,10 @@ export function TablaRecursos({ initialRecursos, permisos }: Props) {
                       <td className="px-6 py-4 font-medium">{r.titulo}</td>
                       <td className="px-6 py-4">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            esGlobal
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${esGlobal
                               ? 'bg-[#676AA0] text-white'
                               : 'bg-[#425C5A] text-white'
-                          }`}
+                            }`}
                         >
                           {r.tipo}
                         </span>
@@ -129,16 +132,16 @@ export function TablaRecursos({ initialRecursos, permisos }: Props) {
                       </td>
                       <td className="px-6 py-4 text-right space-x-2">
                         {puedeEditar && (
-                          <button 
-                            onClick={() => { setRecursoSeleccionado(r); setIsEditModalOpen(true); }} 
+                          <button
+                            onClick={() => { setRecursoSeleccionado(r); setIsEditModalOpen(true); }}
                             className="p-1 hover:text-blue-600 transition-colors"
                           >
                             <Pencil size={18} />
                           </button>
                         )}
                         {puedeEliminar && (
-                          <button 
-                            onClick={() => { setRecursoSeleccionado(r); setIsConfirmModalOpen(true); }} 
+                          <button
+                            onClick={() => { setRecursoSeleccionado(r); setIsConfirmModalOpen(true); }}
                             className="p-1 hover:text-red-600 transition-colors"
                           >
                             <Trash2 size={18} />
@@ -155,22 +158,22 @@ export function TablaRecursos({ initialRecursos, permisos }: Props) {
       </div>
 
       {/* MODALES DE INTERACCIÓN */}
-      
+
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <FormularioCrearRecurso 
-            onClose={() => setIsModalOpen(false)} 
-            onSuccess={fetchRecursos} 
+          <FormularioCrearRecurso
+            onClose={() => setIsModalOpen(false)}
+            onSuccess={fetchRecursos}
           />
         </div>
       )}
 
       {isEditModalOpen && recursoSeleccionado && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <FormularioEditarRecurso 
+          <FormularioEditarRecurso
             recurso={recursoSeleccionado}
-            onClose={() => { setIsEditModalOpen(false); setRecursoSeleccionado(null); }} 
-            onSuccess={fetchRecursos} 
+            onClose={() => { setIsEditModalOpen(false); setRecursoSeleccionado(null); }}
+            onSuccess={fetchRecursos}
           />
         </div>
       )}
