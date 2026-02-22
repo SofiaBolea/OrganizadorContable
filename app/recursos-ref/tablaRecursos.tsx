@@ -108,14 +108,22 @@ export function TablaRecursos({ initialRecursos, permisos }: Props) {
                     <tr key={r.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-medium">{r.titulo}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          esGlobal ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
-                        }`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            esGlobal
+                              ? 'bg-[#676AA0] text-white'
+                              : 'bg-[#425C5A] text-white'
+                          }`}
+                        >
                           {r.tipo}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <a href={r.url} target="_blank" className="text-blue-600 flex items-center gap-1">
+                        <a
+                          href={r.url}
+                          target="_blank"
+                          className="flex items-center gap-1 text-[#2C2C2C] hover:bg-[#C7D0BD] rounded px-10 py-1 transition-colors"
+                        >
                           Ver link <ExternalLink size={14} />
                         </a>
                       </td>
