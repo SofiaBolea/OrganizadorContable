@@ -1,15 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Search, ExternalLink, Pencil, Trash2, FolderOpen, X, Save } from "lucide-react";
-import { Button } from "../components/Button"; //
-import { useOrganization } from "@clerk/nextjs";
-import FormularioCrearRecurso from "./formularioCrearRecurso";
+import { Plus, Search, ExternalLink, Pencil, Trash2, FolderOpen } from "lucide-react";
+import FormularioCrearRecurso from "./formularioCrearRecurso"; //
+import FormularioEditarRecurso from "./formularioEditarRecursoRef";
+import { Button } from "../components/Button";
 
 export default function RecursosPage() {
   const [recursos, setRecursos] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Estados para creación
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Estados para edición
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [recursoParaEditar, setRecursoParaEditar] = useState(null);
 
   const fetchRecursos = () => {
     setLoading(true);
@@ -31,6 +37,12 @@ export default function RecursosPage() {
   useEffect(() => {
     fetchRecursos();
   }, []);
+
+  // Función para abrir modal de edición
+  const handleEdit = (recurso: any) => {
+    setRecursoParaEditar(recurso);
+    setIsEditModalOpen(true);
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -99,7 +111,13 @@ export default function RecursosPage() {
                       </a>
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">
-                      <button className="p-1 hover:text-blue-600 transition-colors"><Pencil size={18} /></button>
+                      {/* ACCIÓN EDITAR: Llama a handleEdit */}
+                      <button 
+                        onClick={() => handleEdit(r)}
+                        className="p-1 hover:text-blue-600 transition-colors"
+                      >
+                        <Pencil size={18} />
+                      </button>
                       <button className="p-1 hover:text-red-600 transition-colors"><Trash2 size={18} /></button>
                     </td>
                   </tr>
@@ -110,11 +128,22 @@ export default function RecursosPage() {
         )}
       </div>
 
-      {/* MODAL PARA CREAR */}
+      {/* MODAL CREAR */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <FormularioCrearRecurso 
             onClose={() => setIsModalOpen(false)} 
+            onSuccess={fetchRecursos} 
+          />
+        </div>
+      )}
+
+      {/* MODAL EDITAR */}
+      {isEditModalOpen && recursoParaEditar && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <FormularioEditarRecurso 
+            recurso={recursoParaEditar}
+            onClose={() => setIsEditModalOpen(false)} 
             onSuccess={fetchRecursos} 
           />
         </div>

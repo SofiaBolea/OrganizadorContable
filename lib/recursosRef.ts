@@ -100,8 +100,13 @@ export async function modificarRecursoPropio(req: NextRequest) {
   if (!titulo || !url) {
     throw new Error("Faltan campos obligatorios");
   }
+  const orgLocal = await prisma.organizacion.findUnique({
+    where: { clerkOrganizationId: orgId },
+    select: { id: true }
+  });
+  
   const usuarioCreador = await prisma.usuario.findFirst({
-    where: { clerkId: userId, organizacionId: orgId },
+    where: { clerkId: userId, organizacionId: orgLocal?.id },
     select: { id: true }
   });
   if (!usuarioCreador) {
@@ -114,7 +119,6 @@ export async function modificarRecursoPropio(req: NextRequest) {
       data: {
         descripcion: descripcion || "",
         tipoRecurso: "RECURSO DE REFERENCIA",
-        organizacionId: orgId,
       },
     });
     // 2. Actualizar el Recurso de Referencia vinculado
