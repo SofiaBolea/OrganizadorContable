@@ -1,9 +1,45 @@
-
 import { NextRequest } from "next/server";
 import { Permisos } from "@/lib/permisos";
 import { auth } from "@clerk/nextjs/server";
-import { validarYLimpiarDatos } from "../lib/validarYLimpiarDatos";
 import prisma from "./prisma";
+
+export async function listarRecursosPropios(request: NextRequest) {
+  const { userId, orgId } = await auth();
+  if (!userId || !orgId) throw new Error("UNAUTHENTICATED: No autenticado.");
+
+  const orgLocal = await prisma.organizacion.findUnique({
+    where: { clerkOrganizationId: orgId },
+    select: { id: true }
+  });
+  if (!orgLocal) throw new Error("NOT_FOUND: Organización no encontrada.");
+
+  const usuarioActual = await prisma.usuario.findFirst({
+    where: { clerkId: userId, organizacionId: orgLocal.id },
+    select: { id: true }
+  });
+  if (!usuarioActual) throw new Error("NOT_FOUND: Usuario no encontrado.");
+
+  try {
+    const recursosRef = await prisma.recursoRef.findMany({
+      where: {
+        tipo: "PROPIO",
+        usuarioId: usuarioActual.id
+      },
+      orderBy: { titulo: "asc" },
+      select: {
+        id: true,
+        titulo: true,
+        url: true,
+        tipo: true,
+      }
+    });
+    return recursosRef;
+  } catch (error) {
+    console.error("Error en GET /api/recursosRef:", error);
+    throw new Error("INTERNAL: Error al obtener recursos de referencia.");
+  }
+}
+
 
 export async function crearRecursoPropio(req: NextRequest) {
   // 1. Validar autenticación y organización
@@ -102,4 +138,34 @@ export async function modificarRecursoPropio(req: NextRequest) {
     };
   });
   return nuevoRecursoPrivado;
+}
+
+export async function listarRecursosPropio() {
+  const { userId, orgId } = await auth();
+  if (!userId || !orgId) {
+    throw new Error("No autorizado");
+  }
+
+  const usuario = await prisma.usuario.findFirst({
+    where: { clerkId: userId, organizacionId: orgId },
+    select: { id: true }
+  });
+
+  if (!usuario) {
+    throw new Error("Usuario no encontrado");
+  }
+
+  // Obtenemos los recursos de tipo "PROPIO" para este usuario
+  return await prisma.recursoRef.findMany({
+    where: {
+      usuarioId: usuario.id,
+      tipo: "PROPIO",
+    },
+    include: {
+      recurso: true // Para obtener la descripción que está en la tabla base
+    },
+    orderBy: {
+      id: 'desc'
+    }
+  });
 }

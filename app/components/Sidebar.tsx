@@ -9,7 +9,8 @@ import {
   Building2,
   Calendar,
   ClipboardList,
-  CheckSquare
+  CheckSquare,
+  BookOpen
 } from "lucide-react"
 import { LucideIcon } from "lucide-react"
 import Image from "next/image"
@@ -110,6 +111,13 @@ export default function Sidebar() {
           href="/tareas-asignadas"
           icon={ClipboardList}
           label="Tareas Asignadas"
+        />
+
+
+        <NavItem
+          href="/recursos-ref"
+          icon={BookOpen}
+          label="Recursos de Referencia"
         />
 
         <NavItem
