@@ -322,4 +322,5 @@ export class Permisos {
     return has({ permission: "org:recursos_de_referencia_globales:eliminar" });
   }
 
+
 }

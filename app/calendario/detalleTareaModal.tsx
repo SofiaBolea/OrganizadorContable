@@ -1,6 +1,4 @@
 "use client";
-
-import React from 'react';
 import { X, Clock, AlignLeft, ExternalLink, AlertCircle } from 'lucide-react';
 
 interface DetalleTareaModalProps {
