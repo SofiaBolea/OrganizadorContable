@@ -11,13 +11,15 @@ interface RefColor {
 
 interface RefColorSelectorProps {
   selectedId: string | null;
+  selectedHexa?: string | null;
+  refColorTitulo?: string | null;
   onChange: (id: string | null, hexa: string | null) => void;
   disabled?: boolean;
 }
 
 type ModalMode = "crear" | "editar" | "ver" | null;
 
-export default function RefColorSelector({ selectedId, onChange, disabled }: RefColorSelectorProps) {
+export default function RefColorSelector({ selectedId, selectedHexa, refColorTitulo, onChange, disabled }: RefColorSelectorProps) {
   const [colores, setColores] = useState<RefColor[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
@@ -64,6 +66,9 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
   };
 
   const selectedColor = colores.find((c) => c.id === selectedId);
+  
+  // Si no encontramos el color en la lista, usarefColorHexa como fallback
+  const fallbackColor = selectedId && selectedHexa ? { id: selectedId, titulo: refColorTitulo || "", codigoHexa: selectedHexa } : null;
 
   // ── Modal handlers ──
 
@@ -180,13 +185,13 @@ export default function RefColorSelector({ selectedId, onChange, disabled }: Ref
           }`}
         >
           <div className="flex items-center gap-2">
-            {selectedColor ? (
+            {selectedColor || fallbackColor ? (
               <>
                 <span
                   className="w-4 h-4 rounded-full inline-block flex-shrink-0"
-                  style={{ backgroundColor: selectedColor.codigoHexa }}
+                  style={{ backgroundColor: (selectedColor || fallbackColor)!.codigoHexa }}
                 />
-                <span className="text-sm font-medium">{selectedColor.titulo}</span>
+                {(selectedColor || fallbackColor) && (selectedColor || fallbackColor)!.titulo && <span className="text-sm font-medium">{(selectedColor || fallbackColor)!.titulo}</span>}
               </>
             ) : (
               <span className="text-sm text-text/40">Color de Referencia (Opcional)</span>
