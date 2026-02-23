@@ -100,16 +100,32 @@ export async function getReporteData(periodo: string, clerkOrgId: string, userId
     const statsMap: Record<string, any> = {};
 
     filasFiltradas.forEach((fila) => {
-        const nombre = fila.asignadoNombre;
+        const nombre = fila.asignadoNombre || "Sin nombre";
         if (!statsMap[nombre]) {
-            // USAR MINÚSCULAS: coincidir con reporteDashboard.tsx
-            statsMap[nombre] = { name: nombre, completadas: 0, pendientes: 0, vencidas: 0, total: 0 };
+            statsMap[nombre] = { 
+                name: nombre, 
+                completadas: 0, 
+                pendientes: 0, 
+                vencidas: 0, 
+                total: 0,
+                alta: 0,   // Nueva métrica
+                media: 0,  // Nueva métrica
+                baja: 0    // Nueva métrica
+            };
         }
 
         statsMap[nombre].total++;
+        
+        // Contar por estado
         if (fila.estado === "COMPLETADA") statsMap[nombre].completadas++;
         else if (fila.estado === "PENDIENTE") statsMap[nombre].pendientes++;
         else if (fila.estado === "VENCIDA") statsMap[nombre].vencidas++;
+
+        // Contar por prioridad
+        const p = fila.prioridad?.toUpperCase();
+        if (p === "ALTA") statsMap[nombre].alta++;
+        else if (p === "MEDIA") statsMap[nombre].media++;
+        else if (p === "BAJA") statsMap[nombre].baja++;
     });
 
     return Object.values(statsMap);
