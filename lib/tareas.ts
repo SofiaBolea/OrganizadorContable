@@ -1,3 +1,39 @@
+/**
+ * Obtiene una asignación por ID, incluyendo la tarea base asociada.
+ */
+export async function obtenerAsignacionYTipoTarea(asignacionId: string) {
+  const asignacion = await prisma.tareaAsignacion.findUnique({
+    where: { id: asignacionId },
+    include: { tarea: true }
+  });
+  if (!asignacion || !asignacion.tarea) {
+    return null;
+  }
+  return {
+    asignacion,
+    tipoTarea: asignacion.tarea.tipoTarea as "ASIGNADA" | "PROPIA"
+  };
+}
+/**
+ * Obtiene una ocurrencia por ID, incluyendo la tarea base asociada.
+ */
+export async function obtenerOcurrenciaYTipoTarea(ocurrenciaId: string) {
+  const ocurrenciaDB = await prisma.ocurrencia.findUnique({
+    where: { id: ocurrenciaId },
+    include: {
+      tareaAsignacion: {
+        include: { tarea: true }
+      }
+    }
+  });
+  if (!ocurrenciaDB || !ocurrenciaDB.tareaAsignacion || !ocurrenciaDB.tareaAsignacion.tarea) {
+    return null;
+  }
+  return {
+    ocurrencia: ocurrenciaDB,
+    tipoTarea: ocurrenciaDB.tareaAsignacion.tarea.tipoTarea as "ASIGNADA" | "PROPIA"
+  };
+}
 import prisma from "./prisma";
 import type { OcurrenciaMaterializada, RecurrenciaData, TareaAsignacionRow } from "./tareas-shared";
 import { generarFechasRecurrencia, formatDateISO } from "./tareas-shared";

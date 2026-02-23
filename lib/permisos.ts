@@ -246,7 +246,7 @@ export class Permisos {
   static async puedeCambiarEstadoTareaAsignada() {
     const ctx = await this.obtenerContextoUsuario();
     if (!ctx) return false;
-    const tienePermiso = ctx.has({ permission: "org:tareas:cambiar_estado" });
+    const tienePermiso = ctx.has({ permission: "org:tareas_asignadas:cambiar_estado" });
     return tienePermiso;
   }
 

@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { materializarOcurrencia, cancelarDesdeAqui, obtenerOcurrenciaMaterializada } from "@/lib/tareas";
+import { materializarOcurrencia, cancelarDesdeAqui, obtenerOcurrenciaMaterializada, obtenerOcurrenciaYTipoTarea, obtenerAsignacionYTipoTarea } from "@/lib/tareas";
 import { Permisos } from "@/lib/permisos";
 
 // POST: Materializar una ocurrencia
@@ -17,9 +17,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Datos requeridos: tareaAsignacionId, fechaOriginal" }, { status: 400 });
     }
 
-    const puedeModificar = await Permisos.puedeCambiarEstadoTareaAsignada();
+    
+    const puedeModificar = await Permisos.puedeModificarTarea();
     if (!puedeModificar) {
-      return NextResponse.json({ error: "No tienes permisos para cambiar el estado de tareas asignadas" }, { status: 403 });
+      return NextResponse.json({ error: "No tienes permisos para modificar tareas" }, { status: 403 });
     }
 
     const ocurrencia = await materializarOcurrencia(
@@ -53,9 +54,22 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Datos requeridos: tareaAsignacionId, fechaDesde" }, { status: 400 });
     }
 
-    const puedeEliminar = await Permisos.puedeEliminarTareaAsignada();
-    if (!puedeEliminar) {
-      return NextResponse.json({ error: "No tienes permisos para eliminar tareas asignadas" }, { status: 403 });
+
+    // Buscar tipo de tarea por la asignación (centralizado)
+    const result2 = await obtenerAsignacionYTipoTarea(tareaAsignacionId);
+    if (!result2) {
+      return NextResponse.json({ error: "Asignación o tarea no encontrada" }, { status: 404 });
+    }
+    if (result2.tipoTarea === "ASIGNADA") {
+      const puedeEliminar = await Permisos.puedeEliminarTareaAsignada();
+      if (!puedeEliminar) {
+        return NextResponse.json({ error: "No tienes permisos para eliminar tareas asignadas" }, { status: 403 });
+      }
+    } else {
+      const puedeEliminar = await Permisos.puedeEliminarTarea();
+      if (!puedeEliminar) {
+        return NextResponse.json({ error: "No tienes permisos para eliminar tareas propias" }, { status: 403 });
+      }
     }
 
     const resultado = await cancelarDesdeAqui(tareaAsignacionId, fechaDesde);
@@ -79,11 +93,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const puedeVer = await Permisos.puedeVerTareaAsignada();
-    if (!puedeVer) {
-      return NextResponse.json({ error: "No tienes permisos para ver tareas asignadas" }, { status: 403 });
-    }
-
     const searchParams = request.nextUrl.searchParams;
     const tareaAsignacionId = searchParams.get("tareaAsignacionId");
     const fechaOcurrencia = searchParams.get("fechaOcurrencia");
@@ -93,6 +102,23 @@ export async function GET(request: NextRequest) {
         { error: "Parámetros requeridos: tareaAsignacionId, fechaOcurrencia" },
         { status: 400 }
       );
+    }
+
+    // Buscar tipo de tarea por la asignación (centralizado)
+    const result = await obtenerAsignacionYTipoTarea(tareaAsignacionId);
+    if (!result) {
+      return NextResponse.json({ error: "Asignación o tarea no encontrada" }, { status: 404 });
+    }
+    if (result.tipoTarea === "ASIGNADA") {
+      const puedeVer = await Permisos.puedeVerTareaAsignada();
+      if (!puedeVer) {
+        return NextResponse.json({ error: "No tienes permisos para ver tareas asignadas" }, { status: 403 });
+      }
+    } else {
+      const puedeVer = await Permisos.puedeVerTarea();
+      if (!puedeVer) {
+        return NextResponse.json({ error: "No tienes permisos para ver tareas propias" }, { status: 403 });
+      }
     }
 
     const ocurrencia = await obtenerOcurrenciaMaterializada(tareaAsignacionId, fechaOcurrencia);
