@@ -59,15 +59,22 @@ export default function CalendarioEventos({ eventos }: CalendarioProps) {
         }}
         onSelectEvent={handleSelectEvent}
         // Personalización de estilos según el tipo de recurso (Tarea o Vencimiento)
-        eventPropGetter={(event) => ({
-          style: {
-            backgroundColor: event.resource?.type === 'vencimiento' ? '#ef4444' : '#3b82f6',
-            borderRadius: '6px',
-            color: 'white',
-            border: 'none',
-            display: 'block'
-          }
-        })}
+        eventPropGetter={(event) => {
+          // Si es vencimiento, rojo. Si es tarea, usa su color asignado o el azul por defecto.
+          const backgroundColor = event.resource?.type === 'vencimiento'
+            ? '#E87A58'
+            : (event.resource?.color || '#DBE6E8');
+
+          return {
+            style: {
+              backgroundColor,
+              borderRadius: '6px',
+              color: 'white',
+              border: 'none',
+              display: 'block'
+            }
+          };
+        }}
       />
 
       {/* Modal de Detalle de Tarea o Vencimiento */}
@@ -76,33 +83,31 @@ export default function CalendarioEventos({ eventos }: CalendarioProps) {
           <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                  eventoSeleccionado.resource.type === 'vencimiento' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'
-                }`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${eventoSeleccionado.resource.type === 'vencimiento' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'
+                  }`}>
                   {eventoSeleccionado.resource.type}
                 </span>
                 <h2 className="text-xl font-bold text-gray-900 mt-1">{eventoSeleccionado.title}</h2>
               </div>
-              <button 
+              <button
                 onClick={() => setEventoSeleccionado(null)}
                 className="text-gray-400 hover:text-gray-600 text-2xl"
               >
                 &times;
               </button>
             </div>
-            
+
             <div className="space-y-4 text-sm text-gray-600">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-gray-800 w-24">Fecha:</span>
                 <span>{format(eventoSeleccionado.start, "PPP", { locale: es })}</span>
               </div>
-              
+
               {eventoSeleccionado.resource.prioridad && (
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-gray-800 w-24">Prioridad:</span>
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                    eventoSeleccionado.resource.prioridad === 'ALTA' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-700'
-                  }`}>
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${eventoSeleccionado.resource.prioridad === 'ALTA' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-700'
+                    }`}>
                     {eventoSeleccionado.resource.prioridad}
                   </span>
                 </div>
@@ -117,13 +122,13 @@ export default function CalendarioEventos({ eventos }: CalendarioProps) {
             </div>
 
             <div className="mt-8 flex gap-3">
-              <button 
+              <button
                 onClick={() => setEventoSeleccionado(null)}
                 className="flex-1 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium rounded-xl transition-all"
               >
                 Cerrar
               </button>
-              <a 
+              <a
                 href={`/${eventoSeleccionado.resource.type === 'tarea' ? 'tareas-asignadas' : 'vencimientos'}/${eventoSeleccionado.resource.id}`}
                 className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-center rounded-xl transition-all shadow-sm shadow-blue-200"
               >
