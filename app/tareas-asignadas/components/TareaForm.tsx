@@ -211,7 +211,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
       setLoadingAsistentes(true);
       fetch("/api/tareas/asistentes")
         .then((res) => res.json())
-        .then((data) => setAsistentes(data))
+        .then((data) => setAsistentes(Array.isArray(data) ? data : []))
         .catch(() => console.error("Error cargando asistentes"))
         .finally(() => setLoadingAsistentes(false));
     }
@@ -262,7 +262,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
 
     try {
       // Si estamos editando y hay contexto de ocurrencia → preguntar alcance
-      if (!isCreateMode && ocurrenciaContext) {
+      if (!isCreateMode && ocurrenciaContext) { 
         // Detectar qué campos fueron modificados
         const tituloModificado = titulo !== (initialData?.titulo || "");
         const descripcionModificada = descripcion !== (initialData?.descripcion || "");
@@ -273,11 +273,20 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
         const recurrenciaModificada = camposModificados.has("recurrencia");
 
         // Determinar qué opciones mostrar en el modal
-        // Si solo se modificó fecha de esta ocurrencia: solo "esta"
-        // Si se modificó fecha base o recurrencia: solo "todas"
-        // En otros casos: ambas opciones
-        const soloEstOpcion = fechaOcurrenciaModificada && !fechaBaseModificada && !recurrenciaModificada;
-        const soloTodasOpcion = fechaBaseModificada || recurrenciaModificada;
+        let soloEstOpcion = false;
+        let soloTodasOpcion = false;
+
+        // Si la tarea NO tiene recurrencia: solo mostrar "esta ocurrencia"
+        if (!esRecurrente) {
+          soloEstOpcion = true;
+          soloTodasOpcion = false;
+        } else {
+          // Si solo se modificó fecha de esta ocurrencia: solo "esta"
+          // Si se modificó fecha base o recurrencia: solo "todas"
+          // En otros casos: ambas opciones
+          soloEstOpcion = fechaOcurrenciaModificada && !fechaBaseModificada && !recurrenciaModificada;
+          soloTodasOpcion = fechaBaseModificada || recurrenciaModificada;
+        }
 
         // Guardar información sobre las opciones disponibles
         (window as any).__alcanceModalOptions = { soloEstOpcion, soloTodasOpcion };
