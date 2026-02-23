@@ -56,6 +56,7 @@ interface TareasTableClientProps {
   mostrarColumnaAsistente?: boolean;
   canModify: boolean;
   canDelete: boolean;
+  canRevertEstado: boolean;
   basePath: string;
 }
 
@@ -70,6 +71,7 @@ export default function TareasTableClient({
   mostrarColumnaAsistente = false,
   canModify,
   canDelete,
+  canRevertEstado,
   basePath,
 }: TareasTableClientProps) {
   const [tareasBase, setTareasBase] = useState(initialTareas);
@@ -159,7 +161,10 @@ export default function TareasTableClient({
     // VENCIDA y CANCELADA son estados finales, no editables
     if (row.estado === "VENCIDA" || row.estado === "CANCELADA") return [];
     if (row.estado === "PENDIENTE") return ["COMPLETADA"];
-    if (row.estado === "COMPLETADA") return ["PENDIENTE"];
+    // Si está COMPLETADA, solo mostrar PENDIENTE si tiene permiso para revertir
+    if (row.estado === "COMPLETADA") {
+      return canRevertEstado ? ["PENDIENTE"] : [];
+    }
     return [];
   };
 
@@ -700,12 +705,12 @@ export default function TareasTableClient({
                         {/* Acciones */}
                         <td className="px-4 py-3 flex gap-3 items-center">
                           <Link
-                            href={`${basePath}/${row.tareaId}?taId=${row.tareaAsignacionId}&fechaOc=${row.fechaOriginalOcurrencia || row.fechaOcurrencia || ""}`}
-                            className="text-text/50 hover:text-text transition-colors"
-                            title="Ver detalle"
-                          >
-                            <Eye size={18} />
-                          </Link>
+                              href={`${basePath}/${row.tareaId}?taId=${row.tareaAsignacionId}&fechaOc=${row.fechaOriginalOcurrencia || row.fechaOcurrencia || ""}`}
+                              className="text-text/50 hover:text-text transition-colors"
+                              title="Ver detalle"
+                              >
+                              <Eye size={18} />
+                            </Link>
 
                           {canModify && (
                             <Link

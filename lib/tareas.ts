@@ -1210,3 +1210,21 @@ export async function obtenerOcurrenciaMaterializada(
   };
 }
 
+/**
+ * Obtiene el estado actual de una ocurrencia por su asignación y fecha.
+ * Devuelve null si no existe ocurrencia materializada.
+ */
+export async function obtenerEstadoOcurrenciaActual(
+  tareaAsignacionId: string,
+  fechaOriginal: string
+) {
+  const ocurrencia = await prisma.ocurrencia.findFirst({
+    where: {
+      tareaAsignacionId,
+      fechaOriginal: new Date(fechaOriginal),
+    },
+    select: { estado: true },
+  });
+  return ocurrencia?.estado || null;
+}
+

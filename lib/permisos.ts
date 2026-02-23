@@ -250,6 +250,13 @@ export class Permisos {
     return tienePermiso;
   }
 
+  static async puedeCambiarEstadoTarea() {
+    const ctx = await this.obtenerContextoUsuario();
+    if (!ctx) return false;
+    const tienePermiso = ctx.has({ permission: "org:tareas:cambiar_estado" });
+    return tienePermiso;
+  }
+
 
   // ── Asistentes ──────────────────────────────────────────────
 
