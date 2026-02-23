@@ -1,35 +1,43 @@
 // lib/reportes.ts
-import prisma from "./prisma";
-import { startOfWeek, startOfMonth, subDays, startOfDay, endOfDay } from "date-fns";
+import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, subDays, startOfDay } from "date-fns";
 import { expandirTareasADisplayRows, TareaAsignacionRow } from "./tareas-shared";
+import prisma from "./prisma";
 
-export async function getReporteData(periodo: string, clerkOrgId: string) {
-    console.log("1. Buscando reporte para Clerk OrgId:", clerkOrgId);
+export async function getReporteData(periodo: string, clerkOrgId: string, userId: string) {
     const ahora = new Date();
-    const fechaFin = endOfDay(ahora); // Reporte hasta el final de hoy
+    // Ajustamos el rango para que el fin no sea solo "hoy"
     let fechaInicio = startOfDay(ahora);
+    let fechaFin = endOfWeek(ahora, { weekStartsOn: 1 }); // Por defecto, fin de esta semana
 
-    if (periodo === "semanal") fechaInicio = startOfWeek(ahora, { weekStartsOn: 1 });
-    else if (periodo === "quincenal") fechaInicio = subDays(ahora, 15);
-    else if (periodo === "mensual") fechaInicio = startOfMonth(ahora);
+    if (periodo === "semanal") {
+        fechaInicio = startOfWeek(ahora, { weekStartsOn: 1 });
+        fechaFin = endOfWeek(ahora, { weekStartsOn: 1 });
+    } else if (periodo === "quincenal") {
+        fechaInicio = subDays(ahora, 15);
+        fechaFin = ahora;
+    } else if (periodo === "mensual") {
+        fechaInicio = startOfMonth(ahora);
+        fechaFin = endOfMonth(ahora);
+    }
 
     const fechaInicioStr = fechaInicio.toISOString().split("T")[0];
     const fechaFinStr = fechaFin.toISOString().split("T")[0];
 
-    // 1. IMPORTANTE: Buscar el ID interno de la organización usando el de Clerk
     const organizacion = await prisma.organizacion.findUnique({
         where: { clerkOrganizationId: clerkOrgId },
     });
 
-    if (!organizacion) {
-        console.error("Organización no encontrada en DB para el Clerk ID:", clerkOrgId);
-        return [];
-    }
-    console.log("3. Organización encontrada en DB interna:", organizacion.id);
-    // 2. Obtener las asignaciones con sus tareas y recurrencias
+    if (!organizacion) return [];
+
+    const usuarioActual = await prisma.usuario.findFirst({
+        where: { clerkId: userId, organizacionId: organizacion.id },
+        select: { id: true }
+    });
+
     const asignacionesDB = await prisma.tareaAsignacion.findMany({
         where: {
-            tarea: { recurso: { organizacionId: organizacion.id } }, // Ahora usamos el ID interno correcto
+            asignadoPorId: usuarioActual?.id,
+            tarea: { recurso: { organizacionId: organizacion.id } },
             estado: { not: "REVOCADA" }
         },
         include: {
@@ -41,9 +49,7 @@ export async function getReporteData(periodo: string, clerkOrgId: string) {
         }
     });
 
-    console.log(`4. Tareas encontradas en DB: ${asignacionesDB.length}`);
-
-    // 3. Mapear al tipo TareaAsignacionRow para la lógica compartida
+    // Mapeo a TareaAsignacionRow para usar Lazy Expansion
     const asignacionesMapped: TareaAsignacionRow[] = asignacionesDB.map((asig) => ({
         tareaAsignacionId: asig.id,
         tareaId: asig.tareaId,
@@ -82,22 +88,21 @@ export async function getReporteData(periodo: string, clerkOrgId: string) {
         })),
     }));
 
-    // 4. Aplicar Lazy Expansion para incluir tareas virtuales
     const todasLasFilas = expandirTareasADisplayRows(asignacionesMapped);
-    console.log(`5. Tareas tras expansión (reales + virtuales): ${todasLasFilas.length}`);
-    // 5. Filtrar por el rango de fechas del reporte
+
+    // FILTRO CRÍTICO: Comparamos contra el nuevo rango extendido
     const filasFiltradas = todasLasFilas.filter(fila => {
         if (!fila.fechaOcurrencia) return false;
         const fechaStr = fila.fechaOcurrencia.split("T")[0];
         return fechaStr >= fechaInicioStr && fechaStr <= fechaFinStr;
     });
 
-    // 6. Agrupar estadísticas por asistente
     const statsMap: Record<string, any> = {};
 
     filasFiltradas.forEach((fila) => {
         const nombre = fila.asignadoNombre;
         if (!statsMap[nombre]) {
+            // USAR MINÚSCULAS: coincidir con reporteDashboard.tsx
             statsMap[nombre] = { name: nombre, completadas: 0, pendientes: 0, vencidas: 0, total: 0 };
         }
 

@@ -7,11 +7,11 @@ export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const periodo = searchParams.get("periodo") || "semanal";
-        const { orgId } = await auth();
+        const { orgId, userId } = await auth();
 
         if (!orgId) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-        const data = await getReporteData(periodo, orgId);
+        const data = await getReporteData(periodo, orgId, userId);
         return NextResponse.json(data);
         // En app/api/reportes/route.ts
     } catch (error) {
