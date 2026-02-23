@@ -56,6 +56,75 @@ body {
 }
 
 /* =========================
+   CUSTOM CALENDAR (MODERN FLAT THEME)
+========================= */
+
+/* Fuente y color de texto base del calendario */
+.rbc-calendar {
+  font-family: 'Montserrat', sans-serif !important;
+  color: #2C2C2C !important; /* Texto base en negro */
+}
+
+/* Grilla del calendario estilo Google */
+.rbc-month-view, 
+.rbc-time-view, 
+.rbc-agenda-view {
+  border-radius: 1rem !important;
+  background-color: white !important;
+  border: 1px solid #e5e7eb !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+/* Cabeceras de días (Lunes, Martes...) y números de fecha */
+.rbc-header, .rbc-button-link, .rbc-date-cell {
+  color: #2C2C2C !important;
+}
+
+.rbc-header {
+  padding: 1rem 0 !important;
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+}
+
+/* Resaltado de día actual y días fuera de mes */
+.rbc-today {
+  background-color: #eff6ff !important;
+}
+
+.rbc-off-range-bg {
+  background-color: #f9fafb !important;
+}
+
+/* Eventos: fondo dinámico pero texto negro para visibilidad */
+.rbc-event {
+  border: none !important;
+  color: #2C2C2C !important; /* Texto del evento en negro */
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+  transition: transform 0.1s ease-in-out !important;
+}
+
+.rbc-event:hover {
+  transform: scale(1.02);
+}
+
+.rbc-event-content {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: #2C2C2C !important;
+}
+
+/* Texto de "Ver más" */
+.rbc-show-more {
+  background: transparent !important;
+  color: #2C2C2C !important; /* Texto "+X más" en negro */
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+}
+
+/* =========================
    BADGES – PRIORIDAD
 ========================= */
 
