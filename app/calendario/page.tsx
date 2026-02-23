@@ -3,100 +3,97 @@ import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import CalendarioEventos from "../components/CalendarioEventos";
 import { redirect } from "next/navigation";
+import { 
+  getTareasAsignadasAdmin, 
+  getTareasAsignadasAsistente, 
+  getTareasPropias 
+} from "@/lib/tareas";
+import { expandirTareasADisplayRows, TareaAsignacionRow } from "@/lib/tareas-shared";
 
 export default async function PaginaCalendario() {
-    // 1. Obtener contexto del usuario desde Clerk
     const { userId: clerkId, orgId: clerkOrgId } = await auth();
 
     if (!clerkId || !clerkOrgId) {
         redirect("/sign-in");
     }
 
+    // 1. Validar organización local
     const orgLocal = await prisma.organizacion.findUnique({
         where: { clerkOrganizationId: clerkOrgId },
-        select: { id: true, nombre: true }
+        select: { id: true }
     });
+
     if (!orgLocal) {
         return <div className="p-8 italic text-slate-500">Sincronizando organización...</div>;
     }
-    // 2. Obtener el perfil del usuario en nuestra DB con sus roles
+
+    // 2. Obtener perfil y rol del usuario
     const usuario = await prisma.usuario.findUnique({
         where: {
-            clerkId_organizacionId: {
-                clerkId,
-                organizacionId: orgLocal.id
-            }
+            clerkId_organizacionId: { clerkId, organizacionId: orgLocal.id }
         },
         include: {
-            roles: {
-                include: { rol: true }
-            }
+            roles: { include: { rol: true } }
         }
     });
 
-    if (!usuario) {
-        return <div>Error: Perfil de usuario no encontrado.</div>;
-    }
+    if (!usuario) return <div>Usuario no encontrado</div>;
 
-    // Determinar si es administrador (asumiendo que el nombre del rol es 'ADMINISTRADOR')
     const esAdmin = usuario.roles.some(ur => ur.rol.nombreRol.toUpperCase() === 'ADMINISTRADOR');
 
-    // 3. Obtener Ocurrencias de Tareas con filtros de rol
-    // Filtro base: Tareas de la organización del usuario
-    const filterTareas: any = {
-        tareaAsignacion: {
-            tarea: {
-                recurso: { organizacionId: orgLocal.id }
-            }
-        }
-    };
+    // 3. Obtener TareaAsignacionRow[] aplicando filtros por Rol
+    const propias = await getTareasPropias(clerkOrgId, clerkId);
+    const creadasPorMi = await getTareasAsignadasAdmin(clerkOrgId, clerkId);
 
-    // Aplicar lógica según el rol solicitado
+    let asignaciones: TareaAsignacionRow[] = [];
+
     if (esAdmin) {
-        // Administrador: Tareas donde él es el creador (quien asignó)
-        filterTareas.tareaAsignacion.asignadoPorId = usuario.id;
+        // Administrador: Sus tareas propias + las que él creó/asignó
+        asignaciones = [...propias, ...creadasPorMi];
     } else {
-        // Miembro: Creadas por él O asignadas a él
-        filterTareas.tareaAsignacion.OR = [
-            { asignadoPorId: usuario.id },
-            { asignadoId: usuario.id }
-        ];
+        // Miembro: Sus tareas propias + las creadas por él + las que tiene asignadas
+        const asignadasAMi = await getTareasAsignadasAsistente(clerkOrgId, clerkId);
+        
+        // Evitar duplicados (ej: una tarea "ASIGNADA" donde él es creador y asignado)
+        const idsExistentes = new Set([...propias, ...creadasPorMi].map(a => a.tareaAsignacionId));
+        asignaciones = [...propias, ...creadasPorMi];
+        
+        asignadasAMi.forEach(a => {
+            if (!idsExistentes.has(a.tareaAsignacionId)) {
+                asignaciones.push(a);
+            }
+        });
     }
 
-    const ocurrencias = await prisma.ocurrencia.findMany({
-        where: filterTareas,
-        include: {
-            tareaAsignacion: {
-                include: { tarea: true }
+    // 4. Lazy Expansion: Generar filas para el calendario (virtuales y reales)
+    const tareasExpandidas = expandirTareasADisplayRows(asignaciones);
+
+    // 5. Mapeo a eventos de React Big Calendar
+    const eventosTareas = tareasExpandidas.map(t => {
+        const fecha = t.fechaOcurrencia ? new Date(t.fechaOcurrencia) : new Date();
+        return {
+            title: t.titulo,
+            start: fecha,
+            end: fecha,
+            allDay: true,
+            resource: {
+                type: 'tarea',
+                id: t.ocurrenciaId || t.tareaAsignacionId,
+                descripcion: t.descripcion,
+                prioridad: t.prioridad,
+                estado: t.estado,
+                color: t.refColorHexa // Color calculado (base o override)
             }
-        }
+        };
     });
 
-    // 4. Obtener Vencimientos de la Organización
+    // 6. Obtener Vencimientos de la Organización
     const vencimientos = await prisma.vencimientoOcurrencia.findMany({
         where: {
-            vencimiento: {
-                recurso: { organizacionId: orgLocal.id }
-            }
+            vencimiento: { recurso: { organizacionId: orgLocal.id } }
         },
-        include: {
-            vencimiento: true
-        }
+        include: { vencimiento: true }
     });
-
-    // 5. Mapeo a formato de eventos (igual que antes)
-    const eventosTareas = ocurrencias.map(ocu => ({
-        title: ocu.tituloOverride || ocu.tareaAsignacion.tarea.titulo,
-        start: new Date(ocu.fechaOverride || ocu.fechaOriginal),
-        end: new Date(ocu.fechaOverride || ocu.fechaOriginal),
-        allDay: true,
-        resource: {
-            type: 'tarea',
-            id: ocu.id,
-            descripcion: ocu.descripcionOverride || ocu.tareaAsignacion.tarea.descripcion,
-            prioridad: ocu.prioridadOverride || ocu.tareaAsignacion.tarea.prioridad
-        }
-    }));
 
     const eventosVencimientos = vencimientos.map(v => ({
         title: v.vencimiento.titulo,
@@ -117,7 +114,7 @@ export default async function PaginaCalendario() {
                 <header className="mb-6">
                     <h1 className="text-3xl font-extrabold text-gray-900">Agenda Contable</h1>
                     <p className="text-gray-500 text-sm mt-1">
-                        Vista personalizada para {usuario.nombreCompleto} ({esAdmin ? 'Administrador' : 'Miembro'})
+                        Sesión de {usuario.nombreCompleto} — {esAdmin ? 'Panel de Control' : 'Mis Actividades'}
                     </p>
                 </header>
 
