@@ -163,6 +163,7 @@ model RefColor {
 
   // Relaciones
   tareasAsignadas TareaAsignacion[]
+  ocurrencias     Ocurrencia[]
 
   @@index([usuarioId])
   @@map("ref_colores")
@@ -265,6 +266,8 @@ model Ocurrencia {
   fechaOverride      DateTime? @db.Date
   tituloOverride     String?  @db.VarChar(100)
   descripcionOverride String? @db.Text
+  refColorId          String?
+  refColor            RefColor?       @relation(fields: [refColorId], references: [id])
 
   estado             String   @default("PENDIENTE") @db.VarChar(20)
   colorOverride      String?  @db.VarChar(7)

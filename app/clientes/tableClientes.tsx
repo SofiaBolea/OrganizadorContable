@@ -4,17 +4,42 @@ import { memo } from "react";
 import { AccionesCliente } from "./accionesClientes";
 import { EmptyState } from "../components/emptyState";
 import { Users } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-function TableCliente({ initialClientes, asistentes, permisos }: any) {
+function TableCliente({ initialClientes, permisos }: any) {
   if (!initialClientes || initialClientes.length === 0) {
     return (
-      <EmptyState 
+      <EmptyState
         icon={Users}
         title="No se encontraron clientes"
         description="Ajusta los filtros o crea un nuevo cliente para empezar."
       />
     );
   }
+
+  const searchParams = useSearchParams();
+  const [loading, setLoading] = useState(true);
+  const [asistentes, setAsistentes] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchAsistentes = async () => {
+      setLoading(true);
+      try {
+        // Construimos la query string a partir de los parámetros actuales de la URL
+        const query = searchParams.toString();
+        const res = await fetch(`/api/asistentes?${query}`);
+        const data = await res.json();
+        setAsistentes(data);
+      } catch (error) {
+        console.error("Error cargando asistentes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAsistentes();
+  }, [searchParams]); // Se ejecuta cada vez que los filtros cambian la URL
 
   return (
     <table className="w-full text-left border-collapse">

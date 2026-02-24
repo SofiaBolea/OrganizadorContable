@@ -201,7 +201,7 @@ export class PrismaClient<
    * ])
    * ```
    * 
-   * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
+   * Read more in our [docs](https://www.prisma.io/docs/orm/prisma-client/queries/transactions).
    */
   $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
@@ -420,8 +420,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 7.4.0
-   * Query Engine version: ab56fe763f921d033a6c195e7ddeb3e255bdbb57
+   * Prisma Client JS version: 7.4.1
+   * Query Engine version: 55ae170b1ced7fc6ed07a15f110549408c501bb3
    */
   export type PrismaVersion = {
     client: string
@@ -2420,10 +2420,12 @@ export namespace Prisma {
 
   export type RefColorCountOutputType = {
     tareasAsignadas: number
+    ocurrencias: number
   }
 
   export type RefColorCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tareasAsignadas?: boolean | RefColorCountOutputTypeCountTareasAsignadasArgs
+    ocurrencias?: boolean | RefColorCountOutputTypeCountOcurrenciasArgs
   }
 
   // Custom InputTypes
@@ -2442,6 +2444,13 @@ export namespace Prisma {
    */
   export type RefColorCountOutputTypeCountTareasAsignadasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TareaAsignacionWhereInput
+  }
+
+  /**
+   * RefColorCountOutputType without action
+   */
+  export type RefColorCountOutputTypeCountOcurrenciasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OcurrenciaWhereInput
   }
 
 
@@ -10827,6 +10836,7 @@ export namespace Prisma {
     recurso?: boolean | RecursoDefaultArgs<ExtArgs>
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     tareasAsignadas?: boolean | RefColor$tareasAsignadasArgs<ExtArgs>
+    ocurrencias?: boolean | RefColor$ocurrenciasArgs<ExtArgs>
     _count?: boolean | RefColorCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["refColor"]>
 
@@ -10860,6 +10870,7 @@ export namespace Prisma {
     recurso?: boolean | RecursoDefaultArgs<ExtArgs>
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     tareasAsignadas?: boolean | RefColor$tareasAsignadasArgs<ExtArgs>
+    ocurrencias?: boolean | RefColor$ocurrenciasArgs<ExtArgs>
     _count?: boolean | RefColorCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type RefColorIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10877,6 +10888,7 @@ export namespace Prisma {
       recurso: Prisma.$RecursoPayload<ExtArgs>
       usuario: Prisma.$UsuarioPayload<ExtArgs>
       tareasAsignadas: Prisma.$TareaAsignacionPayload<ExtArgs>[]
+      ocurrencias: Prisma.$OcurrenciaPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -11280,6 +11292,7 @@ export namespace Prisma {
     recurso<T extends RecursoDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RecursoDefaultArgs<ExtArgs>>): Prisma__RecursoClient<$Result.GetResult<Prisma.$RecursoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     usuario<T extends UsuarioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UsuarioDefaultArgs<ExtArgs>>): Prisma__UsuarioClient<$Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     tareasAsignadas<T extends RefColor$tareasAsignadasArgs<ExtArgs> = {}>(args?: Subset<T, RefColor$tareasAsignadasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TareaAsignacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    ocurrencias<T extends RefColor$ocurrenciasArgs<ExtArgs> = {}>(args?: Subset<T, RefColor$ocurrenciasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OcurrenciaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11730,6 +11743,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: TareaAsignacionScalarFieldEnum | TareaAsignacionScalarFieldEnum[]
+  }
+
+  /**
+   * RefColor.ocurrencias
+   */
+  export type RefColor$ocurrenciasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ocurrencia
+     */
+    select?: OcurrenciaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ocurrencia
+     */
+    omit?: OcurrenciaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OcurrenciaInclude<ExtArgs> | null
+    where?: OcurrenciaWhereInput
+    orderBy?: OcurrenciaOrderByWithRelationInput | OcurrenciaOrderByWithRelationInput[]
+    cursor?: OcurrenciaWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OcurrenciaScalarFieldEnum | OcurrenciaScalarFieldEnum[]
   }
 
   /**
@@ -17369,6 +17406,7 @@ export namespace Prisma {
     fechaOverride: Date | null
     tituloOverride: string | null
     descripcionOverride: string | null
+    refColorId: string | null
     estado: string | null
     colorOverride: string | null
     prioridadOverride: string | null
@@ -17382,6 +17420,7 @@ export namespace Prisma {
     fechaOverride: Date | null
     tituloOverride: string | null
     descripcionOverride: string | null
+    refColorId: string | null
     estado: string | null
     colorOverride: string | null
     prioridadOverride: string | null
@@ -17395,6 +17434,7 @@ export namespace Prisma {
     fechaOverride: number
     tituloOverride: number
     descripcionOverride: number
+    refColorId: number
     estado: number
     colorOverride: number
     prioridadOverride: number
@@ -17410,6 +17450,7 @@ export namespace Prisma {
     fechaOverride?: true
     tituloOverride?: true
     descripcionOverride?: true
+    refColorId?: true
     estado?: true
     colorOverride?: true
     prioridadOverride?: true
@@ -17423,6 +17464,7 @@ export namespace Prisma {
     fechaOverride?: true
     tituloOverride?: true
     descripcionOverride?: true
+    refColorId?: true
     estado?: true
     colorOverride?: true
     prioridadOverride?: true
@@ -17436,6 +17478,7 @@ export namespace Prisma {
     fechaOverride?: true
     tituloOverride?: true
     descripcionOverride?: true
+    refColorId?: true
     estado?: true
     colorOverride?: true
     prioridadOverride?: true
@@ -17522,6 +17565,7 @@ export namespace Prisma {
     fechaOverride: Date | null
     tituloOverride: string | null
     descripcionOverride: string | null
+    refColorId: string | null
     estado: string
     colorOverride: string | null
     prioridadOverride: string | null
@@ -17552,10 +17596,12 @@ export namespace Prisma {
     fechaOverride?: boolean
     tituloOverride?: boolean
     descripcionOverride?: boolean
+    refColorId?: boolean
     estado?: boolean
     colorOverride?: boolean
     prioridadOverride?: boolean
     tareaAsignacion?: boolean | TareaAsignacionDefaultArgs<ExtArgs>
+    refColor?: boolean | Ocurrencia$refColorArgs<ExtArgs>
   }, ExtArgs["result"]["ocurrencia"]>
 
   export type OcurrenciaSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -17566,10 +17612,12 @@ export namespace Prisma {
     fechaOverride?: boolean
     tituloOverride?: boolean
     descripcionOverride?: boolean
+    refColorId?: boolean
     estado?: boolean
     colorOverride?: boolean
     prioridadOverride?: boolean
     tareaAsignacion?: boolean | TareaAsignacionDefaultArgs<ExtArgs>
+    refColor?: boolean | Ocurrencia$refColorArgs<ExtArgs>
   }, ExtArgs["result"]["ocurrencia"]>
 
   export type OcurrenciaSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -17580,10 +17628,12 @@ export namespace Prisma {
     fechaOverride?: boolean
     tituloOverride?: boolean
     descripcionOverride?: boolean
+    refColorId?: boolean
     estado?: boolean
     colorOverride?: boolean
     prioridadOverride?: boolean
     tareaAsignacion?: boolean | TareaAsignacionDefaultArgs<ExtArgs>
+    refColor?: boolean | Ocurrencia$refColorArgs<ExtArgs>
   }, ExtArgs["result"]["ocurrencia"]>
 
   export type OcurrenciaSelectScalar = {
@@ -17594,26 +17644,31 @@ export namespace Prisma {
     fechaOverride?: boolean
     tituloOverride?: boolean
     descripcionOverride?: boolean
+    refColorId?: boolean
     estado?: boolean
     colorOverride?: boolean
     prioridadOverride?: boolean
   }
 
-  export type OcurrenciaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "tareaAsignacionId" | "fechaOriginal" | "fechaEjecucion" | "fechaOverride" | "tituloOverride" | "descripcionOverride" | "estado" | "colorOverride" | "prioridadOverride", ExtArgs["result"]["ocurrencia"]>
+  export type OcurrenciaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "tareaAsignacionId" | "fechaOriginal" | "fechaEjecucion" | "fechaOverride" | "tituloOverride" | "descripcionOverride" | "refColorId" | "estado" | "colorOverride" | "prioridadOverride", ExtArgs["result"]["ocurrencia"]>
   export type OcurrenciaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tareaAsignacion?: boolean | TareaAsignacionDefaultArgs<ExtArgs>
+    refColor?: boolean | Ocurrencia$refColorArgs<ExtArgs>
   }
   export type OcurrenciaIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tareaAsignacion?: boolean | TareaAsignacionDefaultArgs<ExtArgs>
+    refColor?: boolean | Ocurrencia$refColorArgs<ExtArgs>
   }
   export type OcurrenciaIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tareaAsignacion?: boolean | TareaAsignacionDefaultArgs<ExtArgs>
+    refColor?: boolean | Ocurrencia$refColorArgs<ExtArgs>
   }
 
   export type $OcurrenciaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Ocurrencia"
     objects: {
       tareaAsignacion: Prisma.$TareaAsignacionPayload<ExtArgs>
+      refColor: Prisma.$RefColorPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -17623,6 +17678,7 @@ export namespace Prisma {
       fechaOverride: Date | null
       tituloOverride: string | null
       descripcionOverride: string | null
+      refColorId: string | null
       estado: string
       colorOverride: string | null
       prioridadOverride: string | null
@@ -18021,6 +18077,7 @@ export namespace Prisma {
   export interface Prisma__OcurrenciaClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     tareaAsignacion<T extends TareaAsignacionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TareaAsignacionDefaultArgs<ExtArgs>>): Prisma__TareaAsignacionClient<$Result.GetResult<Prisma.$TareaAsignacionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    refColor<T extends Ocurrencia$refColorArgs<ExtArgs> = {}>(args?: Subset<T, Ocurrencia$refColorArgs<ExtArgs>>): Prisma__RefColorClient<$Result.GetResult<Prisma.$RefColorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -18057,6 +18114,7 @@ export namespace Prisma {
     readonly fechaOverride: FieldRef<"Ocurrencia", 'DateTime'>
     readonly tituloOverride: FieldRef<"Ocurrencia", 'String'>
     readonly descripcionOverride: FieldRef<"Ocurrencia", 'String'>
+    readonly refColorId: FieldRef<"Ocurrencia", 'String'>
     readonly estado: FieldRef<"Ocurrencia", 'String'>
     readonly colorOverride: FieldRef<"Ocurrencia", 'String'>
     readonly prioridadOverride: FieldRef<"Ocurrencia", 'String'>
@@ -18453,6 +18511,25 @@ export namespace Prisma {
      * Limit how many Ocurrencias to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Ocurrencia.refColor
+   */
+  export type Ocurrencia$refColorArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefColor
+     */
+    select?: RefColorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefColor
+     */
+    omit?: RefColorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefColorInclude<ExtArgs> | null
+    where?: RefColorWhereInput
   }
 
   /**
@@ -20824,6 +20901,7 @@ export namespace Prisma {
     fechaOverride: 'fechaOverride',
     tituloOverride: 'tituloOverride',
     descripcionOverride: 'descripcionOverride',
+    refColorId: 'refColorId',
     estado: 'estado',
     colorOverride: 'colorOverride',
     prioridadOverride: 'prioridadOverride'
@@ -21470,6 +21548,7 @@ export namespace Prisma {
     recurso?: XOR<RecursoScalarRelationFilter, RecursoWhereInput>
     usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     tareasAsignadas?: TareaAsignacionListRelationFilter
+    ocurrencias?: OcurrenciaListRelationFilter
   }
 
   export type RefColorOrderByWithRelationInput = {
@@ -21480,6 +21559,7 @@ export namespace Prisma {
     recurso?: RecursoOrderByWithRelationInput
     usuario?: UsuarioOrderByWithRelationInput
     tareasAsignadas?: TareaAsignacionOrderByRelationAggregateInput
+    ocurrencias?: OcurrenciaOrderByRelationAggregateInput
   }
 
   export type RefColorWhereUniqueInput = Prisma.AtLeast<{
@@ -21493,6 +21573,7 @@ export namespace Prisma {
     recurso?: XOR<RecursoScalarRelationFilter, RecursoWhereInput>
     usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     tareasAsignadas?: TareaAsignacionListRelationFilter
+    ocurrencias?: OcurrenciaListRelationFilter
   }, "id">
 
   export type RefColorOrderByWithAggregationInput = {
@@ -21868,10 +21949,12 @@ export namespace Prisma {
     fechaOverride?: DateTimeNullableFilter<"Ocurrencia"> | Date | string | null
     tituloOverride?: StringNullableFilter<"Ocurrencia"> | string | null
     descripcionOverride?: StringNullableFilter<"Ocurrencia"> | string | null
+    refColorId?: StringNullableFilter<"Ocurrencia"> | string | null
     estado?: StringFilter<"Ocurrencia"> | string
     colorOverride?: StringNullableFilter<"Ocurrencia"> | string | null
     prioridadOverride?: StringNullableFilter<"Ocurrencia"> | string | null
     tareaAsignacion?: XOR<TareaAsignacionScalarRelationFilter, TareaAsignacionWhereInput>
+    refColor?: XOR<RefColorNullableScalarRelationFilter, RefColorWhereInput> | null
   }
 
   export type OcurrenciaOrderByWithRelationInput = {
@@ -21882,10 +21965,12 @@ export namespace Prisma {
     fechaOverride?: SortOrderInput | SortOrder
     tituloOverride?: SortOrderInput | SortOrder
     descripcionOverride?: SortOrderInput | SortOrder
+    refColorId?: SortOrderInput | SortOrder
     estado?: SortOrder
     colorOverride?: SortOrderInput | SortOrder
     prioridadOverride?: SortOrderInput | SortOrder
     tareaAsignacion?: TareaAsignacionOrderByWithRelationInput
+    refColor?: RefColorOrderByWithRelationInput
   }
 
   export type OcurrenciaWhereUniqueInput = Prisma.AtLeast<{
@@ -21899,10 +21984,12 @@ export namespace Prisma {
     fechaOverride?: DateTimeNullableFilter<"Ocurrencia"> | Date | string | null
     tituloOverride?: StringNullableFilter<"Ocurrencia"> | string | null
     descripcionOverride?: StringNullableFilter<"Ocurrencia"> | string | null
+    refColorId?: StringNullableFilter<"Ocurrencia"> | string | null
     estado?: StringFilter<"Ocurrencia"> | string
     colorOverride?: StringNullableFilter<"Ocurrencia"> | string | null
     prioridadOverride?: StringNullableFilter<"Ocurrencia"> | string | null
     tareaAsignacion?: XOR<TareaAsignacionScalarRelationFilter, TareaAsignacionWhereInput>
+    refColor?: XOR<RefColorNullableScalarRelationFilter, RefColorWhereInput> | null
   }, "id">
 
   export type OcurrenciaOrderByWithAggregationInput = {
@@ -21913,6 +22000,7 @@ export namespace Prisma {
     fechaOverride?: SortOrderInput | SortOrder
     tituloOverride?: SortOrderInput | SortOrder
     descripcionOverride?: SortOrderInput | SortOrder
+    refColorId?: SortOrderInput | SortOrder
     estado?: SortOrder
     colorOverride?: SortOrderInput | SortOrder
     prioridadOverride?: SortOrderInput | SortOrder
@@ -21932,6 +22020,7 @@ export namespace Prisma {
     fechaOverride?: DateTimeNullableWithAggregatesFilter<"Ocurrencia"> | Date | string | null
     tituloOverride?: StringNullableWithAggregatesFilter<"Ocurrencia"> | string | null
     descripcionOverride?: StringNullableWithAggregatesFilter<"Ocurrencia"> | string | null
+    refColorId?: StringNullableWithAggregatesFilter<"Ocurrencia"> | string | null
     estado?: StringWithAggregatesFilter<"Ocurrencia"> | string
     colorOverride?: StringNullableWithAggregatesFilter<"Ocurrencia"> | string | null
     prioridadOverride?: StringNullableWithAggregatesFilter<"Ocurrencia"> | string | null
@@ -22599,6 +22688,7 @@ export namespace Prisma {
     recurso: RecursoCreateNestedOneWithoutRefColorInput
     usuario: UsuarioCreateNestedOneWithoutRefColoresInput
     tareasAsignadas?: TareaAsignacionCreateNestedManyWithoutRefColorInput
+    ocurrencias?: OcurrenciaCreateNestedManyWithoutRefColorInput
   }
 
   export type RefColorUncheckedCreateInput = {
@@ -22607,6 +22697,7 @@ export namespace Prisma {
     titulo: string
     codigoHexa: string
     tareasAsignadas?: TareaAsignacionUncheckedCreateNestedManyWithoutRefColorInput
+    ocurrencias?: OcurrenciaUncheckedCreateNestedManyWithoutRefColorInput
   }
 
   export type RefColorUpdateInput = {
@@ -22615,6 +22706,7 @@ export namespace Prisma {
     recurso?: RecursoUpdateOneRequiredWithoutRefColorNestedInput
     usuario?: UsuarioUpdateOneRequiredWithoutRefColoresNestedInput
     tareasAsignadas?: TareaAsignacionUpdateManyWithoutRefColorNestedInput
+    ocurrencias?: OcurrenciaUpdateManyWithoutRefColorNestedInput
   }
 
   export type RefColorUncheckedUpdateInput = {
@@ -22623,6 +22715,7 @@ export namespace Prisma {
     titulo?: StringFieldUpdateOperationsInput | string
     codigoHexa?: StringFieldUpdateOperationsInput | string
     tareasAsignadas?: TareaAsignacionUncheckedUpdateManyWithoutRefColorNestedInput
+    ocurrencias?: OcurrenciaUncheckedUpdateManyWithoutRefColorNestedInput
   }
 
   export type RefColorCreateManyInput = {
@@ -22998,6 +23091,7 @@ export namespace Prisma {
     colorOverride?: string | null
     prioridadOverride?: string | null
     tareaAsignacion: TareaAsignacionCreateNestedOneWithoutOcurrenciasInput
+    refColor?: RefColorCreateNestedOneWithoutOcurrenciasInput
   }
 
   export type OcurrenciaUncheckedCreateInput = {
@@ -23008,6 +23102,7 @@ export namespace Prisma {
     fechaOverride?: Date | string | null
     tituloOverride?: string | null
     descripcionOverride?: string | null
+    refColorId?: string | null
     estado?: string
     colorOverride?: string | null
     prioridadOverride?: string | null
@@ -23024,6 +23119,7 @@ export namespace Prisma {
     colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
     prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
     tareaAsignacion?: TareaAsignacionUpdateOneRequiredWithoutOcurrenciasNestedInput
+    refColor?: RefColorUpdateOneWithoutOcurrenciasNestedInput
   }
 
   export type OcurrenciaUncheckedUpdateInput = {
@@ -23034,6 +23130,7 @@ export namespace Prisma {
     fechaOverride?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
     descripcionOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    refColorId?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
     prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23047,6 +23144,7 @@ export namespace Prisma {
     fechaOverride?: Date | string | null
     tituloOverride?: string | null
     descripcionOverride?: string | null
+    refColorId?: string | null
     estado?: string
     colorOverride?: string | null
     prioridadOverride?: string | null
@@ -23072,6 +23170,7 @@ export namespace Prisma {
     fechaOverride?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
     descripcionOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    refColorId?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
     prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23697,6 +23796,16 @@ export namespace Prisma {
     usuarioId?: SortOrder
   }
 
+  export type OcurrenciaListRelationFilter = {
+    every?: OcurrenciaWhereInput
+    some?: OcurrenciaWhereInput
+    none?: OcurrenciaWhereInput
+  }
+
+  export type OcurrenciaOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type RefColorCountOrderByAggregateInput = {
     id?: SortOrder
     usuarioId?: SortOrder
@@ -23918,16 +24027,6 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
-  export type OcurrenciaListRelationFilter = {
-    every?: OcurrenciaWhereInput
-    some?: OcurrenciaWhereInput
-    none?: OcurrenciaWhereInput
-  }
-
-  export type OcurrenciaOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
   export type TareaAsignacionCountOrderByAggregateInput = {
     id?: SortOrder
     tareaId?: SortOrder
@@ -23971,6 +24070,7 @@ export namespace Prisma {
     fechaOverride?: SortOrder
     tituloOverride?: SortOrder
     descripcionOverride?: SortOrder
+    refColorId?: SortOrder
     estado?: SortOrder
     colorOverride?: SortOrder
     prioridadOverride?: SortOrder
@@ -23984,6 +24084,7 @@ export namespace Prisma {
     fechaOverride?: SortOrder
     tituloOverride?: SortOrder
     descripcionOverride?: SortOrder
+    refColorId?: SortOrder
     estado?: SortOrder
     colorOverride?: SortOrder
     prioridadOverride?: SortOrder
@@ -23997,6 +24098,7 @@ export namespace Prisma {
     fechaOverride?: SortOrder
     tituloOverride?: SortOrder
     descripcionOverride?: SortOrder
+    refColorId?: SortOrder
     estado?: SortOrder
     colorOverride?: SortOrder
     prioridadOverride?: SortOrder
@@ -24997,11 +25099,25 @@ export namespace Prisma {
     connect?: TareaAsignacionWhereUniqueInput | TareaAsignacionWhereUniqueInput[]
   }
 
+  export type OcurrenciaCreateNestedManyWithoutRefColorInput = {
+    create?: XOR<OcurrenciaCreateWithoutRefColorInput, OcurrenciaUncheckedCreateWithoutRefColorInput> | OcurrenciaCreateWithoutRefColorInput[] | OcurrenciaUncheckedCreateWithoutRefColorInput[]
+    connectOrCreate?: OcurrenciaCreateOrConnectWithoutRefColorInput | OcurrenciaCreateOrConnectWithoutRefColorInput[]
+    createMany?: OcurrenciaCreateManyRefColorInputEnvelope
+    connect?: OcurrenciaWhereUniqueInput | OcurrenciaWhereUniqueInput[]
+  }
+
   export type TareaAsignacionUncheckedCreateNestedManyWithoutRefColorInput = {
     create?: XOR<TareaAsignacionCreateWithoutRefColorInput, TareaAsignacionUncheckedCreateWithoutRefColorInput> | TareaAsignacionCreateWithoutRefColorInput[] | TareaAsignacionUncheckedCreateWithoutRefColorInput[]
     connectOrCreate?: TareaAsignacionCreateOrConnectWithoutRefColorInput | TareaAsignacionCreateOrConnectWithoutRefColorInput[]
     createMany?: TareaAsignacionCreateManyRefColorInputEnvelope
     connect?: TareaAsignacionWhereUniqueInput | TareaAsignacionWhereUniqueInput[]
+  }
+
+  export type OcurrenciaUncheckedCreateNestedManyWithoutRefColorInput = {
+    create?: XOR<OcurrenciaCreateWithoutRefColorInput, OcurrenciaUncheckedCreateWithoutRefColorInput> | OcurrenciaCreateWithoutRefColorInput[] | OcurrenciaUncheckedCreateWithoutRefColorInput[]
+    connectOrCreate?: OcurrenciaCreateOrConnectWithoutRefColorInput | OcurrenciaCreateOrConnectWithoutRefColorInput[]
+    createMany?: OcurrenciaCreateManyRefColorInputEnvelope
+    connect?: OcurrenciaWhereUniqueInput | OcurrenciaWhereUniqueInput[]
   }
 
   export type RecursoUpdateOneRequiredWithoutRefColorNestedInput = {
@@ -25034,6 +25150,20 @@ export namespace Prisma {
     deleteMany?: TareaAsignacionScalarWhereInput | TareaAsignacionScalarWhereInput[]
   }
 
+  export type OcurrenciaUpdateManyWithoutRefColorNestedInput = {
+    create?: XOR<OcurrenciaCreateWithoutRefColorInput, OcurrenciaUncheckedCreateWithoutRefColorInput> | OcurrenciaCreateWithoutRefColorInput[] | OcurrenciaUncheckedCreateWithoutRefColorInput[]
+    connectOrCreate?: OcurrenciaCreateOrConnectWithoutRefColorInput | OcurrenciaCreateOrConnectWithoutRefColorInput[]
+    upsert?: OcurrenciaUpsertWithWhereUniqueWithoutRefColorInput | OcurrenciaUpsertWithWhereUniqueWithoutRefColorInput[]
+    createMany?: OcurrenciaCreateManyRefColorInputEnvelope
+    set?: OcurrenciaWhereUniqueInput | OcurrenciaWhereUniqueInput[]
+    disconnect?: OcurrenciaWhereUniqueInput | OcurrenciaWhereUniqueInput[]
+    delete?: OcurrenciaWhereUniqueInput | OcurrenciaWhereUniqueInput[]
+    connect?: OcurrenciaWhereUniqueInput | OcurrenciaWhereUniqueInput[]
+    update?: OcurrenciaUpdateWithWhereUniqueWithoutRefColorInput | OcurrenciaUpdateWithWhereUniqueWithoutRefColorInput[]
+    updateMany?: OcurrenciaUpdateManyWithWhereWithoutRefColorInput | OcurrenciaUpdateManyWithWhereWithoutRefColorInput[]
+    deleteMany?: OcurrenciaScalarWhereInput | OcurrenciaScalarWhereInput[]
+  }
+
   export type TareaAsignacionUncheckedUpdateManyWithoutRefColorNestedInput = {
     create?: XOR<TareaAsignacionCreateWithoutRefColorInput, TareaAsignacionUncheckedCreateWithoutRefColorInput> | TareaAsignacionCreateWithoutRefColorInput[] | TareaAsignacionUncheckedCreateWithoutRefColorInput[]
     connectOrCreate?: TareaAsignacionCreateOrConnectWithoutRefColorInput | TareaAsignacionCreateOrConnectWithoutRefColorInput[]
@@ -25046,6 +25176,20 @@ export namespace Prisma {
     update?: TareaAsignacionUpdateWithWhereUniqueWithoutRefColorInput | TareaAsignacionUpdateWithWhereUniqueWithoutRefColorInput[]
     updateMany?: TareaAsignacionUpdateManyWithWhereWithoutRefColorInput | TareaAsignacionUpdateManyWithWhereWithoutRefColorInput[]
     deleteMany?: TareaAsignacionScalarWhereInput | TareaAsignacionScalarWhereInput[]
+  }
+
+  export type OcurrenciaUncheckedUpdateManyWithoutRefColorNestedInput = {
+    create?: XOR<OcurrenciaCreateWithoutRefColorInput, OcurrenciaUncheckedCreateWithoutRefColorInput> | OcurrenciaCreateWithoutRefColorInput[] | OcurrenciaUncheckedCreateWithoutRefColorInput[]
+    connectOrCreate?: OcurrenciaCreateOrConnectWithoutRefColorInput | OcurrenciaCreateOrConnectWithoutRefColorInput[]
+    upsert?: OcurrenciaUpsertWithWhereUniqueWithoutRefColorInput | OcurrenciaUpsertWithWhereUniqueWithoutRefColorInput[]
+    createMany?: OcurrenciaCreateManyRefColorInputEnvelope
+    set?: OcurrenciaWhereUniqueInput | OcurrenciaWhereUniqueInput[]
+    disconnect?: OcurrenciaWhereUniqueInput | OcurrenciaWhereUniqueInput[]
+    delete?: OcurrenciaWhereUniqueInput | OcurrenciaWhereUniqueInput[]
+    connect?: OcurrenciaWhereUniqueInput | OcurrenciaWhereUniqueInput[]
+    update?: OcurrenciaUpdateWithWhereUniqueWithoutRefColorInput | OcurrenciaUpdateWithWhereUniqueWithoutRefColorInput[]
+    updateMany?: OcurrenciaUpdateManyWithWhereWithoutRefColorInput | OcurrenciaUpdateManyWithWhereWithoutRefColorInput[]
+    deleteMany?: OcurrenciaScalarWhereInput | OcurrenciaScalarWhereInput[]
   }
 
   export type RecursoCreateNestedOneWithoutClienteInput = {
@@ -25356,12 +25500,28 @@ export namespace Prisma {
     connect?: TareaAsignacionWhereUniqueInput
   }
 
+  export type RefColorCreateNestedOneWithoutOcurrenciasInput = {
+    create?: XOR<RefColorCreateWithoutOcurrenciasInput, RefColorUncheckedCreateWithoutOcurrenciasInput>
+    connectOrCreate?: RefColorCreateOrConnectWithoutOcurrenciasInput
+    connect?: RefColorWhereUniqueInput
+  }
+
   export type TareaAsignacionUpdateOneRequiredWithoutOcurrenciasNestedInput = {
     create?: XOR<TareaAsignacionCreateWithoutOcurrenciasInput, TareaAsignacionUncheckedCreateWithoutOcurrenciasInput>
     connectOrCreate?: TareaAsignacionCreateOrConnectWithoutOcurrenciasInput
     upsert?: TareaAsignacionUpsertWithoutOcurrenciasInput
     connect?: TareaAsignacionWhereUniqueInput
     update?: XOR<XOR<TareaAsignacionUpdateToOneWithWhereWithoutOcurrenciasInput, TareaAsignacionUpdateWithoutOcurrenciasInput>, TareaAsignacionUncheckedUpdateWithoutOcurrenciasInput>
+  }
+
+  export type RefColorUpdateOneWithoutOcurrenciasNestedInput = {
+    create?: XOR<RefColorCreateWithoutOcurrenciasInput, RefColorUncheckedCreateWithoutOcurrenciasInput>
+    connectOrCreate?: RefColorCreateOrConnectWithoutOcurrenciasInput
+    upsert?: RefColorUpsertWithoutOcurrenciasInput
+    disconnect?: RefColorWhereInput | boolean
+    delete?: RefColorWhereInput | boolean
+    connect?: RefColorWhereUniqueInput
+    update?: XOR<XOR<RefColorUpdateToOneWithWhereWithoutOcurrenciasInput, RefColorUpdateWithoutOcurrenciasInput>, RefColorUncheckedUpdateWithoutOcurrenciasInput>
   }
 
   export type RecursoCreateNestedOneWithoutVencimientoInput = {
@@ -26162,6 +26322,7 @@ export namespace Prisma {
     codigoHexa: string
     recurso: RecursoCreateNestedOneWithoutRefColorInput
     tareasAsignadas?: TareaAsignacionCreateNestedManyWithoutRefColorInput
+    ocurrencias?: OcurrenciaCreateNestedManyWithoutRefColorInput
   }
 
   export type RefColorUncheckedCreateWithoutUsuarioInput = {
@@ -26169,6 +26330,7 @@ export namespace Prisma {
     titulo: string
     codigoHexa: string
     tareasAsignadas?: TareaAsignacionUncheckedCreateNestedManyWithoutRefColorInput
+    ocurrencias?: OcurrenciaUncheckedCreateNestedManyWithoutRefColorInput
   }
 
   export type RefColorCreateOrConnectWithoutUsuarioInput = {
@@ -27107,6 +27269,7 @@ export namespace Prisma {
     codigoHexa: string
     usuario: UsuarioCreateNestedOneWithoutRefColoresInput
     tareasAsignadas?: TareaAsignacionCreateNestedManyWithoutRefColorInput
+    ocurrencias?: OcurrenciaCreateNestedManyWithoutRefColorInput
   }
 
   export type RefColorUncheckedCreateWithoutRecursoInput = {
@@ -27114,6 +27277,7 @@ export namespace Prisma {
     titulo: string
     codigoHexa: string
     tareasAsignadas?: TareaAsignacionUncheckedCreateNestedManyWithoutRefColorInput
+    ocurrencias?: OcurrenciaUncheckedCreateNestedManyWithoutRefColorInput
   }
 
   export type RefColorCreateOrConnectWithoutRecursoInput = {
@@ -27292,6 +27456,7 @@ export namespace Prisma {
     codigoHexa?: StringFieldUpdateOperationsInput | string
     usuario?: UsuarioUpdateOneRequiredWithoutRefColoresNestedInput
     tareasAsignadas?: TareaAsignacionUpdateManyWithoutRefColorNestedInput
+    ocurrencias?: OcurrenciaUpdateManyWithoutRefColorNestedInput
   }
 
   export type RefColorUncheckedUpdateWithoutRecursoInput = {
@@ -27299,6 +27464,7 @@ export namespace Prisma {
     titulo?: StringFieldUpdateOperationsInput | string
     codigoHexa?: StringFieldUpdateOperationsInput | string
     tareasAsignadas?: TareaAsignacionUncheckedUpdateManyWithoutRefColorNestedInput
+    ocurrencias?: OcurrenciaUncheckedUpdateManyWithoutRefColorNestedInput
   }
 
   export type RecursoRefUpsertWithoutRecursoInput = {
@@ -27584,6 +27750,42 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type OcurrenciaCreateWithoutRefColorInput = {
+    id?: string
+    fechaOriginal: Date | string
+    fechaEjecucion?: Date | string | null
+    fechaOverride?: Date | string | null
+    tituloOverride?: string | null
+    descripcionOverride?: string | null
+    estado?: string
+    colorOverride?: string | null
+    prioridadOverride?: string | null
+    tareaAsignacion: TareaAsignacionCreateNestedOneWithoutOcurrenciasInput
+  }
+
+  export type OcurrenciaUncheckedCreateWithoutRefColorInput = {
+    id?: string
+    tareaAsignacionId: string
+    fechaOriginal: Date | string
+    fechaEjecucion?: Date | string | null
+    fechaOverride?: Date | string | null
+    tituloOverride?: string | null
+    descripcionOverride?: string | null
+    estado?: string
+    colorOverride?: string | null
+    prioridadOverride?: string | null
+  }
+
+  export type OcurrenciaCreateOrConnectWithoutRefColorInput = {
+    where: OcurrenciaWhereUniqueInput
+    create: XOR<OcurrenciaCreateWithoutRefColorInput, OcurrenciaUncheckedCreateWithoutRefColorInput>
+  }
+
+  export type OcurrenciaCreateManyRefColorInputEnvelope = {
+    data: OcurrenciaCreateManyRefColorInput | OcurrenciaCreateManyRefColorInput[]
+    skipDuplicates?: boolean
+  }
+
   export type RecursoUpsertWithoutRefColorInput = {
     update: XOR<RecursoUpdateWithoutRefColorInput, RecursoUncheckedUpdateWithoutRefColorInput>
     create: XOR<RecursoCreateWithoutRefColorInput, RecursoUncheckedCreateWithoutRefColorInput>
@@ -27682,6 +27884,39 @@ export namespace Prisma {
   export type TareaAsignacionUpdateManyWithWhereWithoutRefColorInput = {
     where: TareaAsignacionScalarWhereInput
     data: XOR<TareaAsignacionUpdateManyMutationInput, TareaAsignacionUncheckedUpdateManyWithoutRefColorInput>
+  }
+
+  export type OcurrenciaUpsertWithWhereUniqueWithoutRefColorInput = {
+    where: OcurrenciaWhereUniqueInput
+    update: XOR<OcurrenciaUpdateWithoutRefColorInput, OcurrenciaUncheckedUpdateWithoutRefColorInput>
+    create: XOR<OcurrenciaCreateWithoutRefColorInput, OcurrenciaUncheckedCreateWithoutRefColorInput>
+  }
+
+  export type OcurrenciaUpdateWithWhereUniqueWithoutRefColorInput = {
+    where: OcurrenciaWhereUniqueInput
+    data: XOR<OcurrenciaUpdateWithoutRefColorInput, OcurrenciaUncheckedUpdateWithoutRefColorInput>
+  }
+
+  export type OcurrenciaUpdateManyWithWhereWithoutRefColorInput = {
+    where: OcurrenciaScalarWhereInput
+    data: XOR<OcurrenciaUpdateManyMutationInput, OcurrenciaUncheckedUpdateManyWithoutRefColorInput>
+  }
+
+  export type OcurrenciaScalarWhereInput = {
+    AND?: OcurrenciaScalarWhereInput | OcurrenciaScalarWhereInput[]
+    OR?: OcurrenciaScalarWhereInput[]
+    NOT?: OcurrenciaScalarWhereInput | OcurrenciaScalarWhereInput[]
+    id?: StringFilter<"Ocurrencia"> | string
+    tareaAsignacionId?: StringFilter<"Ocurrencia"> | string
+    fechaOriginal?: DateTimeFilter<"Ocurrencia"> | Date | string
+    fechaEjecucion?: DateTimeNullableFilter<"Ocurrencia"> | Date | string | null
+    fechaOverride?: DateTimeNullableFilter<"Ocurrencia"> | Date | string | null
+    tituloOverride?: StringNullableFilter<"Ocurrencia"> | string | null
+    descripcionOverride?: StringNullableFilter<"Ocurrencia"> | string | null
+    refColorId?: StringNullableFilter<"Ocurrencia"> | string | null
+    estado?: StringFilter<"Ocurrencia"> | string
+    colorOverride?: StringNullableFilter<"Ocurrencia"> | string | null
+    prioridadOverride?: StringNullableFilter<"Ocurrencia"> | string | null
   }
 
   export type RecursoCreateWithoutClienteInput = {
@@ -28182,6 +28417,7 @@ export namespace Prisma {
     codigoHexa: string
     recurso: RecursoCreateNestedOneWithoutRefColorInput
     usuario: UsuarioCreateNestedOneWithoutRefColoresInput
+    ocurrencias?: OcurrenciaCreateNestedManyWithoutRefColorInput
   }
 
   export type RefColorUncheckedCreateWithoutTareasAsignadasInput = {
@@ -28189,6 +28425,7 @@ export namespace Prisma {
     usuarioId: string
     titulo: string
     codigoHexa: string
+    ocurrencias?: OcurrenciaUncheckedCreateNestedManyWithoutRefColorInput
   }
 
   export type RefColorCreateOrConnectWithoutTareasAsignadasInput = {
@@ -28300,6 +28537,7 @@ export namespace Prisma {
     estado?: string
     colorOverride?: string | null
     prioridadOverride?: string | null
+    refColor?: RefColorCreateNestedOneWithoutOcurrenciasInput
   }
 
   export type OcurrenciaUncheckedCreateWithoutTareaAsignacionInput = {
@@ -28309,6 +28547,7 @@ export namespace Prisma {
     fechaOverride?: Date | string | null
     tituloOverride?: string | null
     descripcionOverride?: string | null
+    refColorId?: string | null
     estado?: string
     colorOverride?: string | null
     prioridadOverride?: string | null
@@ -28371,6 +28610,7 @@ export namespace Prisma {
     codigoHexa?: StringFieldUpdateOperationsInput | string
     recurso?: RecursoUpdateOneRequiredWithoutRefColorNestedInput
     usuario?: UsuarioUpdateOneRequiredWithoutRefColoresNestedInput
+    ocurrencias?: OcurrenciaUpdateManyWithoutRefColorNestedInput
   }
 
   export type RefColorUncheckedUpdateWithoutTareasAsignadasInput = {
@@ -28378,6 +28618,7 @@ export namespace Prisma {
     usuarioId?: StringFieldUpdateOperationsInput | string
     titulo?: StringFieldUpdateOperationsInput | string
     codigoHexa?: StringFieldUpdateOperationsInput | string
+    ocurrencias?: OcurrenciaUncheckedUpdateManyWithoutRefColorNestedInput
   }
 
   export type UsuarioUpsertWithoutTareasAsignadasInput = {
@@ -28502,22 +28743,6 @@ export namespace Prisma {
     data: XOR<OcurrenciaUpdateManyMutationInput, OcurrenciaUncheckedUpdateManyWithoutTareaAsignacionInput>
   }
 
-  export type OcurrenciaScalarWhereInput = {
-    AND?: OcurrenciaScalarWhereInput | OcurrenciaScalarWhereInput[]
-    OR?: OcurrenciaScalarWhereInput[]
-    NOT?: OcurrenciaScalarWhereInput | OcurrenciaScalarWhereInput[]
-    id?: StringFilter<"Ocurrencia"> | string
-    tareaAsignacionId?: StringFilter<"Ocurrencia"> | string
-    fechaOriginal?: DateTimeFilter<"Ocurrencia"> | Date | string
-    fechaEjecucion?: DateTimeNullableFilter<"Ocurrencia"> | Date | string | null
-    fechaOverride?: DateTimeNullableFilter<"Ocurrencia"> | Date | string | null
-    tituloOverride?: StringNullableFilter<"Ocurrencia"> | string | null
-    descripcionOverride?: StringNullableFilter<"Ocurrencia"> | string | null
-    estado?: StringFilter<"Ocurrencia"> | string
-    colorOverride?: StringNullableFilter<"Ocurrencia"> | string | null
-    prioridadOverride?: StringNullableFilter<"Ocurrencia"> | string | null
-  }
-
   export type TareaAsignacionCreateWithoutOcurrenciasInput = {
     id?: string
     fechaAsignacion?: Date | string
@@ -28541,6 +28766,27 @@ export namespace Prisma {
   export type TareaAsignacionCreateOrConnectWithoutOcurrenciasInput = {
     where: TareaAsignacionWhereUniqueInput
     create: XOR<TareaAsignacionCreateWithoutOcurrenciasInput, TareaAsignacionUncheckedCreateWithoutOcurrenciasInput>
+  }
+
+  export type RefColorCreateWithoutOcurrenciasInput = {
+    titulo: string
+    codigoHexa: string
+    recurso: RecursoCreateNestedOneWithoutRefColorInput
+    usuario: UsuarioCreateNestedOneWithoutRefColoresInput
+    tareasAsignadas?: TareaAsignacionCreateNestedManyWithoutRefColorInput
+  }
+
+  export type RefColorUncheckedCreateWithoutOcurrenciasInput = {
+    id: string
+    usuarioId: string
+    titulo: string
+    codigoHexa: string
+    tareasAsignadas?: TareaAsignacionUncheckedCreateNestedManyWithoutRefColorInput
+  }
+
+  export type RefColorCreateOrConnectWithoutOcurrenciasInput = {
+    where: RefColorWhereUniqueInput
+    create: XOR<RefColorCreateWithoutOcurrenciasInput, RefColorUncheckedCreateWithoutOcurrenciasInput>
   }
 
   export type TareaAsignacionUpsertWithoutOcurrenciasInput = {
@@ -28572,6 +28818,33 @@ export namespace Prisma {
     asignadoPorId?: StringFieldUpdateOperationsInput | string
     fechaAsignacion?: DateTimeFieldUpdateOperationsInput | Date | string
     estado?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type RefColorUpsertWithoutOcurrenciasInput = {
+    update: XOR<RefColorUpdateWithoutOcurrenciasInput, RefColorUncheckedUpdateWithoutOcurrenciasInput>
+    create: XOR<RefColorCreateWithoutOcurrenciasInput, RefColorUncheckedCreateWithoutOcurrenciasInput>
+    where?: RefColorWhereInput
+  }
+
+  export type RefColorUpdateToOneWithWhereWithoutOcurrenciasInput = {
+    where?: RefColorWhereInput
+    data: XOR<RefColorUpdateWithoutOcurrenciasInput, RefColorUncheckedUpdateWithoutOcurrenciasInput>
+  }
+
+  export type RefColorUpdateWithoutOcurrenciasInput = {
+    titulo?: StringFieldUpdateOperationsInput | string
+    codigoHexa?: StringFieldUpdateOperationsInput | string
+    recurso?: RecursoUpdateOneRequiredWithoutRefColorNestedInput
+    usuario?: UsuarioUpdateOneRequiredWithoutRefColoresNestedInput
+    tareasAsignadas?: TareaAsignacionUpdateManyWithoutRefColorNestedInput
+  }
+
+  export type RefColorUncheckedUpdateWithoutOcurrenciasInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    usuarioId?: StringFieldUpdateOperationsInput | string
+    titulo?: StringFieldUpdateOperationsInput | string
+    codigoHexa?: StringFieldUpdateOperationsInput | string
+    tareasAsignadas?: TareaAsignacionUncheckedUpdateManyWithoutRefColorNestedInput
   }
 
   export type RecursoCreateWithoutVencimientoInput = {
@@ -29281,6 +29554,7 @@ export namespace Prisma {
     codigoHexa?: StringFieldUpdateOperationsInput | string
     recurso?: RecursoUpdateOneRequiredWithoutRefColorNestedInput
     tareasAsignadas?: TareaAsignacionUpdateManyWithoutRefColorNestedInput
+    ocurrencias?: OcurrenciaUpdateManyWithoutRefColorNestedInput
   }
 
   export type RefColorUncheckedUpdateWithoutUsuarioInput = {
@@ -29288,6 +29562,7 @@ export namespace Prisma {
     titulo?: StringFieldUpdateOperationsInput | string
     codigoHexa?: StringFieldUpdateOperationsInput | string
     tareasAsignadas?: TareaAsignacionUncheckedUpdateManyWithoutRefColorNestedInput
+    ocurrencias?: OcurrenciaUncheckedUpdateManyWithoutRefColorNestedInput
   }
 
   export type RefColorUncheckedUpdateManyWithoutUsuarioInput = {
@@ -29333,6 +29608,19 @@ export namespace Prisma {
     estado?: string
   }
 
+  export type OcurrenciaCreateManyRefColorInput = {
+    id?: string
+    tareaAsignacionId: string
+    fechaOriginal: Date | string
+    fechaEjecucion?: Date | string | null
+    fechaOverride?: Date | string | null
+    tituloOverride?: string | null
+    descripcionOverride?: string | null
+    estado?: string
+    colorOverride?: string | null
+    prioridadOverride?: string | null
+  }
+
   export type TareaAsignacionUpdateWithoutRefColorInput = {
     id?: StringFieldUpdateOperationsInput | string
     fechaAsignacion?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29360,6 +29648,45 @@ export namespace Prisma {
     asignadoPorId?: StringFieldUpdateOperationsInput | string
     fechaAsignacion?: DateTimeFieldUpdateOperationsInput | Date | string
     estado?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type OcurrenciaUpdateWithoutRefColorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fechaOriginal?: DateTimeFieldUpdateOperationsInput | Date | string
+    fechaEjecucion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fechaOverride?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    descripcionOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: StringFieldUpdateOperationsInput | string
+    colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    tareaAsignacion?: TareaAsignacionUpdateOneRequiredWithoutOcurrenciasNestedInput
+  }
+
+  export type OcurrenciaUncheckedUpdateWithoutRefColorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tareaAsignacionId?: StringFieldUpdateOperationsInput | string
+    fechaOriginal?: DateTimeFieldUpdateOperationsInput | Date | string
+    fechaEjecucion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fechaOverride?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    descripcionOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: StringFieldUpdateOperationsInput | string
+    colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type OcurrenciaUncheckedUpdateManyWithoutRefColorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tareaAsignacionId?: StringFieldUpdateOperationsInput | string
+    fechaOriginal?: DateTimeFieldUpdateOperationsInput | Date | string
+    fechaEjecucion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fechaOverride?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    descripcionOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: StringFieldUpdateOperationsInput | string
+    colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ClienteAsignacionCreateManyClienteInput = {
@@ -29431,6 +29758,7 @@ export namespace Prisma {
     fechaOverride?: Date | string | null
     tituloOverride?: string | null
     descripcionOverride?: string | null
+    refColorId?: string | null
     estado?: string
     colorOverride?: string | null
     prioridadOverride?: string | null
@@ -29446,6 +29774,7 @@ export namespace Prisma {
     estado?: StringFieldUpdateOperationsInput | string
     colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
     prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    refColor?: RefColorUpdateOneWithoutOcurrenciasNestedInput
   }
 
   export type OcurrenciaUncheckedUpdateWithoutTareaAsignacionInput = {
@@ -29455,6 +29784,7 @@ export namespace Prisma {
     fechaOverride?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
     descripcionOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    refColorId?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
     prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29467,6 +29797,7 @@ export namespace Prisma {
     fechaOverride?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tituloOverride?: NullableStringFieldUpdateOperationsInput | string | null
     descripcionOverride?: NullableStringFieldUpdateOperationsInput | string | null
+    refColorId?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     colorOverride?: NullableStringFieldUpdateOperationsInput | string | null
     prioridadOverride?: NullableStringFieldUpdateOperationsInput | string | null
