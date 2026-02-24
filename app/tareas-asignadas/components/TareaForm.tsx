@@ -454,8 +454,9 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
         camposParaLimpiar.prioridadOverride = true;
       }
       // Comparar usando el ID real (no el ficticio '__colorOverride__')
+      // Cambiar refColorId en ocurrencias cuando el color base cambia
       if (refColorIdParaGuardar !== (initialData?.refColorId || null)) {
-        camposParaLimpiar.colorOverride = true;
+        camposParaLimpiar.refColorId = true;
       }
 
       // Si hay campos modificados, limpiar sus overrides

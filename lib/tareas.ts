@@ -218,7 +218,9 @@ export async function getTareasAsignadasAdmin(
           descripcionOverride: true,
           fechaOverride: true,
           colorOverride: true,
+          refColorId: true,
           prioridadOverride: true,
+          refColor: { select: { id: true, titulo: true, codigoHexa: true } },
         },
       },
     },
@@ -277,6 +279,7 @@ export async function getTareasAsignadasAsistente(
           descripcionOverride: true,
           fechaOverride: true,
           colorOverride: true,
+          refColorId: true,
           prioridadOverride: true,
         },
       },
@@ -334,7 +337,9 @@ export async function getTareasPropias(
           descripcionOverride: true,
           fechaOverride: true,
           colorOverride: true,
+          refColorId: true,
           prioridadOverride: true,
+          refColor: { select: { id: true, titulo: true, codigoHexa: true } },
         },
       },
     },
@@ -507,7 +512,7 @@ export async function actualizarTarea(
   }
 
   // Actualizar refColorId en asignaciones si es tarea PROPIA y se cambió el color
-  if (datos.refColorId !== undefined && tareaExistente.tipoTarea === "PROPIA") {
+  if (datos.refColorId !== undefined) {
     await prisma.tareaAsignacion.updateMany({
       where: { tareaId },
       data: { refColorId: datos.refColorId || null },
@@ -549,8 +554,8 @@ export async function limpiarOverridesOcurrencias(
   if (camposParaLimpiar.prioridadOverride) {
     datosActualizar.prioridadOverride = null;
   }
-  if (camposParaLimpiar.colorOverride) {
-    datosActualizar.colorOverride = null;
+  if (camposParaLimpiar.refColorId) {
+    datosActualizar.refColorId = null;
   }
 
   // Si no hay campos para limpiar, retornar
@@ -732,7 +737,6 @@ export async function materializarOcurrencia(
           ? (datos.fechaOverride ? new Date(datos.fechaOverride) : null)
           : existente.fechaOverride,
         tituloOverride: datos.tituloOverride !== undefined ? datos.tituloOverride : existente.tituloOverride,
-        colorOverride: datos.colorOverride !== undefined ? datos.colorOverride : existente.colorOverride,
         refColorId: datos.refColorId !== undefined ? datos.refColorId : existente.refColorId,
         descripcionOverride: datos.descripcionOverride !== undefined ? datos.descripcionOverride : existente.descripcionOverride,
         prioridadOverride: datos.prioridadOverride !== undefined ? datos.prioridadOverride : existente.prioridadOverride,
@@ -1184,16 +1188,25 @@ function mapToRow(asignacion: any): TareaAsignacionRow {
           conteoMaximo: rec.conteoMaximo,
         }
       : null,
-    ocurrenciasMaterializadas: (asignacion.ocurrencias || []).map((o: any) => ({
-      id: o.id,
-      fechaOriginal: o.fechaOriginal.toISOString(),
-      estado: o.estado,
-      tituloOverride: o.tituloOverride,
-      fechaOverride: o.fechaOverride ? o.fechaOverride.toISOString() : null,
-      colorOverride: o.colorOverride,
-      prioridadOverride: o.prioridadOverride,
-      descripcionOverride: o.descripcionOverride,
-    })),
+    ocurrenciasMaterializadas: (asignacion.ocurrencias || []).map((o: any) => {
+      // Si la ocurrencia tiene refColorId (override), usar su refColor
+      const colorOverrideTitulo = o.refColor?.titulo || null;
+      const colorOverrideHexa = o.refColor?.codigoHexa || null;
+      
+      return {
+        id: o.id,
+        fechaOriginal: o.fechaOriginal.toISOString(),
+        estado: o.estado,
+        tituloOverride: o.tituloOverride,
+        fechaOverride: o.fechaOverride ? o.fechaOverride.toISOString() : null,
+        colorOverride: o.colorOverride,
+        refColorId: o.refColorId,
+        refColorHexa: colorOverrideHexa,
+        refColorTitulo: colorOverrideTitulo,
+        prioridadOverride: o.prioridadOverride,
+        descripcionOverride: o.descripcionOverride,
+      };
+    }),
   };
 }
 
@@ -1269,7 +1282,7 @@ export async function obtenerOcurrenciaMaterializada(
 
   const colorFinalHex = ocurrencia.refColor?.codigoHexa || 
                         ocurrencia.tareaAsignacion.refColor?.codigoHexa;
-  
+
   return {
     id: ocurrencia.id,
     titulo: ocurrencia.tituloOverride || tarea.titulo,
