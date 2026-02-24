@@ -517,6 +517,58 @@ export async function actualizarTarea(
   return await getTareaDetalle(tareaId);
 }
 
+/**
+ * Limpiar overrides en ocurrencias materializadas después de actualizar campos base
+ * Esto permite que las ocurrencias hereden los nuevos valores base
+ */
+export async function limpiarOverridesOcurrencias(
+  tareaId: string,
+  camposParaLimpiar: { [key: string]: boolean }
+) {
+  // Encontrar todas las asignaciones de la tarea
+  const asignaciones = await prisma.tareaAsignacion.findMany({
+    where: { tareaId },
+    select: { id: true },
+  });
+
+  if (asignaciones.length === 0) {
+    return;
+  }
+
+  const asignacionIds = asignaciones.map((a) => a.id);
+
+  // Preparar datos a actualizar (solo los campos que fueron modificados)
+  const datosActualizar: any = {};
+
+  if (camposParaLimpiar.tituloOverride) {
+    datosActualizar.tituloOverride = null;
+  }
+  if (camposParaLimpiar.descripcionOverride) {
+    datosActualizar.descripcionOverride = null;
+  }
+  if (camposParaLimpiar.prioridadOverride) {
+    datosActualizar.prioridadOverride = null;
+  }
+  if (camposParaLimpiar.colorOverride) {
+    datosActualizar.colorOverride = null;
+  }
+
+  // Si no hay campos para limpiar, retornar
+  if (Object.keys(datosActualizar).length === 0) {
+    return;
+  }
+
+  // Actualizar todas las ocurrencias materializadas que pertenecen a esta tarea
+  await prisma.ocurrencia.updateMany({
+    where: {
+      tareaAsignacion: {
+        id: { in: asignacionIds },
+      },
+    },
+    data: datosActualizar,
+  });
+}
+
 // ═══════════════════════════════════════
 // ELIMINAR
 // ═══════════════════════════════════════
@@ -1145,6 +1197,7 @@ function mapToRow(asignacion: any): TareaAsignacionRow {
 /**
  * Obtiene la ocurrencia materializada junto con los datos de la tarea base
  * Devuelve los overrides si existen, o los valores base si no
+ * Si la ocurrencia no está materializada (virtual), devuelve objeto con valores base
  */
 export async function obtenerOcurrenciaMaterializada(
   tareaAsignacionId: string,
@@ -1165,8 +1218,41 @@ export async function obtenerOcurrenciaMaterializada(
     },
   });
 
-  if (!ocurrencia || !ocurrencia.tareaAsignacion) {
-    throw new Error("Ocurrencia o asignación no encontrada");
+  // Si la ocurrencia no está materializada (es virtual)
+  if (!ocurrencia) {
+    // Obtener asignación y tarea para devolver valores base
+    const asignacion = await prisma.tareaAsignacion.findUnique({
+      where: { id: tareaAsignacionId },
+      include: {
+        tarea: true,
+        refColor: { select: { titulo: true, codigoHexa: true } },
+      },
+    });
+
+    if (!asignacion) {
+      throw new Error("Asignación o tarea no encontrada");
+    }
+
+    const tarea = asignacion.tarea;
+    return {
+      id: null, // No tiene ID porque no está materializada
+      titulo: tarea.titulo,
+      descripcion: tarea.descripcion,
+      prioridad: tarea.prioridad,
+      fecha: fechaOcurrencia,
+      fechaOriginal: fechaOcurrencia,
+      refColorHexa: asignacion.refColor?.codigoHexa || null,
+      refColorTitulo: asignacion.refColor?.titulo || null,
+      tituloOverride: null,
+      descripcionOverride: null,
+      prioridadOverride: null,
+      fechaOverride: null,
+      estado: null, // Ocurrencia virtual, sin estado materializado
+    };
+  }
+
+  if (!ocurrencia.tareaAsignacion) {
+    throw new Error("Asignación no encontrada");
   }
 
   const tarea = ocurrencia.tareaAsignacion.tarea;
@@ -1208,5 +1294,23 @@ export async function obtenerOcurrenciaMaterializada(
     fechaOverride: ocurrencia.fechaOverride ? ocurrencia.fechaOverride.toISOString() : null,
     estado: ocurrencia.estado,
   };
+}
+
+/**
+ * Obtiene el estado actual de una ocurrencia por su asignación y fecha.
+ * Devuelve null si no existe ocurrencia materializada.
+ */
+export async function obtenerEstadoOcurrenciaActual(
+  tareaAsignacionId: string,
+  fechaOriginal: string
+) {
+  const ocurrencia = await prisma.ocurrencia.findFirst({
+    where: {
+      tareaAsignacionId,
+      fechaOriginal: new Date(fechaOriginal),
+    },
+    select: { estado: true },
+  });
+  return ocurrencia?.estado || null;
 }
 

@@ -5,8 +5,33 @@ import { PermissionToggle } from "./permissionToggle";
 import { InviteMemberButton } from "./inviteMemberButton";
 import { FiltrosAsistentes } from "./filtrosAsistentes";
 import { EmptyState } from "../components/emptyState";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export function TablaAsistentes({ initialAsistentes, canInvite }: { initialAsistentes: any[], canInvite: boolean }) {
+export function TablaAsistentes({ canInvite }: {canInvite: boolean }) {
+    const searchParams = useSearchParams();
+    const [loading, setLoading] = useState(true);
+    const [asistentes, setAsistentes] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchAsistentes = async () => {
+            setLoading(true);
+            try {
+                // Construimos la query string a partir de los parámetros actuales de la URL
+                const query = searchParams.toString();
+                const res = await fetch(`/api/asistentes?${query}`);
+                const data = await res.json();
+                setAsistentes(data);
+            } catch (error) {
+                console.error("Error cargando asistentes:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAsistentes();
+    }, [searchParams]); // Se ejecuta cada vez que los filtros cambian la URL
+
     return (
         <>
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
@@ -20,19 +45,19 @@ export function TablaAsistentes({ initialAsistentes, canInvite }: { initialAsist
                     <div className="flex items-center gap-4 bg-card border border-black/5 px-6 py-3 rounded-xl shadow-sm">
                         <div className="text-right">
                             <span className="block text-[10px] font-bold text-text/40 uppercase tracking-widest">Total</span>
-                            <span className="text-2xl font-black text-text leading-none">{initialAsistentes.length}</span>
+                            <span className="text-2xl font-black text-text leading-none">{asistentes.length}</span>
                         </div>
                         <Users className="w-6 h-6 text-primary/40" />
                     </div>
                     {canInvite && <InviteMemberButton />}
                 </div>
             </header>
-            
+
             <FiltrosAsistentes />
 
             <div className="overflow-hidden rounded-xl border border-black/5 bg-card shadow-sm">
-                {initialAsistentes.length === 0 ? (
-                    <EmptyState 
+                {asistentes.length === 0 ? (
+                    <EmptyState
                         icon={UserPlus}
                         title="No hay asistentes"
                         description="Invita a tu equipo para empezar a delegar tareas."
@@ -48,7 +73,7 @@ export function TablaAsistentes({ initialAsistentes, canInvite }: { initialAsist
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-black/[0.03]">
-                            {initialAsistentes.map((usuario) => (
+                            {asistentes.map((usuario) => (
                                 <tr key={usuario.id} className="group hover:bg-black/[0.01] transition-colors">
                                     <td className="px-8 py-6">
                                         <div className="flex items-center gap-4">

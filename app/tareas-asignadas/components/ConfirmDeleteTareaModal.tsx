@@ -5,6 +5,7 @@ import { useState } from "react";
 interface ConfirmDeleteTareaModalProps {
   isOpen: boolean;
   titulo: string;
+  esRecurrente: boolean;
   onClose: () => void;
   onDeleteOne: () => void;
   onDeleteAll: () => void;
@@ -13,6 +14,7 @@ interface ConfirmDeleteTareaModalProps {
 export default function ConfirmDeleteTareaModal({
   isOpen,
   titulo,
+  esRecurrente,
   onClose,
   onDeleteOne,
   onDeleteAll,
@@ -52,18 +54,20 @@ export default function ConfirmDeleteTareaModal({
             </span>
           </label>
 
-          <label className="flex items-center gap-3 cursor-pointer group">
-            <input
-              type="radio"
-              name="deleteOption"
-              checked={opcion === "all"}
-              onChange={() => setOpcion("all")}
-              className="w-4 h-4 accent-primary-foreground"
-            />
-            <span className="text-text/80 group-hover:text-text transition-colors">
-              Cancelar esta y todas las ocurrencias futuras
-            </span>
-          </label>
+          {esRecurrente && (
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <input
+                type="radio"
+                name="deleteOption"
+                checked={opcion === "all"}
+                onChange={() => setOpcion("all")}
+                className="w-4 h-4 accent-primary-foreground"
+              />
+              <span className="text-text/80 group-hover:text-text transition-colors">
+                Cancelar esta y todas las ocurrencias futuras
+              </span>
+            </label>
+          )}
         </div>
 
         <div className="flex justify-between items-center">

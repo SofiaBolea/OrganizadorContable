@@ -10,6 +10,9 @@ import type {
   TareaDisplayRow,
 } from "@/lib/tareas-shared";
 import { expandirTareasADisplayRows } from "@/lib/tareas-shared";
+import { get } from "http";
+import { getTareasAsignadasAdmin, getTareasAsignadasAsistente } from "@/lib/tareas";
+import { auth } from "@clerk/nextjs/server";
 
 // ═══════════════════════════════════════
 // HELPERS
@@ -56,6 +59,7 @@ interface TareasTableClientProps {
   mostrarColumnaAsistente?: boolean;
   canModify: boolean;
   canDelete: boolean;
+  canRevertEstado: boolean;
   basePath: string;
 }
 
@@ -70,6 +74,7 @@ export default function TareasTableClient({
   mostrarColumnaAsistente = false,
   canModify,
   canDelete,
+  canRevertEstado,
   basePath,
 }: TareasTableClientProps) {
   const [tareasBase, setTareasBase] = useState(initialTareas);
@@ -95,7 +100,26 @@ export default function TareasTableClient({
     row: TareaDisplayRow | null;
     nuevoEstado: string;
   }>({ isOpen: false, row: null, nuevoEstado: "" });
+  // ─── Recargar tareas sin recargar toda la página ───
+  
+  /*
+  const recargarTareas = async () => {
 
+
+    try {
+      const { orgId, userId } = await auth();
+      if (!orgId || !userId) throw new Error("UNAUTHENTICATED: No autenticado.");
+
+      const tareas = esAdmin
+        ? await getTareasAsignadasAdmin(orgId, userId)
+        : await getTareasAsignadasAsistente(orgId, userId);
+
+      setTareasBase(tareas);
+    } catch (err) {
+      console.error("Error recargando tareas:", err);
+    }
+  };
+  */
 
   // ─── Expandir tareas a filas de display ───
   const todasLasFilas = useMemo(
@@ -159,7 +183,10 @@ export default function TareasTableClient({
     // VENCIDA y CANCELADA son estados finales, no editables
     if (row.estado === "VENCIDA" || row.estado === "CANCELADA") return [];
     if (row.estado === "PENDIENTE") return ["COMPLETADA"];
-    if (row.estado === "COMPLETADA") return ["PENDIENTE"];
+    // Si está COMPLETADA, solo mostrar PENDIENTE si tiene permiso para revertir
+    if (row.estado === "COMPLETADA") {
+      return canRevertEstado ? ["PENDIENTE"] : [];
+    }
     return [];
   };
 
@@ -209,22 +236,8 @@ export default function TareasTableClient({
               ...t,
               ocurrenciasMaterializadas: yaExiste
                 ? t.ocurrenciasMaterializadas.map((o) =>
-                    o.fechaOriginal.split("T")[0] === fechaKey
-                      ? {
-                          id: ocurrencia.id,
-                          fechaOriginal: ocurrencia.fechaOriginal,
-                          estado: ocurrencia.estado,
-                          tituloOverride: ocurrencia.tituloOverride,
-                          fechaOverride: ocurrencia.fechaOverride,
-                          colorOverride: ocurrencia.colorOverride,
-                          prioridadOverride: ocurrencia.prioridadOverride,
-                          descripcionOverride: ocurrencia.descripcionOverride,
-                        }
-                      : o
-                  )
-                : [
-                    ...t.ocurrenciasMaterializadas,
-                    {
+                  o.fechaOriginal.split("T")[0] === fechaKey
+                    ? {
                       id: ocurrencia.id,
                       fechaOriginal: ocurrencia.fechaOriginal,
                       estado: ocurrencia.estado,
@@ -233,8 +246,22 @@ export default function TareasTableClient({
                       colorOverride: ocurrencia.colorOverride,
                       prioridadOverride: ocurrencia.prioridadOverride,
                       descripcionOverride: ocurrencia.descripcionOverride,
-                    },
-                  ],
+                    }
+                    : o
+                )
+                : [
+                  ...t.ocurrenciasMaterializadas,
+                  {
+                    id: ocurrencia.id,
+                    fechaOriginal: ocurrencia.fechaOriginal,
+                    estado: ocurrencia.estado,
+                    tituloOverride: ocurrencia.tituloOverride,
+                    fechaOverride: ocurrencia.fechaOverride,
+                    colorOverride: ocurrencia.colorOverride,
+                    prioridadOverride: ocurrencia.prioridadOverride,
+                    descripcionOverride: ocurrencia.descripcionOverride,
+                  },
+                ],
             };
           })
         );
@@ -305,27 +332,30 @@ export default function TareasTableClient({
             ...t,
             ocurrenciasMaterializadas: yaExiste
               ? t.ocurrenciasMaterializadas.map((o) =>
-                  o.fechaOriginal.split("T")[0] === fechaKey
-                    ? { ...o, estado: "CANCELADA" }
-                    : o
-                )
+                o.fechaOriginal.split("T")[0] === fechaKey
+                  ? { ...o, estado: "CANCELADA" }
+                  : o
+              )
               : [
-                  ...t.ocurrenciasMaterializadas,
-                  {
-                    id: "temp",
-                    fechaOriginal: fechaKey,
-                    estado: "CANCELADA",
-                    tituloOverride: null,
-                    fechaOverride: null,
-                    colorOverride: null,
-                    prioridadOverride: null,
-                    descripcionOverride: null,
-                  },
-                ],
+                ...t.ocurrenciasMaterializadas,
+                {
+                  id: "temp",
+                  fechaOriginal: fechaKey,
+                  estado: "CANCELADA",
+                  tituloOverride: null,
+                  fechaOverride: null,
+                  colorOverride: null,
+                  prioridadOverride: null,
+                  descripcionOverride: null,
+                },
+              ],
           };
         })
       );
       setDeleteModal({ isOpen: false, row: null });
+      // Recargar solo la tabla
+      //await recargarTareas();
+      window.location.reload(); // Recargar toda la página para evitar inconsistencias en tareas recurrentes, se puede optimizar luego para solo recargar la tabla sin recargar toda la página
     } catch {
       alert("Error al conectar con el servidor");
     } finally {
@@ -419,29 +449,31 @@ export default function TareasTableClient({
               ...t,
               ocurrenciasMaterializadas: yaExiste
                 ? t.ocurrenciasMaterializadas.map((o) =>
-                    o.fechaOriginal.split("T")[0] === fechaKey
-                      ? { ...o, estado: "CANCELADA" }
-                      : o
-                  )
+                  o.fechaOriginal.split("T")[0] === fechaKey
+                    ? { ...o, estado: "CANCELADA" }
+                    : o
+                )
                 : [
-                    ...t.ocurrenciasMaterializadas,
-                    {
-                      id: "temp",
-                      fechaOriginal: fechaKey,
-                      estado: "CANCELADA",
-                      tituloOverride: null,
-                      fechaOverride: null,
-                      colorOverride: null,
-                      prioridadOverride: null,
-                      descripcionOverride: null,
-                    },
-                  ],
+                  ...t.ocurrenciasMaterializadas,
+                  {
+                    id: "temp",
+                    fechaOriginal: fechaKey,
+                    estado: "CANCELADA",
+                    tituloOverride: null,
+                    fechaOverride: null,
+                    colorOverride: null,
+                    prioridadOverride: null,
+                    descripcionOverride: null,
+                  },
+                ],
             };
           })
         );
       }
 
       setDeleteModal({ isOpen: false, row: null });
+      // Recargar solo la tabla
+      window.location.reload(); // Recargar toda la página para evitar inconsistencias en tareas recurrentes, se puede optimizar luego para solo recargar la tabla sin recargar toda la página
     } catch {
       alert("Error al conectar con el servidor");
     } finally {
@@ -754,6 +786,7 @@ export default function TareasTableClient({
       <ConfirmDeleteTareaModal
         isOpen={deleteModal.isOpen}
         titulo={deleteModal.row?.titulo || ""}
+        esRecurrente={deleteModal.row?.tieneRecurrencia || false}
         onClose={() => setDeleteModal({ isOpen: false, row: null })}
         onDeleteOne={handleDeleteOne}
         onDeleteAll={handleDeleteAll}

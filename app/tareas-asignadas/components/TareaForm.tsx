@@ -107,7 +107,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
   // Finaliza tipo (para recurrencia)
   const [finalizaTipo, setFinalizaTipo] = useState<"nunca" | "fecha" | "ocurrencias">(
     initialData?.recurrencia?.hastaFecha ? "fecha" :
-    initialData?.recurrencia?.conteoMaximo ? "ocurrencias" : "nunca"
+      initialData?.recurrencia?.conteoMaximo ? "ocurrencias" : "nunca"
   );
 
   // Cargar datos de override cuando se abre el formulario para editar una ocurrencia específica
@@ -125,20 +125,20 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
             // Cargar overrides si existen, usar valores base si no
             setTitulo(data.tituloOverride || (initialData?.titulo || ""));
             setTituloOverrideOriginal(data.tituloOverride || null);
-            
+
             setDescripcion(data.descripcionOverride || (initialData?.descripcion || ""));
             setDescripcionOverrideOriginal(data.descripcionOverride || null);
-            
+
             setPrioridad(data.prioridadOverride || (initialData?.prioridad || "MEDIA"));
             setPrioridadOverrideOriginal(data.prioridadOverride || null);
-            
+
             // Para la fecha: mostrar fechaOverride si existe, sino mostrar fechaOcurrencia (que puede ser la original o el base)
-            const fechaAMostrar = data.fechaOverride 
+            const fechaAMostrar = data.fechaOverride
               ? data.fechaOverride.split("T")[0]
               : (data.fechaOcurrencia?.split("T")[0] || fechaOcurrenciaInicial);
             setFechaVencimiento(fechaAMostrar);
             setFechaOverrideOriginal(data.fechaOverride ? data.fechaOverride.split("T")[0] : null);
-            
+
             // Para el color: si hay override, usar ID ficticio para que RefColorSelector muestre el fallback con el hex correcto
             if (data.colorOverride) {
               // ID ficticio para que no matchee con ningún color de la lista
@@ -154,7 +154,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
               setRefColorTitulo(null);
               setColorOverrideOriginal(null);
             }
-            
+
             setOcurrenciaDataLoaded(true);
           }
         } catch (err) {
@@ -211,7 +211,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
       setLoadingAsistentes(true);
       fetch("/api/tareas/asistentes")
         .then((res) => res.json())
-        .then((data) => setAsistentes(data))
+        .then((data) => setAsistentes(Array.isArray(data) ? data : []))
         .catch(() => console.error("Error cargando asistentes"))
         .finally(() => setLoadingAsistentes(false));
     }
@@ -273,11 +273,20 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
         const recurrenciaModificada = camposModificados.has("recurrencia");
 
         // Determinar qué opciones mostrar en el modal
-        // Si solo se modificó fecha de esta ocurrencia: solo "esta"
-        // Si se modificó fecha base o recurrencia: solo "todas"
-        // En otros casos: ambas opciones
-        const soloEstOpcion = fechaOcurrenciaModificada && !fechaBaseModificada && !recurrenciaModificada;
-        const soloTodasOpcion = fechaBaseModificada || recurrenciaModificada;
+        let soloEstOpcion = false;
+        let soloTodasOpcion = false;
+
+        // Si la tarea NO tiene recurrencia: solo mostrar "esta ocurrencia"
+        if (!esRecurrente) {
+          soloEstOpcion = true;
+          soloTodasOpcion = false;
+        } else {
+          // Si solo se modificó fecha de esta ocurrencia: solo "esta"
+          // Si se modificó fecha base o recurrencia: solo "todas"
+          // En otros casos: ambas opciones
+          soloEstOpcion = fechaOcurrenciaModificada && !fechaBaseModificada && !recurrenciaModificada;
+          soloTodasOpcion = fechaBaseModificada || recurrenciaModificada;
+        }
 
         // Guardar información sobre las opciones disponibles
         (window as any).__alcanceModalOptions = { soloEstOpcion, soloTodasOpcion };
@@ -328,9 +337,8 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
         setError(data.error || "Error al guardar");
         return;
       }
-
       window.location.href = basePath;
-      setError("Error al conectar con el servidor");
+
     } finally {
       setLoading(false);
     }
@@ -345,7 +353,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
 
     try {
       const fechaOriginal = ocurrenciaContext.fechaOcurrencia;
-      
+
       // Comparar contra donde vino: override si existe, base si no
       const tituloOriginal = tituloOverrideOriginal !== null ? tituloOverrideOriginal : (initialData?.titulo || "");
       const descripcionOriginal = descripcionOverrideOriginal !== null ? descripcionOverrideOriginal : (initialData?.descripcion || "");
@@ -425,6 +433,37 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
         return;
       }
 
+      // ─── Limpiar overrides en ocurrencias que correspondan a campos modificados ───
+      // Detectar qué campos fueron modificados
+      const camposParaLimpiar: { [key: string]: boolean } = {};
+      
+      if (titulo !== (initialData?.titulo || "")) {
+        camposParaLimpiar.tituloOverride = true;
+      }
+      if (descripcion !== (initialData?.descripcion || "")) {
+        camposParaLimpiar.descripcionOverride = true;
+      }
+      if (prioridad !== (initialData?.prioridad || "MEDIA")) {
+        camposParaLimpiar.prioridadOverride = true;
+      }
+      if (refColorId !== (initialData?.refColorId || null)) {
+        camposParaLimpiar.colorOverride = true;
+      }
+
+      // Si hay campos modificados, limpiar sus overrides
+      if (Object.keys(camposParaLimpiar).length > 0) {
+        try {
+          await fetch(`/api/tareas/${initialData?.id}/limpiar-overrides`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ camposParaLimpiar }),
+          });
+        } catch (err) {
+          console.error("Error limpiando overrides:", err);
+          // No lanzar error, continuar igual
+        }
+      }
+
       window.location.href = basePath;
     } catch {
       setError("Error al conectar con el servidor");
@@ -435,18 +474,17 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
 
   return (
     <>
-    <form onSubmit={handleSubmit}>
-      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-8 max-w-3xl mx-auto">
-        <h2 className="text-xl font-bold text-text mb-6 flex items-center gap-3">
-          <span>
-            {isViewMode
-              ? "Detalle de Tarea"
-              : isCreateMode
-                ? tipoTarea === "ASIGNADA" ? "Asignar Nueva Tarea" : "Nueva Tarea"
-                : "Modificar Tarea"}
-          </span>
-          {ocurrenciaContext?.fechaOcurrencia && (() => {
-            if (isViewMode) {
+      <form onSubmit={handleSubmit}>
+        <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-8 max-w-3xl mx-auto">
+          <h2 className="text-xl font-bold text-text mb-6 flex items-center gap-3">
+            <span>
+              {isViewMode
+                ? "Detalle de Tarea"
+                : isCreateMode
+                  ? tipoTarea === "ASIGNADA" ? "Asignar Nueva Tarea" : "Nueva Tarea"
+                  : "Modificar Tarea"}
+            </span>
+            {ocurrenciaContext?.fechaOcurrencia && (() => {
               const raw = fechaVencimiento;
               const dateOnly = raw.includes("T") ? raw.split("T")[0] : raw;
               const d = new Date(dateOnly + "T00:00:00");
@@ -456,474 +494,455 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
                   — {d.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })}
                 </span>
               );
-            }
-            return (
-              <div className="flex items-center gap-2">
-                <span className="text-base font-normal text-muted-foreground">—</span>
-                <input
-                  type="date"
-                  value={fechaVencimiento || ""}
-                  onChange={(e) => {
-                    setFechaVencimiento(e.target.value);
-                    setCamposModificados(prev => new Set([...prev, "fechaOcurrencia"]));
-                  }}
-                  className="bg-[#e9e8e0] p-1.5 px-3 rounded-full outline-none text-sm text-text focus:ring-2 focus:ring-primary transition-all"
-                />
-              </div>
-            );
-          })()}
-        </h2>
+            })()}
+          </h2>
 
-        {error && (
-          <div className="mb-6 p-3 bg-danger/20 border border-danger text-danger-foreground rounded-xl text-sm font-medium">
-            {error}
+          {error && (
+            <div className="mb-6 p-3 bg-danger/20 border border-danger text-danger-foreground rounded-xl text-sm font-medium">
+              {error}
+            </div>
+          )}
+
+          {/* Título */}
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Titulo de Tarea"
+              value={titulo}
+              onChange={(e) => {
+                setTitulo(e.target.value);
+                setCamposModificados(prev => new Set([...prev, "titulo"]));
+              }}
+              disabled={isViewMode}
+              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text placeholder:text-text/40 focus:ring-2 focus:ring-primary transition-all"
+              required
+            />
           </div>
-        )}
 
-        {/* Título */}
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Titulo de Tarea"
-            value={titulo}
-            onChange={(e) => {
-              setTitulo(e.target.value);
-              setCamposModificados(prev => new Set([...prev, "titulo"]));
-            }}
-            disabled={isViewMode}
-            className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text placeholder:text-text/40 focus:ring-2 focus:ring-primary transition-all"
-            required
-          />
-        </div>
+          {/* Descripción */}
+          <div className="mb-6">
+            <textarea
+              placeholder="Descripción de la tarea"
+              value={descripcion}
+              onChange={(e) => {
+                setDescripcion(e.target.value);
+                setCamposModificados(prev => new Set([...prev, "descripcion"]));
+              }}
+              disabled={isViewMode}
+              rows={3}
+              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-2xl outline-none text-text placeholder:text-text/40 focus:ring-2 focus:ring-primary transition-all resize-none"
+            />
+          </div>
 
-        {/* Descripción */}
-        <div className="mb-6">
-          <textarea
-            placeholder="Descripción de la tarea"
-            value={descripcion}
-            onChange={(e) => {
-              setDescripcion(e.target.value);
-              setCamposModificados(prev => new Set([...prev, "descripcion"]));
-            }}
-            disabled={isViewMode}
-            rows={3}
-            className="w-full bg-[#e9e8e0] p-3 px-5 rounded-2xl outline-none text-text placeholder:text-text/40 focus:ring-2 focus:ring-primary transition-all resize-none"
-          />
-        </div>
-
-        {/* Asignación de Asistentes (solo ASIGNADA) */}
-        {tipoTarea === "ASIGNADA" && esAdmin &&(
-          <div className="mb-6 border border-text/10 rounded-2xl overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-text/10">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-text">Asistentes asignados</span>
-                <button
-                  type="button"
-                  onClick={() => setShowBusqueda(!showBusqueda)}
-                  className="text-text/40 hover:text-text/70 transition-colors"
-                >
-                  <Search size={16} />
-                </button>
-              </div>
-              {!isViewMode && asistentes.length > 0 && (
+          {/* Asignación de Asistentes (solo ASIGNADA) */}
+          {tipoTarea === "ASIGNADA" && esAdmin && (
+            <div className="mb-6 border border-text/10 rounded-2xl overflow-hidden">
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-3 border-b border-text/10">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-text/60">Asignar a todos</span>
+                  <span className="text-sm font-semibold text-text">Asistentes asignados</span>
                   <button
                     type="button"
-                    onClick={toggleAsignarTodos}
-                    className={`relative w-11 h-6 rounded-full transition-colors ${
-                      asignadoIds.length === asistentes.length && asistentes.length > 0
-                        ? "bg-primary-foreground"
-                        : "bg-text/20"
-                    }`}
+                    onClick={() => setShowBusqueda(!showBusqueda)}
+                    className="text-text/40 hover:text-text/70 transition-colors"
                   >
-                    <span
-                      className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
-                        asignadoIds.length === asistentes.length && asistentes.length > 0
-                          ? "translate-x-5"
-                          : "translate-x-0"
-                      }`}
-                    />
+                    <Search size={16} />
                   </button>
                 </div>
-              )}
-            </div>
-
-            {/* Búsqueda */}
-            {showBusqueda && (
-              <div className="px-5 py-2 border-b border-text/10">
-                <input
-                  type="text"
-                  placeholder="Buscar asistente..."
-                  value={busquedaAsistente}
-                  onChange={(e) => setBusquedaAsistente(e.target.value)}
-                  className="w-full bg-transparent outline-none text-sm text-text placeholder:text-text/40"
-                  autoFocus
-                />
-              </div>
-            )}
-
-            {/* Lista */}
-            {loadingAsistentes ? (
-              <p className="text-text/50 text-sm p-5">Cargando asistentes...</p>
-            ) : asistentes.length === 0 ? (
-              <p className="text-text/50 text-sm p-5">
-                No hay asistentes disponibles. Invitá colaboradores desde la sección Equipo.
-              </p>
-            ) : (
-              <div className="max-h-60 overflow-y-auto">
-                {asistentesFiltrados.map((a, i) => (
-                  <label
-                    key={a.id}
-                    className={`flex items-center justify-between px-5 py-3 transition-colors hover:bg-black/[0.02] ${
-                      i < asistentesFiltrados.length - 1 ? "border-b border-text/5" : ""
-                    } ${isViewMode ? "cursor-default" : "cursor-pointer"}`}
-                  >
-                    <div>
-                      <span className="text-sm font-medium text-text">{a.nombreCompleto}</span>
-                      <span className="text-xs text-text/50 ml-2">{a.email}</span>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={asignadoIds.includes(a.id)}
-                      onChange={() => !isViewMode && toggleAsignado(a.id)}
-                      disabled={isViewMode}
-                      className="w-5 h-5 accent-primary-foreground rounded"
-                    />
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        <div className="flex flex-row mb-6 mt-4 items-center">
-          <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
-            Informacion general de la tarea
-          </label>
-          
-        </div>
-
-        {/* Fecha + Prioridad en fila */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="flex flex-col gap-1.5">
-            <div className="flex flex-row gap-3 items-baseline">
-              <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
-              {esRecurrente ? "Fecha Base" : "Fecha"}
-              </label>
-              {esRecurrente && (
-              <p className="text-[11px] text-text/40 -mt-1">
-                A partir de la cual se generan las ocurrencias
-              </p>
-            )}
-            </div>
-            
-            <input
-              type="date"
-              value={fechaBaseOriginal || ""}
-              onChange={(e) => {
-                setFechaBaseOriginal(e.target.value);
-                setCamposModificados(prev => new Set([...prev, "fechaBase"]));
-              }}
-              disabled={isViewMode}
-              required={!esRecurrente}
-              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text focus:ring-2 focus:ring-primary transition-all"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
-              Prioridad
-            </label>
-            <select
-            value={prioridad}
-            onChange={(e) => {
-              setPrioridad(e.target.value);
-              setCamposModificados(prev => new Set([...prev, "prioridad"]));
-            }}
-            disabled={isViewMode}
-            className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text focus:ring-2 focus:ring-primary transition-all appearance-none cursor-pointer"
-          >
-            {prioridades.map((p) => (
-              <option key={p} value={p}>{p === "ALTA" ? "Prioridad Alta" : p === "MEDIA" ? "Prioridad Media" : "Prioridad Baja"}</option>
-            ))}
-          </select>
-          </div>
-        </div>
-
-        {/* Recurrencia */}
-        <div className="mb-6">
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={esRecurrente}
-              onChange={(e) => handleToggleRecurrente(e.target.checked)}
-              disabled={isViewMode}
-              className="w-4 h-4 accent-primary-foreground"
-            />
-            <span className="text-sm font-bold text-text">Tarea Recurrente</span>
-          </label>
-
-          {esRecurrente && (
-            <div className="bg-[#e9e8e0] rounded-2xl p-6 mt-4 space-y-5">
-              <h3 className="text-lg font-semibold text-text">Recurrencia Personalizada</h3>
-
-              {/* Repetir - Botones de días (solo SEMANAL) */}
-              {frecuencia === "SEMANAL" && (
-                <div>
-                  <h4 className="text-sm font-bold text-primary-foreground mb-3">Repetir</h4>
-                  <div className="flex gap-2 flex-wrap">
-                    {diasSemanaOpciones.map((dia) => {
-                      const sel = diasSeleccionados.includes(dia);
-                      return (
-                        <button
-                          key={dia}
-                          type="button"
-                          disabled={isViewMode}
-                          onClick={() => toggleDiaSemana(dia)}
-                          className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                            sel
-                              ? "bg-primary-foreground text-white"
-                              : "bg-white text-text/60 hover:bg-white/80"
-                          } ${isViewMode ? "cursor-default" : "cursor-pointer"}`}
-                        >
-                          {dia}
-                        </button>
-                      );
-                    })}
+                {!isViewMode && asistentes.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-text/60">Asignar a todos</span>
+                    <button
+                      type="button"
+                      onClick={toggleAsignarTodos}
+                      className={`relative w-11 h-6 rounded-full transition-colors ${asignadoIds.length === asistentes.length && asistentes.length > 0
+                          ? "bg-primary-foreground"
+                          : "bg-text/20"
+                        }`}
+                    >
+                      <span
+                        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${asignadoIds.length === asistentes.length && asistentes.length > 0
+                            ? "translate-x-5"
+                            : "translate-x-0"
+                          }`}
+                      />
+                    </button>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
-              {/* Día del mes (solo MENSUAL) */}
-              {frecuencia === "MENSUAL" && (
-                <div>
-                  <h4 className="text-sm font-bold text-primary-foreground mb-3">Día del mes</h4>
+              {/* Búsqueda */}
+              {showBusqueda && (
+                <div className="px-5 py-2 border-b border-text/10">
                   <input
                     type="text"
-                    placeholder="1,15..."
-                    value={diaDelMes}
-                    onChange={(e) => setDiaDelMes(e.target.value)}
-                    disabled={isViewMode}
-                    className="w-32 bg-white p-2 px-4 rounded-full outline-none text-sm text-text placeholder:text-text/40"
+                    placeholder="Buscar asistente..."
+                    value={busquedaAsistente}
+                    onChange={(e) => setBusquedaAsistente(e.target.value)}
+                    className="w-full bg-transparent outline-none text-sm text-text placeholder:text-text/40"
+                    autoFocus
                   />
                 </div>
               )}
 
-              {/* Cada N [frecuencia] */}
-              <div className="flex items-center justify-center gap-3">
-                <span className="text-sm font-medium text-text">Cada</span>
-                <input
-                  type="number"
-                  min={1}
-                  value={intervalo}
-                  onChange={(e) => setIntervalo(Number(e.target.value) || 1)}
-                  disabled={isViewMode}
-                  className="w-16 bg-white p-2 px-3 rounded-full outline-none text-sm text-text text-center"
-                />
-                <select
-                  value={frecuencia}
-                  onChange={(e) => setFrecuencia(e.target.value)}
-                  disabled={isViewMode}
-                  className="bg-white p-2 px-4 rounded-full outline-none text-sm text-text appearance-none cursor-pointer pr-8"
-                >
-                  {frecuenciaOpciones.map((f) => (
-                    <option key={f.value} value={f.value}>{f.label}</option>
+              {/* Lista */}
+              {loadingAsistentes ? (
+                <p className="text-text/50 text-sm p-5">Cargando asistentes...</p>
+              ) : asistentes.length === 0 ? (
+                <p className="text-text/50 text-sm p-5">
+                  No hay asistentes disponibles. Invitá colaboradores desde la sección Equipo.
+                </p>
+              ) : (
+                <div className="max-h-60 overflow-y-auto">
+                  {asistentesFiltrados.map((a, i) => (
+                    <label
+                      key={a.id}
+                      className={`flex items-center justify-between px-5 py-3 transition-colors hover:bg-black/[0.02] ${i < asistentesFiltrados.length - 1 ? "border-b border-text/5" : ""
+                        } ${isViewMode ? "cursor-default" : "cursor-pointer"}`}
+                    >
+                      <div>
+                        <span className="text-sm font-medium text-text">{a.nombreCompleto}</span>
+                        <span className="text-xs text-text/50 ml-2">{a.email}</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={asignadoIds.includes(a.id)}
+                        onChange={() => !isViewMode && toggleAsignado(a.id)}
+                        disabled={isViewMode}
+                        className="w-5 h-5 accent-primary-foreground rounded"
+                      />
+                    </label>
                   ))}
-                </select>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="flex flex-row mb-6 mt-4 items-center">
+            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+              Informacion general de la tarea
+            </label>
+
+          </div>
+
+          {/* Fecha + Prioridad en fila */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="flex flex-col gap-1.5">
+              <div className="flex flex-row gap-3 items-baseline">
+                <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+                  {esRecurrente ? "Fecha Base" : "Fecha"}
+                </label>
+                {esRecurrente && (
+                  <p className="text-[11px] text-text/40 -mt-1">
+                    A partir de la cual se generan las ocurrencias
+                  </p>
+                )}
               </div>
 
-              {/* Finaliza */}
-              <div>
-                <h4 className="text-sm font-bold text-text mb-3">Finaliza</h4>
-                <div className="space-y-4">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="finalizaTipo"
-                      checked={finalizaTipo === "nunca"}
-                      onChange={() => setFinalizaTipo("nunca")}
-                      disabled={isViewMode}
-                      className="w-4 h-4 accent-primary-foreground"
-                    />
-                    <span className="text-sm text-text">Nunca</span>
-                  </label>
+              <input
+                type="date"
+                value={fechaBaseOriginal || ""}
+                onChange={(e) => {
+                  setFechaBaseOriginal(e.target.value);
+                  setCamposModificados(prev => new Set([...prev, "fechaBase"]));
+                }}
+                disabled={!isCreateMode}
+                required={!esRecurrente}
+                className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text focus:ring-2 focus:ring-primary transition-all"
+              />
+            </div>
 
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="finalizaTipo"
-                      checked={finalizaTipo === "fecha"}
-                      onChange={() => setFinalizaTipo("fecha")}
-                      disabled={isViewMode}
-                      className="w-4 h-4 accent-primary-foreground"
-                    />
-                    <span className="text-sm text-text">El</span>
-                    <input
-                      type="date"
-                      value={hastaFecha}
-                      onChange={(e) => {
-                        setHastaFecha(e.target.value);
-                        setFinalizaTipo("fecha");
-                      }}
-                      disabled={isViewMode || finalizaTipo !== "fecha"}
-                      className="bg-white p-2 px-4 rounded-full outline-none text-sm text-text disabled:opacity-50"
-                    />
-                  </label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+                Prioridad
+              </label>
+              <select
+                value={prioridad}
+                onChange={(e) => {
+                  setPrioridad(e.target.value);
+                  setCamposModificados(prev => new Set([...prev, "prioridad"]));
+                }}
+                disabled={isViewMode}
+                className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text focus:ring-2 focus:ring-primary transition-all appearance-none cursor-pointer"
+              >
+                {prioridades.map((p) => (
+                  <option key={p} value={p}>{p === "ALTA" ? "Prioridad Alta" : p === "MEDIA" ? "Prioridad Media" : "Prioridad Baja"}</option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-                  <label className="flex items-center gap-3 cursor-pointer">
+          {/* Recurrencia */}
+          <div className="mb-6">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={esRecurrente}
+                onChange={(e) => handleToggleRecurrente(e.target.checked)}
+                disabled={!isCreateMode}
+                className="w-4 h-4 accent-primary-foreground"
+              />
+              <span className="text-sm font-bold text-text">Tarea Recurrente</span>
+            </label>
+
+            {esRecurrente && (
+              <div className="bg-[#e9e8e0] rounded-2xl p-6 mt-4 space-y-5">
+                <h3 className="text-lg font-semibold text-text">Recurrencia Personalizada</h3>
+
+                {/* Repetir - Botones de días (solo SEMANAL) */}
+                {frecuencia === "SEMANAL" && (
+                  <div>
+                    <h4 className="text-sm font-bold text-primary-foreground mb-3">Repetir</h4>
+                    <div className="flex gap-2 flex-wrap">
+                      {diasSemanaOpciones.map((dia) => {
+                        const sel = diasSeleccionados.includes(dia);
+                        return (
+                          <button
+                            key={dia}
+                            type="button"
+                            disabled={!isCreateMode}
+                            onClick={() => toggleDiaSemana(dia)}
+                            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${sel
+                                ? "bg-primary-foreground text-white"
+                                : "bg-white text-text/60 hover:bg-white/80"
+                              } ${!isCreateMode ? "cursor-default opacity-50" : "cursor-pointer"}`}
+                          >
+                            {dia}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Día del mes (solo MENSUAL) */}
+                {frecuencia === "MENSUAL" && (
+                  <div>
+                    <h4 className="text-sm font-bold text-primary-foreground mb-3">Día del mes</h4>
                     <input
-                      type="radio"
-                      name="finalizaTipo"
-                      checked={finalizaTipo === "ocurrencias"}
-                      onChange={() => setFinalizaTipo("ocurrencias")}
-                      disabled={isViewMode}
-                      className="w-4 h-4 accent-primary-foreground"
+                      type="text"
+                      placeholder="1,15..."
+                      value={diaDelMes}
+                      onChange={(e) => setDiaDelMes(e.target.value)}
+                      disabled={!isCreateMode}
+                      className="w-32 bg-white p-2 px-4 rounded-full outline-none text-sm text-text placeholder:text-text/40"
                     />
-                    <span className="text-sm text-text">Despues de</span>
-                    <input
-                      type="number"
-                      min={1}
-                      value={conteoMaximo}
-                      onChange={(e) => {
-                        setConteoMaximo(e.target.value ? Number(e.target.value) : "");
-                        setFinalizaTipo("ocurrencias");
-                      }}
-                      disabled={isViewMode || finalizaTipo !== "ocurrencias"}
-                      placeholder="1"
-                      className="w-16 bg-white p-2 px-3 rounded-full outline-none text-sm text-text text-center disabled:opacity-50"
-                    />
-                    <span className="text-sm text-text">ocurrencias</span>
-                  </label>
+                  </div>
+                )}
+
+                {/* Cada N [frecuencia] */}
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-sm font-medium text-text">Cada</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={intervalo}
+                    onChange={(e) => setIntervalo(Number(e.target.value) || 1)}
+                    disabled={!isCreateMode}
+                    className="w-16 bg-white p-2 px-3 rounded-full outline-none text-sm text-text text-center"
+                  />
+                  <select
+                    value={frecuencia}
+                    onChange={(e) => setFrecuencia(e.target.value)}
+                    disabled={!isCreateMode}
+                    className="bg-white p-2 px-4 rounded-full outline-none text-sm text-text appearance-none cursor-pointer pr-8"
+                  >
+                    {frecuenciaOpciones.map((f) => (
+                      <option key={f.value} value={f.value}>{f.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Finaliza */}
+                <div>
+                  <h4 className="text-sm font-bold text-text mb-3">Finaliza</h4>
+                  <div className="space-y-4">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="finalizaTipo"
+                        checked={finalizaTipo === "nunca"}
+                        onChange={() => setFinalizaTipo("nunca")}
+                        disabled={!isCreateMode}
+                        className="w-4 h-4 accent-primary-foreground"
+                      />
+                      <span className="text-sm text-text">Nunca</span>
+                    </label>
+
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="finalizaTipo"
+                        checked={finalizaTipo === "fecha"}
+                        onChange={() => setFinalizaTipo("fecha")}
+                        disabled={!isCreateMode}
+                        className="w-4 h-4 accent-primary-foreground"
+                      />
+                      <span className="text-sm text-text">El</span>
+                      <input
+                        type="date"
+                        value={hastaFecha}
+                        onChange={(e) => {
+                          setHastaFecha(e.target.value);
+                          setFinalizaTipo("fecha");
+                        }}
+                        disabled={!isCreateMode || finalizaTipo !== "fecha"}
+                        className="bg-white p-2 px-4 rounded-full outline-none text-sm text-text disabled:opacity-50"
+                      />
+                    </label>
+
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="finalizaTipo"
+                        checked={finalizaTipo === "ocurrencias"}
+                        onChange={() => setFinalizaTipo("ocurrencias")}
+                        disabled={!isCreateMode}
+                        className="w-4 h-4 accent-primary-foreground"
+                      />
+                      <span className="text-sm text-text">Despues de</span>
+                      <input
+                        type="number"
+                        min={1}
+                        value={conteoMaximo}
+                        onChange={(e) => {
+                          setConteoMaximo(e.target.value ? Number(e.target.value) : "");
+                          setFinalizaTipo("ocurrencias");
+                        }}
+                        disabled={!isCreateMode || finalizaTipo !== "ocurrencias"}
+                        placeholder="1"
+                        className="w-16 bg-white p-2 px-3 rounded-full outline-none text-sm text-text text-center disabled:opacity-50"
+                      />
+                      <span className="text-sm text-text">ocurrencias</span>
+                    </label>
+                  </div>
                 </div>
               </div>
+            )}
+          </div>
+
+          {/* Color de Referencia (solo tareas propias) */}
+          {tipoTarea === "PROPIA" && (
+            <div className="mb-6">
+              <RefColorSelector
+                selectedId={refColorId}
+                selectedHexa={refColorHexa}
+                refColorTitulo={refColorTitulo}
+                onChange={(id, hexa) => {
+                  setRefColorId(id);
+                  setRefColorHexa(hexa);
+                  setRefColorTitulo(null);
+                  setCamposModificados(prev => new Set([...prev, "refColor"]));
+                }}
+                disabled={isViewMode}
+              />
             </div>
           )}
-        </div>
 
-        {/* Color de Referencia (solo tareas propias) */}
-        {tipoTarea === "PROPIA" && (
-          <div className="mb-6">
-            <RefColorSelector
-              selectedId={refColorId}
-              selectedHexa={refColorHexa}
-              refColorTitulo={refColorTitulo}
-              onChange={(id, hexa) => { 
-                setRefColorId(id); 
-                setRefColorHexa(hexa); 
-                setRefColorTitulo(null);
-                setCamposModificados(prev => new Set([...prev, "refColor"]));
-              }}
-              disabled={isViewMode}
-            />
-          </div>
-        )}
-
-        {/* Botones */}
-        <div className="flex justify-between items-center mt-8 pt-6">
-          <button
-            type="button"
-            onClick={() => router.push(basePath)}
-            className="px-8 py-3 rounded-xl text-base font-medium transition-opacity border-[3px] bg-danger text-danger-foreground border-danger-foreground hover:opacity-90"
-          >
-            {isViewMode ? "Volver" : "Cancelar"}
-          </button>
-
-          {!isViewMode && (
+          {/* Botones */}
+          <div className="flex justify-between items-center mt-8 pt-6">
             <button
-              type="submit"
-              disabled={loading}
-              className="px-8 py-3 rounded-xl text-base font-medium transition-opacity border-[3px] bg-primary text-primary-foreground border-primary-foreground hover:opacity-90 disabled:opacity-50"
+              type="button"
+              onClick={() => router.push(basePath)}
+              className="px-8 py-3 rounded-xl text-base font-medium transition-opacity border-[3px] bg-danger text-danger-foreground border-danger-foreground hover:opacity-90"
             >
-              {loading ? "Procesando..." : "Guardar"}
+              {isViewMode ? "Volver" : "Cancelar"}
             </button>
-          )}
-        </div>
-      </div>
-    </form>
 
-    {/* Modal de alcance */}
-    {showAlcanceModal && (() => {
-      const options = (window as any).__alcanceModalOptions || { soloEstOpcion: false, soloTodasOpcion: false };
-      const mostrarEstOpcion = !options.soloTodasOpcion;
-      const mostrarTodasOpcion = !options.soloEstOpcion;
-      
-      // Si solo hay una opción, seleccionarla automáticamente
-      const tieneUnaOpcion = (mostrarEstOpcion && !mostrarTodasOpcion) || (!mostrarEstOpcion && mostrarTodasOpcion);
-      if (tieneUnaOpcion && alcanceModal !== (mostrarEstOpcion ? "esta" : "todas")) {
-        setAlcanceModal(mostrarEstOpcion ? "esta" : "todas");
-      }
-
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-card rounded-2xl border border-white shadow-xl p-8 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-text mb-2">¿Aplicar cambios a…?</h3>
-            <p className="text-sm text-text/60 mb-6">
-              Elegí si querés modificar solo esta ocurrencia o todas las ocurrencias de la tarea.
-            </p>
-
-            <div className="space-y-3">
-              {mostrarTodasOpcion && (
-                <label className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border-2
-                  ${alcanceModal === 'todas' ? 'bg-primary/10 border-primary/40' : 'bg-[#e9e8e0] border-transparent hover:border-text/10'}`}>
-                  <input
-                    type="radio"
-                    name="alcanceModal"
-                    checked={alcanceModal === "todas"}
-                    onChange={() => setAlcanceModal("todas")}
-                    className="w-4 h-4 accent-primary-foreground"
-                  />
-                  <div>
-                    <span className="text-sm font-semibold text-text">Todas las ocurrencias</span>
-                    <p className="text-xs text-text/50">
-                      Se modifica la tarea base (título, fecha, prioridad, recurrencia, etc.)
-                    </p>
-                  </div>
-                </label>
-              )}
-
-              {mostrarEstOpcion && (
-                <label className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border-2
-                  ${alcanceModal === 'esta' ? 'bg-primary/10 border-primary/40' : 'bg-[#e9e8e0] border-transparent hover:border-text/10'}`}>
-                  <input
-                    type="radio"
-                    name="alcanceModal"
-                    checked={alcanceModal === "esta"}
-                    onChange={() => setAlcanceModal("esta")}
-                    className="w-4 h-4 accent-primary-foreground"
-                  />
-                  <div>
-                    <span className="text-sm font-semibold text-text">Solo esta ocurrencia</span>
-                    <p className="text-xs text-text/50">
-                      Se guardan cambios de título y fecha solo para esta fecha particular
-                    </p>
-                  </div>
-                </label>
-              )}
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6">
+            {!isViewMode && (
               <button
-                type="button"
-                onClick={() => setShowAlcanceModal(false)}
-                className="px-6 py-2.5 rounded-xl text-sm font-medium transition-opacity border-[3px] bg-danger text-danger-foreground border-danger-foreground hover:opacity-90"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={() => alcanceModal === "esta" ? guardarSoloEsta() : guardarTodas()}
+                type="submit"
                 disabled={loading}
-                className="px-6 py-2.5 rounded-xl text-sm font-medium transition-opacity border-[3px] bg-primary text-primary-foreground border-primary-foreground hover:opacity-90 disabled:opacity-50"
+                className="px-8 py-3 rounded-xl text-base font-medium transition-opacity border-[3px] bg-primary text-primary-foreground border-primary-foreground hover:opacity-90 disabled:opacity-50"
               >
-                {loading ? "Procesando..." : "Aceptar"}
+                {loading ? "Procesando..." : "Guardar"}
               </button>
-            </div>
+            )}
           </div>
         </div>
-      );
-    })()}
+      </form>
+
+      {/* Modal de alcance */}
+      {showAlcanceModal && (() => {
+        const options = (window as any).__alcanceModalOptions || { soloEstOpcion: false, soloTodasOpcion: false };
+        const mostrarEstOpcion = !options.soloTodasOpcion;
+        const mostrarTodasOpcion = !options.soloEstOpcion;
+
+        // Si solo hay una opción, seleccionarla automáticamente
+        const tieneUnaOpcion = (mostrarEstOpcion && !mostrarTodasOpcion) || (!mostrarEstOpcion && mostrarTodasOpcion);
+        if (tieneUnaOpcion && alcanceModal !== (mostrarEstOpcion ? "esta" : "todas")) {
+          setAlcanceModal(mostrarEstOpcion ? "esta" : "todas");
+        }
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="bg-card rounded-2xl border border-white shadow-xl p-8 max-w-md w-full mx-4">
+              <h3 className="text-lg font-bold text-text mb-2">¿Aplicar cambios a…?</h3>
+              <p className="text-sm text-text/60 mb-6">
+                Elegí si querés modificar solo esta ocurrencia o todas las ocurrencias de la tarea.
+              </p>
+
+              <div className="space-y-3">
+                {mostrarTodasOpcion && (
+                  <label className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border-2
+                  ${alcanceModal === 'todas' ? 'bg-primary/10 border-primary/40' : 'bg-[#e9e8e0] border-transparent hover:border-text/10'}`}>
+                    <input
+                      type="radio"
+                      name="alcanceModal"
+                      checked={alcanceModal === "todas"}
+                      onChange={() => setAlcanceModal("todas")}
+                      className="w-4 h-4 accent-primary-foreground"
+                    />
+                    <div>
+                      <span className="text-sm font-semibold text-text">Todas las ocurrencias</span>
+                      <p className="text-xs text-text/50">
+                        Se modifica la tarea base (título, fecha, prioridad, recurrencia, etc.)
+                      </p>
+                    </div>
+                  </label>
+                )}
+
+                {mostrarEstOpcion && (
+                  <label className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border-2
+                  ${alcanceModal === 'esta' ? 'bg-primary/10 border-primary/40' : 'bg-[#e9e8e0] border-transparent hover:border-text/10'}`}>
+                    <input
+                      type="radio"
+                      name="alcanceModal"
+                      checked={alcanceModal === "esta"}
+                      onChange={() => setAlcanceModal("esta")}
+                      className="w-4 h-4 accent-primary-foreground"
+                    />
+                    <div>
+                      <span className="text-sm font-semibold text-text">Solo esta ocurrencia</span>
+                      <p className="text-xs text-text/50">
+                        Se guardan cambios de título y fecha solo para esta fecha particular
+                      </p>
+                    </div>
+                  </label>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowAlcanceModal(false)}
+                  className="px-6 py-2.5 rounded-xl text-sm font-medium transition-opacity border-[3px] bg-danger text-danger-foreground border-danger-foreground hover:opacity-90"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => alcanceModal === "esta" ? guardarSoloEsta() : guardarTodas()}
+                  disabled={loading}
+                  className="px-6 py-2.5 rounded-xl text-sm font-medium transition-opacity border-[3px] bg-primary text-primary-foreground border-primary-foreground hover:opacity-90 disabled:opacity-50"
+                >
+                  {loading ? "Procesando..." : "Aceptar"}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </>
   );
 }

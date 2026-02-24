@@ -12,6 +12,7 @@ import { listarClientes } from "@/lib/clientes";
 export default async function ClientesPage(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams; 
   const { userId, orgId } = await auth();
+  
 
   if (!userId || !orgId) redirect("/");
 
@@ -66,7 +67,6 @@ async function ClientesTableContainer({ searchParams, orgId }: { searchParams: a
   return (
     <TableCliente 
       initialClientes={clientes || []} 
-      asistentes={asistentes}
       permisos={{ puedeEditar, puedeEliminar }} 
     />
   );

@@ -24,10 +24,29 @@ export default async function TareasAsignadasPage() {
       </main>
     );
   }
+  const [esAdmin, canView, canCreate, canModify, canDelete, canRevertEstado] = await Promise.all([  
+    Permisos.esAdmin(),
+    Permisos.puedeVerTareaAsignada(),
+    Permisos.puedeCrearTareaAsignada(),
+    Permisos.puedeModificarTareaAsignada(),
+    Permisos.puedeEliminarTareaAsignada(),
+    Permisos.puedeCambiarEstadoTareaAsignada(),
+  ]);
 
-  const esAdmin = await Permisos.esAdmin();
-  const canModify = esAdmin;
-  const canDelete = esAdmin;
+  
+  if (!canView) {
+    return (
+      <main className="flex min-h-[80vh] items-center justify-center p-6 bg-[#030712]">
+        <div className="bg-[#0a0a0a] border border-white/5 p-12 rounded-[3rem] text-center max-w-sm shadow-2xl">
+          <Lock className="w-12 h-12 text-blue-500/40 mx-auto mb-6" />
+          <h2 className="text-xl font-bold text-white mb-2">Acceso Denegado</h2>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            No tienes permisos para ver las tareas asignadas.
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   const tareas = esAdmin
     ? await getTareasAsignadasAdmin(orgId, userId)
@@ -37,7 +56,7 @@ export default async function TareasAsignadasPage() {
     <main className="p-8">
       <div className="flex justify-between items-center mb-2">
         <h1 className="text-3xl font-bold text-text">Tareas Asignadas</h1>
-        {esAdmin && (
+        {esAdmin && canCreate && (
           <Button variant="primario">
             <Link href="/tareas-asignadas/nueva">
               Nueva Tarea
@@ -59,6 +78,7 @@ export default async function TareasAsignadasPage() {
         mostrarColumnaAsistente={esAdmin}
         canModify={canModify}
         canDelete={canDelete}
+        canRevertEstado={canRevertEstado}
         basePath="/tareas-asignadas"
       />
 

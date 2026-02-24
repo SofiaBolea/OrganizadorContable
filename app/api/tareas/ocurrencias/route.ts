@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { materializarOcurrencia, cancelarDesdeAqui, obtenerOcurrenciaMaterializada, obtenerOcurrenciaYTipoTarea, obtenerAsignacionYTipoTarea } from "@/lib/tareas";
+import { materializarOcurrencia, cancelarDesdeAqui, obtenerOcurrenciaMaterializada, obtenerOcurrenciaYTipoTarea, obtenerAsignacionYTipoTarea, obtenerEstadoOcurrenciaActual } from "@/lib/tareas";
 import { Permisos } from "@/lib/permisos";
 
 // POST: Materializar una ocurrencia
@@ -17,10 +17,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Datos requeridos: tareaAsignacionId, fechaOriginal" }, { status: 400 });
     }
 
-    
-    const puedeModificar = await Permisos.puedeModificarTarea();
-    if (!puedeModificar) {
-      return NextResponse.json({ error: "No tienes permisos para modificar tareas" }, { status: 403 });
+    // Buscar tipo de tarea por la asignación
+    const result = await obtenerAsignacionYTipoTarea(tareaAsignacionId);
+    if (!result) {
+      return NextResponse.json({ error: "Asignación o tarea no encontrada" }, { status: 404 });
+    }
+
+    // Validación especial: si está cambiando de COMPLETADA a PENDIENTE, requiere permiso especial
+    // Este permiso lo tiene solo el admin, el asistente NO lo tiene
+    if (estado === "PENDIENTE") {
+      const estadoActual = await obtenerEstadoOcurrenciaActual(tareaAsignacionId, fechaOriginal);
+      if (estadoActual === "COMPLETADA") {
+        const puedeRevertir = result.tipoTarea === "ASIGNADA"
+          ? await Permisos.puedeCambiarEstadoTareaAsignada()
+          : await Permisos.puedeModificarTarea();
+        if (!puedeRevertir) {
+          return NextResponse.json({ error: "No tienes permisos para revertir una tarea completada a pendiente" }, { status: 403 });
+        }
+      }
     }
 
     const ocurrencia = await materializarOcurrencia(
