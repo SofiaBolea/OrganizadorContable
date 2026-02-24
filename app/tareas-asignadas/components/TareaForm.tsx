@@ -303,7 +303,8 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
         tipoTarea,
         fechaVencimientoBase: fechaBaseOriginal || null,
         descripcion: descripcion || null,
-        refColorId: tipoTarea === "PROPIA" ? refColorId : null,
+        // Si hay colorOverride ficticio, usar el ID original; si no, usar refColorId actual
+        refColorId: tipoTarea === "PROPIA" ? (refColorId === "__colorOverride__" ? (initialData?.refColorId || null) : refColorId) : null,
       };
 
       if (esRecurrente) {
@@ -395,13 +396,18 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
     setError("");
 
     try {
+      // Si hay colorOverride, usar el ID original; si no, usar el refColorId actual
+      const refColorIdParaGuardar = refColorId === "__colorOverride__" 
+        ? (initialData?.refColorId || null)
+        : refColorId;
+
       const body: any = {
         titulo,
         prioridad,
         tipoTarea,
         fechaVencimientoBase: fechaBaseOriginal || null,
         descripcion: descripcion || null,
-        refColorId: tipoTarea === "PROPIA" ? refColorId : null,
+        refColorId: tipoTarea === "PROPIA" ? refColorIdParaGuardar : null,
       };
 
       if (esRecurrente) {
@@ -446,7 +452,8 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
       if (prioridad !== (initialData?.prioridad || "MEDIA")) {
         camposParaLimpiar.prioridadOverride = true;
       }
-      if (refColorId !== (initialData?.refColorId || null)) {
+      // Comparar usando el ID real (no el ficticio '__colorOverride__')
+      if (refColorIdParaGuardar !== (initialData?.refColorId || null)) {
         camposParaLimpiar.colorOverride = true;
       }
 
