@@ -55,7 +55,7 @@ export default function TareasAsignadasCard({
 
         setTareas((prev) =>
           prev.map((t) =>
-            t.ocurrenciaId === tarea.ocurrenciaId ? { ...t, estado: nuevoEstado } : t
+            t.key === tarea.key ? { ...t, estado: nuevoEstado } : t
           )
         );
       } catch (error) {

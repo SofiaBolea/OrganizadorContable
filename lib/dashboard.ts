@@ -20,17 +20,17 @@ export async function obtenerVencimientosProximos(
   });
   if (!usuario) return [];
 
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
+  // Usar UTC para comparación con campos @db.Date (Prisma los almacena a medianoche UTC)
+  const ahora = new Date();
+  const hoy = new Date(Date.UTC(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 0, 0, 0, 0));
   
   const hastaDia = new Date(hoy);
-  hastaDia.setDate(hastaDia.getDate() + dias);
-  hastaDia.setHours(23, 59, 59, 999);
+  hastaDia.setUTCDate(hastaDia.getUTCDate() + dias);
+  hastaDia.setUTCHours(23, 59, 59, 999);
 
   const vencimientos = await prisma.vencimientoOcurrencia.findMany({
     where: {
       vencimiento: {
-        usuarioCreadorId: usuario.id,
         recurso: {
           organizacionId: organizacion.id,
         },
