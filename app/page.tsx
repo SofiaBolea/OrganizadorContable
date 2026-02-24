@@ -1,9 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
 import DashboardContainer from "./components/dashboard/DashboardContainer";
 import { ShieldAlert } from "lucide-react";
+import PaginaCalendario from "./calendario/page";
+
 
 export default async function Home() {
   const { orgId, userId } = await auth();
+
+
 
   if (!orgId || !userId) {
     return (
@@ -21,5 +25,19 @@ export default async function Home() {
     );
   }
 
-  return <DashboardContainer orgId={orgId} userId={userId} />;
+  return (
+    <div>
+
+      <a href="#calendario" className="boton-scroll">
+        Ir a la sección
+      </a>
+      <section>
+        <DashboardContainer orgId={orgId} userId={userId} />
+      </section>
+
+      <section id="calendario" className="mt-16">
+        <PaginaCalendario />
+      </section>
+    </div>
+  )
 }

@@ -5,9 +5,8 @@ import prisma from "./prisma";
 
 export async function getReporteData(periodo: string, clerkOrgId: string, userId: string) {
     const ahora = new Date();
-    // Ajustamos el rango para que el fin no sea solo "hoy"
     let fechaInicio = startOfDay(ahora);
-    let fechaFin = endOfWeek(ahora, { weekStartsOn: 1 }); // Por defecto, fin de esta semana
+    let fechaFin = endOfWeek(ahora, { weekStartsOn: 1 });
 
     if (periodo === "semanal") {
         fechaInicio = startOfWeek(ahora, { weekStartsOn: 1 });
@@ -27,7 +26,7 @@ export async function getReporteData(periodo: string, clerkOrgId: string, userId
         where: { clerkOrganizationId: clerkOrgId },
     });
 
-    if (!organizacion) return [];
+    if (!organizacion) return { stats: [], rango: { inicio: fechaInicioStr, fin: fechaFinStr } };
 
     const usuarioActual = await prisma.usuario.findFirst({
         where: { clerkId: userId, organizacionId: organizacion.id },
@@ -49,7 +48,6 @@ export async function getReporteData(periodo: string, clerkOrgId: string, userId
         }
     });
 
-    // Mapeo a TareaAsignacionRow para usar Lazy Expansion
     const asignacionesMapped: TareaAsignacionRow[] = asignacionesDB.map((asig) => ({
         tareaAsignacionId: asig.id,
         tareaId: asig.tareaId,
@@ -85,12 +83,16 @@ export async function getReporteData(periodo: string, clerkOrgId: string, userId
             colorOverride: o.colorOverride,
             descripcionOverride: o.descripcionOverride,
             prioridadOverride: o.prioridadOverride,
+            // FIX: Agregamos estos campos como null para cumplir con la interfaz
+            // sin tocar los archivos de tareas.
+            refColorId: null,
+            refColorHexa: null,
+            refColorTitulo: null,
         })),
     }));
 
     const todasLasFilas = expandirTareasADisplayRows(asignacionesMapped);
 
-    // FILTRO CRÍTICO: Comparamos contra el nuevo rango extendido
     const filasFiltradas = todasLasFilas.filter(fila => {
         if (!fila.fechaOcurrencia) return false;
         const fechaStr = fila.fechaOcurrencia.split("T")[0];
@@ -103,30 +105,23 @@ export async function getReporteData(periodo: string, clerkOrgId: string, userId
         const nombre = fila.asignadoNombre || "Sin nombre";
         if (!statsMap[nombre]) {
             statsMap[nombre] = { 
-                name: nombre, 
-                completadas: 0, 
-                pendientes: 0, 
-                vencidas: 0, 
-                total: 0,
-                alta: 0,   // Nueva métrica
-                media: 0,  // Nueva métrica
-                baja: 0    // Nueva métrica
+                name: nombre, completadas: 0, pendientes: 0, vencidas: 0, total: 0,
+                alta: 0, media: 0, baja: 0 
             };
         }
-
         statsMap[nombre].total++;
-        
-        // Contar por estado
         if (fila.estado === "COMPLETADA") statsMap[nombre].completadas++;
         else if (fila.estado === "PENDIENTE") statsMap[nombre].pendientes++;
         else if (fila.estado === "VENCIDA") statsMap[nombre].vencidas++;
 
-        // Contar por prioridad
         const p = fila.prioridad?.toUpperCase();
         if (p === "ALTA") statsMap[nombre].alta++;
         else if (p === "MEDIA") statsMap[nombre].media++;
         else if (p === "BAJA") statsMap[nombre].baja++;
     });
 
-    return Object.values(statsMap);
+    return {
+        stats: Object.values(statsMap),
+        rango: { inicio: fechaInicioStr, fin: fechaFinStr }
+    };
 }

@@ -1,10 +1,6 @@
 "use client";
 
-import React from 'react';
 import { Pencil, Trash2, X } from 'lucide-react';
-
-// Nota: Asegúrate de importar Montserrat en tu CSS global o tailwind.config.js
-// @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
 
 interface DetalleTareaModalProps {
   tarea: {
