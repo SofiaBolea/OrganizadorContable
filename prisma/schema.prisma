@@ -126,7 +126,6 @@ model Recurso {
   id              String   @id @default(cuid())
   organizacionId  String
   organizacion    Organizacion @relation(fields: [organizacionId], references: [id])
-  descripcion     String?  @db.VarChar(255)
   tipoRecurso     String   @db.VarChar(50)
 
   // Herencia TPT
@@ -140,6 +139,7 @@ model Recurso {
   @@index([tipoRecurso])
   @@map("recursos")
 }
+
 
 model RecursoRef {
   id      String  @id
@@ -163,6 +163,7 @@ model RefColor {
 
   // Relaciones
   tareasAsignadas TareaAsignacion[]
+  ocurrencias     Ocurrencia[]
 
   @@index([usuarioId])
   @@map("ref_colores")
@@ -201,6 +202,7 @@ model Tarea {
   id                   String   @id
   recurso              Recurso  @relation(fields: [id], references: [id], onDelete: Cascade)
   titulo               String   @db.VarChar(100)
+  descripcion          String?  @db.Text
   prioridad            String   @default("MEDIA") @db.VarChar(20)
   fechaVencimientoBase DateTime?
   tipoTarea            String   @db.VarChar(20)
@@ -211,6 +213,7 @@ model Tarea {
 
   @@map("tareas")
 }
+
 
 model Recurrencia {
   id               String    @id @default(cuid())
@@ -262,10 +265,12 @@ model Ocurrencia {
   fechaEjecucion     DateTime?
   fechaOverride      DateTime? @db.Date
   tituloOverride     String?  @db.VarChar(100)
+  descripcionOverride String? @db.Text
+  refColorId          String?
+  refColor            RefColor?       @relation(fields: [refColorId], references: [id])
 
   estado             String   @default("PENDIENTE") @db.VarChar(20)
   colorOverride      String?  @db.VarChar(7)
-
   prioridadOverride  String?  @db.VarChar(20) 
 
   @@index([tareaAsignacionId])

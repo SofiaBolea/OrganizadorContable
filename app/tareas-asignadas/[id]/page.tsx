@@ -7,7 +7,7 @@ import RefColorSelector from "@/app/tareas-asignadas/components/RefColorSelector
 
 interface PageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ fechaOc?: string }>;
+  searchParams: Promise<{ taId?: string; fechaOc?: string }>;
 }
 
 export default async function DetalleTareaAsignadaPage({ params, searchParams }: PageProps) {
@@ -18,7 +18,7 @@ export default async function DetalleTareaAsignadaPage({ params, searchParams }:
   }
 
   const { id } = await params;
-  const { fechaOc } = await searchParams;
+  const { taId, fechaOc } = await searchParams;
   const esAdmin = await Permisos.esAdmin();
 
   const tarea = await getTareaDetalle(id);
@@ -34,6 +34,10 @@ export default async function DetalleTareaAsignadaPage({ params, searchParams }:
     );
   }
 
+  // Usar taId si viene del URL, sino usar el primer tareaAsignacionId
+  const tareaAsignacionId = taId || tarea.asignaciones[0]?.id || "";
+  const refColorHexa = tarea.asignaciones[0]?.refColor?.codigoHexa || null;
+
   return (
     <main className="p-8">
       <h1 className="text-3xl font-bold text-text mb-2">Tareas Asignadas</h1>
@@ -48,7 +52,7 @@ export default async function DetalleTareaAsignadaPage({ params, searchParams }:
           titulo: tarea.titulo,
           prioridad: tarea.prioridad,
           fechaVencimientoBase: tarea.fechaVencimientoBase?.toISOString() || null,
-          descripcion: tarea.recurso?.descripcion || null,
+          descripcion: tarea.descripcion || null,
           recurrencia: tarea.recurrencia
             ? {
                 frecuencia: tarea.recurrencia.frecuencia,
@@ -62,9 +66,10 @@ export default async function DetalleTareaAsignadaPage({ params, searchParams }:
             : null,
           asignadoIds: tarea.asignaciones.map((a) => a.asignadoId),
           refColorId: tarea.asignaciones[0]?.refColor?.id || null,
+          refColorHexa: refColorHexa,
         }}
         esAdmin={esAdmin}
-        ocurrenciaContext={fechaOc ? { tareaAsignacionId: "", fechaOcurrencia: fechaOc } : null}
+        ocurrenciaContext={fechaOc && tareaAsignacionId ? { tareaAsignacionId, fechaOcurrencia: fechaOc } : null}
       />
 
       {/* Sección de asignaciones con detalle */}

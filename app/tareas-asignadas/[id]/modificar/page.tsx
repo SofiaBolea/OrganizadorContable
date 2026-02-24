@@ -36,6 +36,8 @@ export default async function ModificarTareaAsignadaPage({ params, searchParams 
     );
   }
 
+  const refColorHexa = tarea.asignaciones[0]?.refColor?.codigoHexa || null;
+
   return (
     <main className="p-8">
       <h1 className="text-3xl font-bold text-text mb-2">Tareas Asignadas</h1>
@@ -55,7 +57,7 @@ export default async function ModificarTareaAsignadaPage({ params, searchParams 
           titulo: tarea.titulo,
           prioridad: tarea.prioridad,
           fechaVencimientoBase: tarea.fechaVencimientoBase?.toISOString() || null,
-          descripcion: tarea.recurso?.descripcion || null,
+          descripcion: tarea.descripcion || null,
           recurrencia: tarea.recurrencia
             ? {
                 frecuencia: tarea.recurrencia.frecuencia,
@@ -68,7 +70,8 @@ export default async function ModificarTareaAsignadaPage({ params, searchParams 
               }
             : null,
           asignadoIds: tarea.asignaciones.map((a) => a.asignadoId),
-          refColorId: null,
+          refColorId: tarea.asignaciones[0]?.refColor?.id || null,
+          refColorHexa: refColorHexa,
         }}
         esAdmin={puedeModificar}
       />
