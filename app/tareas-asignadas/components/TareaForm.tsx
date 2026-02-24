@@ -61,6 +61,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
   );
   const [descripcion, setDescripcion] = useState(initialData?.descripcion || "");
   const [refColorId, setRefColorId] = useState<string | null>(initialData?.refColorId || null);
+  const [refColorIdBase, setRefColorIdBase] = useState<string | null>(initialData?.refColorId || null);
   const [refColorHexa, setRefColorHexa] = useState<string | null>(initialData?.refColorHexa || null);
   const [refColorTitulo, setRefColorTitulo] = useState<string | null>(null);
 
@@ -297,14 +298,16 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
       }
 
       // ─── Guardar la tarea completa (crear o editar todas) ───
+      // Usar siempre refColorId (el nuevo color que el usuario seleccionó)
+      const refColorIdBody = refColorId;
+      
       const body: any = {
         titulo,
         prioridad,
         tipoTarea,
         fechaVencimientoBase: fechaBaseOriginal || null,
         descripcion: descripcion || null,
-        // Si hay colorOverride ficticio, usar el ID original; si no, usar refColorId actual
-        refColorId: tipoTarea === "PROPIA" ? (refColorId === "__colorOverride__" ? (initialData?.refColorId || null) : refColorId) : null,
+        refColorId: tipoTarea === "PROPIA" ? refColorIdBody : null,
       };
 
       if (esRecurrente) {
@@ -397,10 +400,9 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
     setError("");
 
     try {
-      // Si hay colorOverride, usar el ID original; si no, usar el refColorId actual
-      const refColorIdParaGuardar = refColorId === "__colorOverride__" 
-        ? (initialData?.refColorId || null)
-        : refColorId;
+      // Cuando guardamos para TODAS las ocurrencias, usamos el color nuevo (refColorId)
+      // El refColorIdBase solo se usa para proteger en guardarSoloEsta
+      const refColorIdParaGuardar = refColorId;
 
       const body: any = {
         titulo,
@@ -453,8 +455,8 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
       if (prioridad !== (initialData?.prioridad || "MEDIA")) {
         camposParaLimpiar.prioridadOverride = true;
       }
-      // Comparar usando el ID real (no el ficticio '__colorOverride__')
       // Cambiar refColorId en ocurrencias cuando el color base cambia
+      // Comparar contra el valor original (initialData)
       if (refColorIdParaGuardar !== (initialData?.refColorId || null)) {
         camposParaLimpiar.refColorId = true;
       }
