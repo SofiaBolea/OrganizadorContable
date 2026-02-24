@@ -38,7 +38,7 @@ const CustomToolbar = (props: ToolbarProps<any, any>) => {
 };
 
 export default function CalendarioEventos({ eventos }: { eventos: any[] }) {
- const [view, setView] = useState<View>(Views.MONTH);
+  const [view, setView] = useState<View>(Views.MONTH);
   const [date, setDate] = useState(new Date());
   const [tareaSeleccionada, setTareaSeleccionada] = useState<any>(null);
 
@@ -46,7 +46,34 @@ export default function CalendarioEventos({ eventos }: { eventos: any[] }) {
     return event.resource?.color || (event.resource?.type === 'vencimiento' ? '#EFBEAF' : '#90BF77');
   };
 
-  // Esta es la función clave para que el modal reciba los datos correctamente
+  // PROCESAMIENTO CRÍTICO: Esta es la parte que limpia el desfase UTC
+  const eventosProcesados = useMemo(() => {
+    return eventos.map(event => {
+      // 1. Extraer el string de fecha puro (YYYY-MM-DD)
+      // Si es un string ISO, hacemos split. Si es un objeto Date, usamos format de date-fns
+      // pero teniendo cuidado de no dejar que la zona horaria lo mueva.
+      let dateStr = "";
+      if (typeof event.start === 'string') {
+        dateStr = event.start.split('T')[0];
+      } else {
+        // Si ya es un objeto Date, forzamos a obtener los valores UTC para que no 
+        // se reste un día si el navegador está en UTC-3
+        const d = event.start;
+        dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+      }
+
+      // 2. Crear la fecha local exacta
+      const [year, month, day] = dateStr.split('-').map(Number);
+      const localDate = new Date(year, month - 1, day, 12, 0, 0);
+
+      return {
+        ...event,
+        start: localDate,
+        end: localDate,
+      };
+    });
+  }, [eventos]);
+
   const handleSelectEvent = (event: any) => {
     setTareaSeleccionada({
       id: event.resource?.id,
@@ -55,17 +82,19 @@ export default function CalendarioEventos({ eventos }: { eventos: any[] }) {
       prioridad: event.resource?.prioridad,
       estado: event.resource?.estado,
       color: getEventColor(event),
+      // Al usar el evento procesado, event.start ya es la fecha local corregida
       fecha: format(event.start, "EEEE, d 'de' MMMM", { locale: es }),
       type: event.resource?.type
     });
   };
 
   const components = useMemo(() => ({ toolbar: CustomToolbar }), []);
+
   return (
     <div className="h-[85vh] relative font-sans">
       <Calendar
         localizer={localizer}
-        events={eventos}
+        events={eventosProcesados} // <--- CAMBIO CLAVE: Usa la lista procesada
         view={view}
         onView={setView}
         date={date}
@@ -89,10 +118,7 @@ export default function CalendarioEventos({ eventos }: { eventos: any[] }) {
         <DetalleTareaModal
           tarea={tareaSeleccionada}
           onClose={() => setTareaSeleccionada(null)}
-          onVerMas={() => {
-            const path = tareaSeleccionada.type === 'tarea' ? 'tareas-asignadas' : 'vencimientos';
-            window.location.href = `/${path}/${tareaSeleccionada.id}`;
-          }}
+          // Si necesitas que el botón "Ver más" funcione, agrégalo aquí
         />
       )}
     </div>
