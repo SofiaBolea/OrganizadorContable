@@ -64,6 +64,7 @@ interface TareasTableClientProps {
   mostrarColumnaAsistente?: boolean;
   canModify: boolean;
   canDelete: boolean;
+  canRevertEstado?: boolean;
   basePath: string;
 }
 

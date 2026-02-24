@@ -1035,7 +1035,7 @@ function getFechaStr(fecha: Date | string | null): string {
  * Se ejecuta al leer las tareas para mantener los estados actualizados
  * sin necesidad de un cron job.
  */
-async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
+export async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
   // Usar la parte de fecha del ISO string de hoy para comparaciones consistentes
   const hoyStr = new Date().toISOString().split('T')[0];
 
@@ -1165,7 +1165,7 @@ async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
   }
 }
 
-function mapToRow(asignacion: any): TareaAsignacionRow {
+export function mapToRow(asignacion: any): TareaAsignacionRow {
   const rec = asignacion.tarea.recurrencia;
   return {
     tareaAsignacionId: asignacion.id,
