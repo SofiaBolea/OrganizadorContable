@@ -270,7 +270,6 @@ model Ocurrencia {
   refColor            RefColor?       @relation(fields: [refColorId], references: [id])
 
   estado             String   @default("PENDIENTE") @db.VarChar(20)
-  colorOverride      String?  @db.VarChar(7)
   prioridadOverride  String?  @db.VarChar(20) 
 
   @@index([tareaAsignacionId])

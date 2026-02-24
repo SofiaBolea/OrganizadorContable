@@ -2,13 +2,14 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Search, ExternalLink, Pencil, Trash2, FolderOpen, UserCheck } from "lucide-react";
 import { Button } from "../components/Button";
 import FormularioCrearRecurso from "./formularioCrearRecurso";
 import FormularioEditarRecurso from "./formularioEditarRecursoRef";
 import { ModalConfirmacionEliminarRecurso } from "./modalConfirmacionEliminarRecurso";
 import { ModalErrorRecurso } from "./modalErrorRecurso";
+import { JSX } from "react/jsx-runtime";
 
 interface Props {
   initialRecursos: any[];
@@ -40,6 +41,10 @@ export function TablaRecursos({ initialRecursos, permisos }: Props) {
     setRecursos(data);
   };
 
+  useEffect(() => {
+    fetchRecursos();
+  } , [permisos]);
+  
   const handleConfirmarEliminacion = async () => {
     if (!recursoSeleccionado) return;
 
@@ -195,3 +200,7 @@ export function TablaRecursos({ initialRecursos, permisos }: Props) {
     </>
   );
 }
+
+function useffect(arg0: () => JSX.Element) {
+      throw new Error("Function not implemented.");
+    }
