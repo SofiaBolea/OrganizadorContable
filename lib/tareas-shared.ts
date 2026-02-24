@@ -304,8 +304,17 @@ export function expandirTareasADisplayRows(
         matMap.set(fechaKey, o);
       }
 
-      // Si no se generaron fechas, mostrar al menos 1 fila resumen
+      // Si no se generaron fechas y no hay ocurrencias materializadas visibles
       if (fechas.length === 0 && matMap.size === 0) {
+        // Si la recurrencia está agotada (hastaFecha < fechaBase), no mostrar nada
+        if (t.recurrencia?.hastaFecha && t.fechaVencimientoBase) {
+          const hastaStr = t.recurrencia.hastaFecha.split("T")[0];
+          const baseStr = t.fechaVencimientoBase.split("T")[0];
+          if (hastaStr < baseStr) continue;
+        }
+        // Si la asignación está en estado final, no mostrar
+        if (["FINALIZADA", "COMPLETADA", "REVOCADA"].includes(t.estado)) continue;
+
         rows.push({
           key: t.tareaAsignacionId,
           tareaAsignacionId: t.tareaAsignacionId,

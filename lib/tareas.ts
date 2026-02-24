@@ -840,7 +840,7 @@ export async function cancelarDesdeAqui(
     data: { hastaFecha: diaAnterior },
   });
 
-  const estados = ["PENDIENTE", "COMPLETADA"];
+  const estados = ["PENDIENTE", "COMPLETADA", "VENCIDA"];
 
   // Marcar como CANCELADA: ocurrencias cuya fecha ISO >= fechaCorte y estado esté en lista
   const ocurrenciasACancelar = asignacion.ocurrencias.filter((oc) => {
@@ -863,6 +863,24 @@ export async function cancelarDesdeAqui(
   }
 
   await evaluarEstadoAsignacion(tareaAsignacionId);
+
+  // Si la recurrencia quedó totalmente agotada (hastaFecha < fechaVencimientoBase),
+  // y no hay ocurrencias pendientes, forzar FINALIZADA
+  const baseStr = asignacion.tarea.fechaVencimientoBase
+    ? getFechaStr(asignacion.tarea.fechaVencimientoBase)
+    : null;
+  if (baseStr && getFechaStr(diaAnterior) < baseStr) {
+    const asigActualizada = await prisma.tareaAsignacion.findUnique({
+      where: { id: tareaAsignacionId },
+      select: { estado: true },
+    });
+    if (asigActualizada?.estado === "ACTIVA") {
+      await prisma.tareaAsignacion.update({
+        where: { id: tareaAsignacionId },
+        data: { estado: "FINALIZADA" },
+      });
+    }
+  }
 
   return { canceladas: ocurrenciasACancelar.length, nuevaHastaFecha: getFechaStr(diaAnterior) };
 }

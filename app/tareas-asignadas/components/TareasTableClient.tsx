@@ -290,7 +290,7 @@ export default function TareasTableClient({
         }
       } else {
         // Ocurrencia virtual: materializar con estado CANCELADA
-        const fechaOriginal = row.fechaOcurrencia || new Date().toISOString().split("T")[0];
+        const fechaOriginal = row.fechaOriginalOcurrencia || row.fechaOcurrencia || new Date().toISOString().split("T")[0];
         const res = await fetch("/api/tareas/ocurrencias", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -309,7 +309,7 @@ export default function TareasTableClient({
 
       // Actualizar en memoria: agregar/actualizar ocurrencia con CANCELADA
       // expandirTareasADisplayRows filtrará las CANCELADA automáticamente
-      const fechaKey = (row.fechaOcurrencia || new Date().toISOString()).split("T")[0];
+      const fechaKey = (row.fechaOriginalOcurrencia || row.fechaOcurrencia || new Date().toISOString()).split("T")[0];
       setTareasBase((prev) =>
         prev.map((t) => {
           if (t.tareaAsignacionId !== row.tareaAsignacionId) return t;
@@ -357,7 +357,7 @@ export default function TareasTableClient({
     const row = deleteModal.row;
     setLoading(true);
     try {
-      const fechaDesde = row.fechaOcurrencia || new Date().toISOString().split("T")[0];
+      const fechaDesde = row.fechaOriginalOcurrencia || row.fechaOcurrencia || new Date().toISOString().split("T")[0];
 
       if (row.tieneRecurrencia) {
         // Tarea recurrente → cortar recurrencia y cancelar futuras
@@ -376,7 +376,6 @@ export default function TareasTableClient({
         }
 
         // Actualizar en memoria: setear hastaFecha y marcar ocurrencias futuras como CANCELADA
-        // No actualiza en la BD solo en lo que se muestra, el endpoint se encarga de actualizar correctamente la recurrencia y las ocurrencias futuras
         const fechaCorteStr = fechaDesde.split("T")[0];
         setTareasBase((prev) =>
           prev.map((t) => {
@@ -384,16 +383,39 @@ export default function TareasTableClient({
             // Actualizar hastaFecha en recurrencia (día anterior)
             const diaAnterior = new Date(fechaCorteStr + "T12:00:00");
             diaAnterior.setDate(diaAnterior.getDate() - 1);
+            const diaAnteriorIso = diaAnterior.toISOString();
+
+            // Marcar como CANCELADA todas las ocurrencias >= fechaCorte (incluye VENCIDA y COMPLETADA)
+            const nuevasMats = t.ocurrenciasMaterializadas.map((o) => {
+              const fechaOc = o.fechaOriginal.split("T")[0];
+              if (fechaOc >= fechaCorteStr && o.estado !== "CANCELADA") {
+                return { ...o, estado: "CANCELADA" };
+              }
+              return o;
+            });
+
+            // Determinar nuevo estado de la asignación
+            let nuevoEstado = t.estado;
+            const hastaStr = diaAnteriorIso.split("T")[0];
+            const baseStr = t.fechaVencimientoBase?.split("T")[0];
+            if (baseStr && hastaStr < baseStr) {
+              // Recurrencia totalmente agotada → FINALIZADA
+              nuevoEstado = "FINALIZADA";
+            } else if (nuevasMats.length > 0) {
+              const hayPendientes = nuevasMats.some((o) => o.estado === "PENDIENTE");
+              if (!hayPendientes) {
+                const todasCompletadas = nuevasMats.every((o) => o.estado === "COMPLETADA");
+                nuevoEstado = todasCompletadas ? "COMPLETADA" : "FINALIZADA";
+              }
+            }
+
             return {
               ...t,
+              estado: nuevoEstado,
               recurrencia: t.recurrencia
-                ? { ...t.recurrencia, hastaFecha: diaAnterior.toISOString() }
+                ? { ...t.recurrencia, hastaFecha: diaAnteriorIso }
                 : null,
-              ocurrenciasMaterializadas: t.ocurrenciasMaterializadas.map((o) =>
-                o.fechaOriginal.split("T")[0] >= fechaCorteStr && o.estado === "PENDIENTE"
-                  ? { ...o, estado: "CANCELADA" }
-                  : o
-              ),
+              ocurrenciasMaterializadas: nuevasMats,
             };
           })
         );

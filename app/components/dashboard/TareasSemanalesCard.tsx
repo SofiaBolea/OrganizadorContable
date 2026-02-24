@@ -15,17 +15,17 @@ export default function TareasSemanalesCard({
   tareasAsignacion,
 }: TareasSemanalesCardProps) {
   const [tareas, setTareas] = useState<TareaDisplayRow[]>(() => {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    const hastaDia = new Date(hoy);
-    hastaDia.setDate(hastaDia.getDate() + 7);
-    hastaDia.setHours(23, 59, 59, 999);
+    // Usar strings ISO para comparación (YYYY-MM-DD) - mismo método que cancelarDesdeAqui
+    const hoyStr = new Date().toISOString().split('T')[0];
+    const hastaDiaDate = new Date();
+    hastaDiaDate.setDate(hastaDiaDate.getDate() + 7);
+    const hastaDiaStr = hastaDiaDate.toISOString().split('T')[0];
 
     // Expandir y filtrar por rango de 7 días
     return expandirTareasADisplayRows(tareasAsignacion).filter((t) => {
       if (!t.fechaOcurrencia) return false;
-      const fecha = new Date(t.fechaOcurrencia);
-      return fecha >= hoy && fecha <= hastaDia;
+      const fechaStr = new Date(t.fechaOcurrencia).toISOString().split('T')[0];
+      return fechaStr >= hoyStr && fechaStr <= hastaDiaStr;
     });
   });
   const [modalTarea, setModalTarea] = useState<TareaDisplayRow | null>(null);
