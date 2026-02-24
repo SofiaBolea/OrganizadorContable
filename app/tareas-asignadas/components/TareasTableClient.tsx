@@ -38,10 +38,18 @@ function formatFecha(fechaStr: string | null) {
 
 function getDiasFaltantes(fechaStr: string | null) {
   if (!fechaStr) return null;
+  // Extraer YYYY-MM-DD y crear fecha a medianoche UTC
+  const fechaParts = fechaStr.split("T")[0].split("-");
+  const año = parseInt(fechaParts[0]);
+  const mes = parseInt(fechaParts[1]);
+  const día = parseInt(fechaParts[2]);
+  
+  // Crear ambas fechas a medianoche UTC para comparación consistente
   const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  const fecha = new Date(fechaStr.split("T")[0] + "T00:00:00");
-  const diffMs = fecha.getTime() - hoy.getTime();
+  const hoyUTC = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate(), 0, 0, 0, 0));
+  const fechaVenc = new Date(Date.UTC(año, mes - 1, día, 0, 0, 0, 0));
+  
+  const diffMs = fechaVenc.getTime() - hoyUTC.getTime();
   return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 }
 

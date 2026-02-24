@@ -818,22 +818,21 @@ export async function cancelarDesdeAqui(
     },
   });
 
-
   if (!asignacion) throw new Error("Asignación no encontrada");
   if (!asignacion.tarea.recurrencia) throw new Error("Solo se puede cancelar desde aquí en tareas recurrentes");
 
   // Parsear fecha manualmente (YYYY-MM-DD o YYYY-MM-DDTHH:mm:ss)
-  // Esto evita problemas de zona horaria que causaban cancelar un día antes de lo esperado
   const fechaStr = fechaDesde.split('T')[0]; // "2026-02-05"
   const [año, mes, día] = fechaStr.split('-').map(Number);
   
-  // Crear fechaCorte a las 00:00:00 en zona local (será interpretado consistentemente en la BD)
-  const fechaCorte = new Date(año, mes - 1, día, 0, 0, 0, 0);
+  // Crear fechaCorte a las 00:00:00 UTC
+  const fechaCorte = new Date(Date.UTC(año, mes - 1, día, 0, 0, 0, 0));
+  const fechaCortStr = getFechaStr(fechaCorte);
   
-  // Día anterior a las 00:00:00 (última ocurrencia que NO se cancelará)
-  const diaAnterior = new Date(año, mes - 1, día - 1, 0, 0, 0, 0);
+  // Día anterior a las 00:00:00 UTC
+  const diaAnterior = new Date(Date.UTC(año, mes - 1, día - 1, 0, 0, 0, 0));
 
-  console.log(`Cancelando ocurrencias desde ${fechaCorte.toISOString()} en adelante. Nueva hastaFecha: ${diaAnterior.toISOString()}`);
+  console.log(`Cancelando ocurrencias desde ${fechaCortStr} en adelante. Nueva hastaFecha: ${getFechaStr(diaAnterior)}`);
 
   // Actualizar hastaFecha de la recurrencia
   await prisma.recurrencia.update({
@@ -843,31 +842,29 @@ export async function cancelarDesdeAqui(
 
   const estados = ["PENDIENTE", "COMPLETADA"];
 
-  // Marcar como CANCELADA todas las ocurrencias desde la fecha indicada en adelante
-  // Comparar normalizando ambas fechas a YYYYMMDD para evitar problemas de zona horaria
-  const fechaCorteNum = fechaCorte.getFullYear() * 10000 + (fechaCorte.getMonth() + 1) * 100 + fechaCorte.getDate();
-  
+  // Marcar como CANCELADA: ocurrencias cuya fecha ISO >= fechaCorte y estado esté en lista
   const ocurrenciasACancelar = asignacion.ocurrencias.filter((oc) => {
-    const ocDate = new Date(oc.fechaOriginal);
-    const ocDateNum = ocDate.getUTCFullYear() * 10000 + (ocDate.getUTCMonth() + 1) * 100 + ocDate.getUTCDate();
-    return ocDateNum >= fechaCorteNum && estados.includes(oc.estado);
+    const ocStr = getFechaStr(oc.fechaOriginal);
+    return ocStr >= fechaCortStr && estados.includes(oc.estado);
   });
 
-  await prisma.ocurrencia.updateMany({
-    where: {
-      tareaAsignacionId,
-      fechaOriginal: {
-        gte: fechaCorte,
+  console.log(`Ocurrencias a cancelar: ${ocurrenciasACancelar.map(oc => getFechaStr(oc.fechaOriginal)).join(', ')}`);
+
+  // Actualizar en BD usando IDs específicos
+  if (ocurrenciasACancelar.length > 0) {
+    await prisma.ocurrencia.updateMany({
+      where: {
+        id: { in: ocurrenciasACancelar.map(oc => oc.id) },
       },
-    },
-    data: {
-      estado: "CANCELADA",
-    },
-  });
+      data: {
+        estado: "CANCELADA",
+      },
+    });
+  }
 
   await evaluarEstadoAsignacion(tareaAsignacionId);
 
-  return { canceladas: ocurrenciasACancelar.length, nuevaHastaFecha: diaAnterior.toISOString() };
+  return { canceladas: ocurrenciasACancelar.length, nuevaHastaFecha: getFechaStr(diaAnterior) };
 }
 
 // ═══════════════════════════════════════
@@ -1017,6 +1014,20 @@ export async function getAsistentesOrganizacion(orgId: string) {
 // ═══════════════════════════════════════
 
 /**
+ * Obtiene la fecha en formato YYYY-MM-DD desde cualquier tipo de fecha
+ * Funciona tanto con Date objects como con strings ISO
+ */
+function getFechaStr(fecha: Date | string | null): string {
+  if (!fecha) return "";
+  // Si es string, extraer la parte YYYY-MM-DD
+  if (typeof fecha === 'string') {
+    return fecha.split('T')[0];
+  }
+  // Si es Date, convertir a ISO y extraer YYYY-MM-DD
+  return fecha.toISOString().split('T')[0];
+}
+
+/**
  * Marca como VENCIDA las ocurrencias PENDIENTES cuya fecha ya pasó.
  * Para tareas sin recurrencia, crea una ocurrencia con estado VENCIDA
  * si su fechaVencimientoBase ya pasó y la asignación está ACTIVA.
@@ -1025,8 +1036,8 @@ export async function getAsistentesOrganizacion(orgId: string) {
  * sin necesidad de un cron job.
  */
 async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
+  // Usar la parte de fecha del ISO string de hoy para comparaciones consistentes
+  const hoyStr = new Date().toISOString().split('T')[0];
 
   const idsOcurrenciasAVencer: string[] = [];
   // Para tareas únicas sin ocurrencia existente: crear una con VENCIDA
@@ -1039,9 +1050,9 @@ async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
     // Marcar ocurrencias materializadas PENDIENTES cuya fecha ya pasó
     for (const oc of asig.ocurrencias || []) {
       if (oc.estado === "PENDIENTE") {
-        const fechaOc = new Date(oc.fechaOriginal);
-        fechaOc.setHours(0, 0, 0, 0);
-        if (fechaOc < hoy) {
+        // Comparar usando strings ISO YYYY-MM-DD
+        const fechaOcStr = getFechaStr(oc.fechaOriginal);
+        if (fechaOcStr < hoyStr) {
           idsOcurrenciasAVencer.push(oc.id);
           oc.estado = "VENCIDA"; // Actualizar en memoria también
         }
@@ -1055,9 +1066,8 @@ async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
       asig.tarea.fechaVencimientoBase &&
       asig.estado === "ACTIVA"
     ) {
-      const fechaVenc = new Date(asig.tarea.fechaVencimientoBase);
-      fechaVenc.setHours(0, 0, 0, 0);
-      if (fechaVenc < hoy) {
+      const fechaVencStr = getFechaStr(asig.tarea.fechaVencimientoBase);
+      if (fechaVencStr < hoyStr) {
         const ocurrencias = asig.ocurrencias || [];
         const yaResuelta = ocurrencias.some(
           (oc: any) => ["COMPLETADA", "VENCIDA", "CANCELADA"].includes(oc.estado)
@@ -1088,13 +1098,12 @@ async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
         ? asig.tarea.fechaVencimientoBase.toISOString()
         : null;
       const fechasGeneradas = generarFechasRecurrencia(recData, fechaBaseStr);
-      const hoyStr = formatDateISO(hoy);
       const ocurrencias = asig.ocurrencias || [];
 
       // Índice de ocurrencias materializadas por fechaOriginal (YYYY-MM-DD)
       const matPorFecha = new Map<string, any>();
       for (const oc of ocurrencias) {
-        const key = formatDateISO(new Date(oc.fechaOriginal));
+        const key = getFechaStr(oc.fechaOriginal);
         matPorFecha.set(key, oc);
       }
 
