@@ -77,5 +77,5 @@ async function AsistentesDataWrapper({ searchParams, has }: any) {
   const asistentes = await listarAsistentes(mockRequest);
   const canInvite = has({ permission: "org:asistentes:crear_asistente" });
 
-  return <TablaAsistentes initialAsistentes={asistentes || []} canInvite={canInvite} />;
+  return <TablaAsistentes canInvite={canInvite} />;
 }
