@@ -12,6 +12,9 @@ export interface OcurrenciaMaterializada {
   colorOverride: string | null;
   descripcionOverride: string | null;
   prioridadOverride: string | null;
+  refColorId: string | null; // Override del color (si la ocurrencia tiene color diferente)
+  refColorHexa: string | null; // Hex del color override
+  refColorTitulo: string | null; // Nombre del color override
 }
 
 export interface RecurrenciaData {
@@ -234,9 +237,8 @@ export function expandirTareasADisplayRows(
   const rows: TareaDisplayRow[] = [];
 
   // Fecha de hoy para detectar ocurrencias vencidas
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  const hoyStr = hoy.toISOString().split("T")[0];
+  // Usar ISO string YYYY-MM-DD para comparaciones consistentes entre timezones
+  const hoyStr = new Date().toISOString().split("T")[0];
 
   /** Estado para una ocurrencia sin materializar según su fecha */
   const estadoVirtualPorFecha = (fechaStr: string | null): string => {
@@ -283,9 +285,10 @@ export function expandirTareasADisplayRows(
         asignadoPorNombre: t.asignadoPorNombre,
         estado: mat?.estado || estadoVirtualPorFecha(mat?.fechaOverride || mat?.fechaOriginal || t.fechaVencimientoBase),
         fechaAsignacion: t.fechaAsignacion,
-        refColorId: t.refColorId,
-        refColorTitulo: t.refColorTitulo,
-        refColorHexa: mat?.colorOverride || t.refColorHexa,
+        // Si la ocurrencia tiene seu propio refColorId (override), usar ese. Si no, usar el base
+        refColorId: mat?.refColorId || t.refColorId,
+        refColorTitulo: mat?.refColorTitulo || t.refColorTitulo,
+        refColorHexa: mat?.refColorHexa || t.refColorHexa,
         tieneRecurrencia: false,
         frecuencia: null,
       });
@@ -359,9 +362,10 @@ export function expandirTareasADisplayRows(
           asignadoPorNombre: t.asignadoPorNombre,
           estado: mat?.estado || estadoVirtualPorFecha(mat?.fechaOverride || mat?.fechaOriginal || fechaStr),
           fechaAsignacion: t.fechaAsignacion,
-          refColorId: t.refColorId,
-          refColorTitulo: t.refColorTitulo,
-          refColorHexa: mat?.colorOverride || t.refColorHexa,
+          // Si la ocurrencia tiene su propio refColorId (override), usar ese. Si no, usar el base
+          refColorId: mat?.refColorId || t.refColorId,
+          refColorTitulo: mat?.refColorTitulo || t.refColorTitulo,
+          refColorHexa: mat?.refColorHexa || t.refColorHexa,
           tieneRecurrencia: true,
           frecuencia: t.recurrencia!.frecuencia,
         });

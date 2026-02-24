@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const { tareaAsignacionId, fechaOriginal, estado, fechaOverride, tituloOverride, colorOverride, prioridadOverride, descripcionOverride } = await request.json();
+    const { tareaAsignacionId, fechaOriginal, estado, refColorId, fechaOverride, tituloOverride, colorOverride, prioridadOverride, descripcionOverride } = await request.json();
 
     if (!tareaAsignacionId || !fechaOriginal) {
       return NextResponse.json({ error: "Datos requeridos: tareaAsignacionId, fechaOriginal" }, { status: 400 });
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     const ocurrencia = await materializarOcurrencia(
       tareaAsignacionId,
       fechaOriginal,
-      { estado, fechaOverride, tituloOverride, colorOverride, prioridadOverride, descripcionOverride }
+      { estado, fechaOverride, tituloOverride, refColorId, colorOverride, prioridadOverride, descripcionOverride }
     );
 
     return NextResponse.json(
