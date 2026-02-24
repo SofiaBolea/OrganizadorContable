@@ -696,6 +696,7 @@ export async function materializarOcurrencia(
     fechaOverride?: string | null;
     tituloOverride?: string | null;
     descripcionOverride?: string | null;
+    refColorId?: string | null;
     colorOverride?: string | null;
     prioridadOverride?: string | null;
   }
@@ -732,6 +733,7 @@ export async function materializarOcurrencia(
           : existente.fechaOverride,
         tituloOverride: datos.tituloOverride !== undefined ? datos.tituloOverride : existente.tituloOverride,
         colorOverride: datos.colorOverride !== undefined ? datos.colorOverride : existente.colorOverride,
+        refColorId: datos.refColorId !== undefined ? datos.refColorId : existente.refColorId,
         descripcionOverride: datos.descripcionOverride !== undefined ? datos.descripcionOverride : existente.descripcionOverride,
         prioridadOverride: datos.prioridadOverride !== undefined ? datos.prioridadOverride : existente.prioridadOverride,
         fechaEjecucion: datos.estado === "COMPLETADA" ? new Date() : existente.fechaEjecucion,
@@ -746,6 +748,7 @@ export async function materializarOcurrencia(
         fechaOverride: datos.fechaOverride ? new Date(datos.fechaOverride) : null,
         tituloOverride: datos.tituloOverride || null,
         descripcionOverride: datos.descripcionOverride || null,
+        refColorId: datos.refColorId || null,
         colorOverride: datos.colorOverride !== undefined ? datos.colorOverride : null,
         prioridadOverride: datos.prioridadOverride || null,
         fechaEjecucion: datos.estado === "COMPLETADA" ? new Date() : null,
@@ -1209,10 +1212,11 @@ export async function obtenerOcurrenciaMaterializada(
       fechaOriginal: new Date(fechaOcurrencia),
     },
     include: {
+      refColor: true, // Para obtener el colorOverride si existe
       tareaAsignacion: {
         include: {
           tarea: true,
-          refColor: { select: { titulo: true, codigoHexa: true } },
+          refColor: true, // Para obtener el color de la asignación si no hay override
         },
       },
     },
@@ -1225,7 +1229,7 @@ export async function obtenerOcurrenciaMaterializada(
       where: { id: tareaAsignacionId },
       include: {
         tarea: true,
-        refColor: { select: { titulo: true, codigoHexa: true } },
+        refColor: true,
       },
     });
 
@@ -1240,8 +1244,8 @@ export async function obtenerOcurrenciaMaterializada(
       descripcion: tarea.descripcion,
       prioridad: tarea.prioridad,
       fecha: fechaOcurrencia,
-      fechaOriginal: fechaOcurrencia,
-      refColorHexa: asignacion.refColor?.codigoHexa || null,
+      refColorId: asignacion?.refColorId || null,
+      refColorHexa: asignacion?.refColor?.codigoHexa || null,
       refColorTitulo: asignacion.refColor?.titulo || null,
       tituloOverride: null,
       descripcionOverride: null,
@@ -1259,24 +1263,13 @@ export async function obtenerOcurrenciaMaterializada(
   const asignacion = ocurrencia.tareaAsignacion;
 
   // Si hay colorOverride, usar ese código hex. Si no, usar el color de la asignación
-  let refColorTitulo = asignacion.refColor?.titulo || null;
-  let refColorHexa = asignacion.refColor?.codigoHexa || null;
+  const refColorTitulo = ocurrencia.refColor?.titulo || 
+                        ocurrencia.tareaAsignacion.refColor?.titulo;
   
-  if (ocurrencia.colorOverride) {
-    // colorOverride es el código hex guardado directamente
-    refColorHexa = ocurrencia.colorOverride;
-    // Buscar si existe un RefColor con ese código hex para obtener el nombre
-    try {
-      const colorConEseHex = await prisma.refColor.findFirst({
-        where: { codigoHexa: ocurrencia.colorOverride },
-        select: { titulo: true },
-      });
-      refColorTitulo = colorConEseHex?.titulo || null;
-    } catch {
-      refColorTitulo = null;
-    }
-  }
 
+  const colorFinalHex = ocurrencia.refColor?.codigoHexa || 
+                        ocurrencia.tareaAsignacion.refColor?.codigoHexa;
+  
   return {
     id: ocurrencia.id,
     titulo: ocurrencia.tituloOverride || tarea.titulo,
@@ -1286,8 +1279,9 @@ export async function obtenerOcurrenciaMaterializada(
       ? ocurrencia.fechaOverride.toISOString()
       : ocurrencia.fechaOriginal.toISOString(),
     colorOverride: ocurrencia.colorOverride,
+    refColorId: ocurrencia.refColorId || ocurrencia.tareaAsignacion.refColorId,
     refColorTitulo: refColorTitulo,
-    refColorHexa: refColorHexa,
+    refColorHexa: colorFinalHex,
     tituloOverride: ocurrencia.tituloOverride,
     descripcionOverride: ocurrencia.descripcionOverride,
     prioridadOverride: ocurrencia.prioridadOverride,

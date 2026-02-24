@@ -140,11 +140,11 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
             setFechaOverrideOriginal(data.fechaOverride ? data.fechaOverride.split("T")[0] : null);
 
             // Para el color: si hay override, usar ID ficticio para que RefColorSelector muestre el fallback con el hex correcto
-            if (data.colorOverride) {
+            if (data.colorOverride || data.refColorId) {
               // ID ficticio para que no matchee con ningún color de la lista
               // Así RefColorSelector usará fallbackColor con el hex del override
-              setRefColorId("__colorOverride__");
-              setRefColorHexa(data.colorOverride);
+              setRefColorId(data.refColorId || null); 
+              setRefColorHexa(data.refColorHexa);
               setRefColorTitulo(data.refColorTitulo || null);
               setColorOverrideOriginal(data.colorOverride);
             } else {
@@ -369,11 +369,12 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
           tareaAsignacionId: ocurrenciaContext.tareaAsignacionId,
           fechaOriginal,
           // undefined se omite de JSON → el server sabe que no cambió
+          refColorId: refColorId,
           tituloOverride: titulo !== tituloOriginal ? titulo : undefined,
           descripcionOverride: descripcion !== descripcionOriginal ? descripcion : undefined,
           prioridadOverride: prioridad !== prioridadOriginal ? prioridad : undefined,
           fechaOverride: fechaVencimiento !== fechaOriginalOverride ? fechaVencimiento : undefined,
-          colorOverride: refColorHexa !== (colorOverrideOriginal || initialData?.refColorHexa || null) ? (refColorHexa ?? null) : undefined,
+          colorOverride: undefined, // Solo usar si es un color manual fuera del catálogo
         }),
       });
       if (!res.ok) {
