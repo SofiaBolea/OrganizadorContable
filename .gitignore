@@ -34,6 +34,7 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+
 # vercel
 .vercel
 
@@ -41,4 +42,17 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-/app/generated/prisma
+
+# entorno virtual python
+.venv/
+
+# directorios generados
+/generated/
+.prisma/
+prisma/generated/
+
+# configuración de VSCode
+.vscode/
+
+# logs generales
+*.log
