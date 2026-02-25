@@ -26,7 +26,7 @@ export default async function DashboardContainer({
     ]);
 
   return (
-    <main className="dashboard-container">
+    <main className="dashboard-container h-full flex flex-col gap-6">
       {/* Card de Tareas Asignadas (solo si es asistente) */}
       {tieneAsistente && (
         <div className="dashboard-grid-full">

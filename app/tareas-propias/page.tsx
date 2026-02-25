@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "../components/Button";
 import TareasTableClient from "@/app/tareas-asignadas/components/TareasTableClient";
 import RefColorTable from "@/app/tareas-asignadas/components/RefColorTable";
+import BotonScroll from "../components/botonScroll";
 
 export default async function TareasPropiasPage() {
   const { orgId, userId } = await auth();
@@ -52,15 +53,21 @@ export default async function TareasPropiasPage() {
 
   return (
     <main className="p-8">
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex flex-row justify-between items-center mb-2">
+
         <h1 className="text-3xl font-bold text-text">Mis Tareas</h1>
-        {canCreate && (
+        <div className="flex flex-row gap-4">
+          {canCreate && (
           <Button variant="primario">
             <Link href="/tareas-propias/nueva">
               Nueva Tarea
             </Link>
           </Button>
         )}
+
+        <BotonScroll targetId="refColor-section" label="Referencias de color" />
+        </div>
+        
       </div>
       <p className="text-text/50 mb-8">Gestionar tus tareas personales</p>
 
@@ -75,7 +82,10 @@ export default async function TareasPropiasPage() {
         basePath="/tareas-propias"
       />
 
-      <RefColorTable />
+      <section id="refColor-section" className="mt-16">
+        <RefColorTable />
+      </section>
+
     </main>
   );
 }
