@@ -6,6 +6,7 @@ import TareaItemRow from "./TareaItemRow";
 import DetalleTareaModal from "./DetalleTareaModal";
 import type { TareaAsignacionRow, TareaDisplayRow } from "@/lib/tareas-shared";
 import { expandirTareasADisplayRows } from "@/lib/tareas-shared";
+import { ModalError } from "./modalError";
 
 interface TareasSemanalesCardProps {
   tareasAsignacion: TareaAsignacionRow[];
@@ -30,10 +31,12 @@ export default function TareasSemanalesCard({
   });
   const [modalTarea, setModalTarea] = useState<TareaDisplayRow | null>(null);
   const router = useRouter();
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleVerDetalle = useCallback((tarea: TareaDisplayRow) => {
     setModalTarea(tarea);
   }, []);
+  
 
   const handleEstadoChange = useCallback(
     async (tarea: TareaDisplayRow, nuevoEstado: string) => {
@@ -51,7 +54,7 @@ export default function TareasSemanalesCard({
 
         if (!response.ok) {
           const data = await response.json();
-          console.error("Error:", data.error || "Error al actualizar estado");
+          setErrorMsg("Error al actualizar el estado: " + (data.error || "Error desconocido"));
           return;
         }
 
@@ -61,7 +64,7 @@ export default function TareasSemanalesCard({
           )
         );
       } catch (error) {
-        console.error("Error:", error);
+        setErrorMsg("No se pudo actualizar el estado de la tarea.");
       }
     },
     []
@@ -98,6 +101,12 @@ export default function TareasSemanalesCard({
         <DetalleTareaModal
           tarea={modalTarea}
           onClose={() => setModalTarea(null)}
+        />
+      )}
+      {errorMsg && (
+        <ModalError
+          mensaje={errorMsg}
+          onClose={() => setErrorMsg(null)}
         />
       )}
     </>

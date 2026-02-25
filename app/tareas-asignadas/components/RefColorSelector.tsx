@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { ChevronDown, Eye, Edit, Trash2, Plus } from "lucide-react";
+import { ModalError } from "./modalError";
 
 interface RefColor {
   id: string;
@@ -24,6 +25,7 @@ export default function RefColorSelector({ selectedId, selectedHexa, refColorTit
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Modal state
   const [modalMode, setModalMode] = useState<ModalMode>(null);
@@ -58,8 +60,8 @@ export default function RefColorSelector({ selectedId, selectedHexa, refColorTit
         const data = await res.json();
         setColores(data);
       }
-    } catch {
-      console.error("Error cargando colores");
+    } catch (error) {
+      setErrorMsg("Error al cargar los colores");
     } finally {
       setLoading(false);
     }
@@ -119,7 +121,7 @@ export default function RefColorSelector({ selectedId, selectedHexa, refColorTit
           onChange(data.id, data.codigoHexa);
           closeModal();
         } else {
-          alert("Error al crear color");
+          setErrorMsg("Error al crear color");
         }
       } else if (modalMode === "editar" && modalColor) {
         const res = await fetch(`/api/ref-colores/${modalColor.id}`, {
@@ -138,11 +140,11 @@ export default function RefColorSelector({ selectedId, selectedHexa, refColorTit
 
           closeModal();
         } else {
-          alert("Error al actualizar color");
+          setErrorMsg("Error al actualizar color");
         }
       }
-    } catch {
-      alert("Error al conectar con el servidor");
+    } catch (error) {
+      setErrorMsg("Error al conectar con el servidor");
     } finally {
       setSaving(false);
     }
@@ -165,10 +167,10 @@ export default function RefColorSelector({ selectedId, selectedHexa, refColorTit
         if (selectedId === deleteConfirm.id) onChange(null, null);
         setDeleteConfirm(null);
       } else {
-        alert("Error al eliminar color");
+        setErrorMsg("Error al eliminar color");
       }
-    } catch {
-      alert("Error al conectar con el servidor");
+    } catch (error) {
+      setErrorMsg("Error al conectar con el servidor");
     } finally {
       setDeleting(false);
     }
@@ -392,6 +394,12 @@ export default function RefColorSelector({ selectedId, selectedHexa, refColorTit
             </div>
           </div>
         </div>
+      )}
+      {errorMsg && (
+        <ModalError
+          mensaje={errorMsg}
+          onClose={() => setErrorMsg(null)}
+        />
       )}
     </>
   );

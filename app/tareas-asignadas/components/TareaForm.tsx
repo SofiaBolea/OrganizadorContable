@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import RefColorSelector from "./RefColorSelector";
+import { ModalError } from "./modalError";
 
 interface Asistente {
   id: string;
@@ -64,7 +65,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
   const [refColorIdBase, setRefColorIdBase] = useState<string | null>(initialData?.refColorId || null);
   const [refColorHexa, setRefColorHexa] = useState<string | null>(initialData?.refColorHexa || null);
   const [refColorTitulo, setRefColorTitulo] = useState<string | null>(null);
-
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   // Recurrencia
   const [esRecurrente, setEsRecurrente] = useState(!!initialData?.recurrencia);
 
@@ -159,7 +160,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
             setOcurrenciaDataLoaded(true);
           }
         } catch (err) {
-          console.error("Error loading ocurrencia data:", err);
+          setErrorMsg("Error loading ocurrencia data: " + (err as Error).message);
           setOcurrenciaDataLoaded(true);
         }
       };
@@ -213,7 +214,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
       fetch("/api/tareas/asistentes")
         .then((res) => res.json())
         .then((data) => setAsistentes(Array.isArray(data) ? data : []))
-        .catch(() => console.error("Error cargando asistentes"))
+        .catch((err) => setErrorMsg("Error cargando asistentes: " + (err as Error).message))
         .finally(() => setLoadingAsistentes(false));
     }
   }, [tipoTarea]);
@@ -470,7 +471,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
             body: JSON.stringify({ camposParaLimpiar }),
           });
         } catch (err) {
-          console.error("Error limpiando overrides:", err);
+          setErrorMsg("Error limpiando overrides: " + (err as Error).message);
           // No lanzar error, continuar igual
         }
       }
@@ -954,6 +955,11 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
           </div>
         );
       })()}
+      
+      
+      {errorMsg && (
+        <ModalError mensaje={errorMsg} onClose={() => setErrorMsg(null)} />
+      )}
     </>
   );
 }
