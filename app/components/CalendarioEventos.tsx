@@ -50,28 +50,30 @@ export default function CalendarioEventos({ eventos }: { eventos: any[] }) {
 
   // PROCESAMIENTO CRÍTICO: Esta es la parte que limpia el desfase UTC
   const eventosProcesados = useMemo(() => {
-    return eventos.map(event => {
-     
-      let dateStr = "";
-      if (typeof event.start === 'string') {
-        dateStr = event.start.split('T')[0];
-      } else {
-        // Si ya es un objeto Date, forzamos a obtener los valores UTC para que no 
-        // se reste un día si el navegador está en UTC-3
-        const d = event.start;
-        dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-      }
+    // 1. Filtramos eventos que no tengan fecha de inicio válida
+    return eventos
+      .filter(event => event && event.start)
+      .map(event => {
+        let dateStr = "";
+        if (typeof event.start === 'string') {
+          dateStr = event.start.split('T')[0];
+        } else {
+          const d = event.start;
+          // Agregamos una comprobación extra por seguridad
+          if (!(d instanceof Date)) return null;
+          dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+        }
 
-      // 2. Crear la fecha local exacta
-      const [year, month, day] = dateStr.split('-').map(Number);
-      const localDate = new Date(year, month - 1, day, 12, 0, 0);
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const localDate = new Date(year, month - 1, day, 12, 0, 0);
 
-      return {
-        ...event,
-        start: localDate,
-        end: localDate,
-      };
-    });
+        return {
+          ...event,
+          start: localDate,
+          end: localDate,
+        };
+      })
+      .filter(Boolean); // Eliminamos posibles nulos si la fecha era inválida
   }, [eventos]);
 
   const handleSelectEvent = (event: any) => {
@@ -94,7 +96,7 @@ export default function CalendarioEventos({ eventos }: { eventos: any[] }) {
     <div className="h-[85vh] relative font-sans">
       <Calendar
         localizer={localizer}
-        events={eventosProcesados} 
+        events={eventosProcesados}
         view={view}
         onView={setView}
         date={date}
