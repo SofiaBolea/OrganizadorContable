@@ -58,7 +58,7 @@ model Usuario {
   vencimientosCreados     Vencimiento[]
   clientesAsignados       ClienteAsignacion[]
   refColores              RefColor[]
-  
+  ocurrenciasAsignadasOverride Ocurrencia[]
 
   @@index([organizacionId])
   @@map("usuarios")
@@ -271,6 +271,9 @@ model Ocurrencia {
 
   estado             String   @default("PENDIENTE") @db.VarChar(20)
   prioridadOverride  String?  @db.VarChar(20) 
+
+  asignadoOverrideId String?
+  asignadoOverride Usuario? @relation(fields: [asignadoOverrideId], references: [id])
 
   @@index([tareaAsignacionId])
   @@index([fechaOriginal])
