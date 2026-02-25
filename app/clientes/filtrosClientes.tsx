@@ -62,7 +62,7 @@ export function FiltrosClientes({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 bg-[#f2f1eb] p-6 rounded-[30px] border border-white shadow-sm">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 dashboard-card ">
       {/* Filtro por Nombre */}
       <div className="relative">
         <input
@@ -70,7 +70,7 @@ export function FiltrosClientes({
           placeholder="Buscar por nombre..."
           defaultValue={searchParams.get("nombre")?.toString()}
           onChange={(e) => handleSearch(e.target.value, "nombre")}
-          className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-[#98c18c] transition-all"
+          className="input-base"
         />
       </div>
 

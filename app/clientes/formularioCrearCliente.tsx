@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 // import { crearClienteAction } from "./actions";
 import { ModalError } from "./modalError";
 import { Button } from "../components/Button";
+import { Plus } from "lucide-react";
 
 export function FormularioCrearCliente({ onClienteCreado }: { onClienteCreado?: () => void }) {
   const [asistentes, setAsistentes] = useState<any[]>([]);
@@ -29,13 +30,13 @@ export function FormularioCrearCliente({ onClienteCreado }: { onClienteCreado?: 
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  
+
   const [searchTerm, setSearchTerm] = useState("");
   const [asignarTodos, setAsignarTodos] = useState(false);
   const [seleccionados, setSeleccionados] = useState<string[]>([]);
 
   const asistentesFiltrados = useMemo(() => {
-    return asistentes.filter(a => 
+    return asistentes.filter(a =>
       a.nombreCompleto.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [asistentes, searchTerm]);
@@ -61,7 +62,7 @@ export function FormularioCrearCliente({ onClienteCreado }: { onClienteCreado?: 
   const router = require('next/navigation').useRouter();
   async function handleOnSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget; 
+    const form = e.currentTarget;
     setLoading(true);
 
     const formData = new FormData(form);
@@ -97,9 +98,13 @@ export function FormularioCrearCliente({ onClienteCreado }: { onClienteCreado?: 
   }
 
   if (!isOpen) return (
-    <Button onClick={() => setIsOpen(true)} variant="primario" >
-      + Nuevo Cliente
-    </Button>
+    <div className="flex w-full justify-end">
+      <Button onClick={() => setIsOpen(true)} variant="primario">
+        <Plus className="w-4 h-4 mr-2" />
+        Nuevo Cliente
+      </Button>
+    </div>
+
   );
 
   if (asistentesLoading) {

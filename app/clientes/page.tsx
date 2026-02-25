@@ -27,12 +27,8 @@ export default async function ClientesPage(props: { searchParams: Promise<any> }
   const puedeVerTodosLosClientes = await Permisos.puedeVerTodosLosClientes();
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto">
       <header className="flex justify-between items-end mb-10">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight italic">Lista de Clientes</h1>
-          <p className="text-slate-500 mt-1 italic">Estudio {orgLocal.nombre}</p>
-        </div>
         {puedeCrear && <FormularioCrearCliente />}
       </header>
 

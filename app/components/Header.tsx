@@ -34,66 +34,43 @@ export default function Header() {
   }
 
   const [isAdmin, setIsAdmin] = useState(false);
-    const [loadingPerms, setLoadingPerms] = useState(true);
-    const { organization } = useOrganization();
-  
-    useEffect(() => {
-      async function checkAdmin() {
-        setLoadingPerms(true);
-        try {
-          const res = await fetch("/api/administrador");
-          const data = await res.json();
-          setIsAdmin(!!data.esAdmin);
-        } catch (err) {
-          console.error("Error al verificar permisos:", err);
-          setIsAdmin(false);
-        } finally {
-          setLoadingPerms(false);
-        }
+  const [loadingPerms, setLoadingPerms] = useState(true);
+  const { organization } = useOrganization();
+
+  useEffect(() => {
+    async function checkAdmin() {
+      setLoadingPerms(true);
+      try {
+        const res = await fetch("/api/administrador");
+        const data = await res.json();
+        setIsAdmin(!!data.esAdmin);
+      } catch (err) {
+        console.error("Error al verificar permisos:", err);
+        setIsAdmin(false);
+      } finally {
+        setLoadingPerms(false);
       }
-  
-      // Solo hacemos fetch si hay una org seleccionada
-      if (organization?.id) {
-        checkAdmin();
-      }
-    }, [organization?.id]);
+    }
+
+    // Solo hacemos fetch si hay una org seleccionada
+    if (organization?.id) {
+      checkAdmin();
+    }
+  }, [organization?.id]);
 
   return (
-    <header className="h-20 flex items-center justify-between px-8 border-b bg-[#EFEDE7]">
+    <header className="h-25 flex items-center justify-between px-15 ">
 
-      <h1 className="text-2xl font-semibold text-[#494E5F]">
-        {getTitle()}
-      </h1>
+      <div className="flex flex-col items-baseline md:items-start">
+        <h1 className="text-3xl font-bold text-text">
+          {getTitle()}
+        </h1>
+        <p className="text-text/50">Gestionar vencimientos de impuestos nacionales, provinciales y municipales</p>
+      </div>
+
 
       <div className="flex items-center gap-4">
-        <OrganizationSwitcher
-          appearance={{
-            variables: {
-              colorPrimary: "#6C8A51",
-              colorDanger: "#E08A76",
-              colorText: "#3F4A5A",
-              colorBackground: "#FFFFFF",
-              fontFamily: "montserrat, sans-serif",
-            },
-            elements: {
-              card: {
-                borderRadius: "16px",
-                padding: "24px",
-                boxShadow: "0px 4px 12px rgba(0,0,0,0.05)",
-              },
-              rootBox: {
-                width: "100%",
-              },
-              input: {
-                borderRadius: "9999px",        // redondeado tipo “pill”
-                backgroundColor: "#F8F8F6",     // fondo suave de input
-                border: "1px solid #E1E3E6",    // borde muy suave
-                padding: "12px 16px",
-                fontSize: "16px",
-              },
-            },
-          }}
-        >
+        <OrganizationSwitcher>
           {/* Siempre visible */}
           <OrganizationProfile.Page
             label="Ver Información"
@@ -113,33 +90,7 @@ export default function Header() {
             </OrganizationProfile.Page>
           )}
         </OrganizationSwitcher>
-        <UserButton
-          appearance={{
-            variables: {
-              colorPrimary: "#6C8A51",
-              colorDanger: "#E08A76",
-              colorText: "#3F4A5A",
-              colorBackground: "#FFFFFF",
-              fontFamily: "montserrat, sans-serif",
-            },
-            elements: {
-              card: {
-                borderRadius: "16px",
-                padding: "24px",
-                boxShadow: "0px 4px 12px rgba(0,0,0,0.05)",
-              },
-              rootBox: {
-                width: "100%",
-              },
-              input: {
-                borderRadius: "9999px",        // redondeado tipo “pill”
-                backgroundColor: "#F8F8F6",     // fondo suave de input
-                border: "1px solid #E1E3E6",    // borde muy suave
-                padding: "12px 16px",
-                fontSize: "16px",
-              },
-            },
-          }}>
+        <UserButton>
           <UserButton.UserProfilePage label="Editar Datos Extras" url="custom" labelIcon={<DotIcon />}>
             <Perfil />
           </UserButton.UserProfilePage>
