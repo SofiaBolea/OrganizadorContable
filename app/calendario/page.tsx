@@ -3,10 +3,10 @@ import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import CalendarioEventos from "../components/CalendarioEventos";
 import { redirect } from "next/navigation";
-import { 
-  getTareasAsignadasAdmin, 
-  getTareasAsignadasAsistente, 
-  getTareasPropias 
+import {
+    getTareasAsignadasAdmin,
+    getTareasAsignadasAsistente,
+    getTareasPropias
 } from "@/lib/tareas";
 import { expandirTareasADisplayRows, TareaAsignacionRow } from "@/lib/tareas-shared";
 
@@ -53,11 +53,11 @@ export default async function PaginaCalendario() {
     } else {
         // Miembro: Sus tareas propias + las creadas por él + las que tiene asignadas
         const asignadasAMi = await getTareasAsignadasAsistente(clerkOrgId, clerkId);
-        
+
         // Evitar duplicados (ej: una tarea "ASIGNADA" donde él es creador y asignado)
         const idsExistentes = new Set([...propias, ...creadasPorMi].map(a => a.tareaAsignacionId));
         asignaciones = [...propias, ...creadasPorMi];
-        
+
         asignadasAMi.forEach(a => {
             if (!idsExistentes.has(a.tareaAsignacionId)) {
                 asignaciones.push(a);
@@ -111,13 +111,6 @@ export default async function PaginaCalendario() {
     return (
         <main className="p-6 bg-gray-50 min-h-screen">
             <div className="max-w-7xl mx-auto">
-                <header className="mb-6">
-                    <h1 className="text-3xl font-extrabold text-gray-900">Agenda Contable</h1>
-                    <p className="text-gray-500 text-sm mt-1">
-                        Sesión de {usuario.nombreCompleto} — {esAdmin ? 'Panel de Control' : 'Mis Actividades'}
-                    </p>
-                </header>
-
                 <CalendarioEventos eventos={[...eventosTareas, ...eventosVencimientos]} />
             </div>
         </main>

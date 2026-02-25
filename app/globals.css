@@ -127,7 +127,36 @@ body {
 /* =========================
    BADGES – PRIORIDAD
 ========================= */
+/* app/globals.css */
+@layer utilities {
+  /* Animación de rebote suave */
+  @keyframes bounce-slow {
+    0%, 100% {
+      transform: translateY(-5%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+  .animate-bounce-slow {
+    animation: bounce-slow 2s infinite;
+  }
 
+  /* Animación de brillo pulsante */
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.6);
+    }
+  }
+  .animate-glow-pulse {
+    animation: glow-pulse 2s infinite;
+  }
+}
 @layer components {
   .badge-prioridad {
     display: inline-block;

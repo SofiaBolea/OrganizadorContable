@@ -16,12 +16,14 @@ const CustomToolbar = (props: ToolbarProps<any, any>) => {
   return (
     <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
       <div className="flex items-center gap-3">
-        <button onClick={() => onNavigate('TODAY')} className="px-5 py-2 text-sm font-bold text-black bg-gray-50 hover:bg-gray-100 rounded-xl transition-all border border-gray-200">Hoy</button>
-        <div className="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-200">
-          <button onClick={() => onNavigate('PREV')} className="p-1.5 hover:bg-white rounded-lg transition-all text-black"><ChevronLeft size={20} /></button>
-          <button onClick={() => onNavigate('NEXT')} className="p-1.5 hover:bg-white rounded-lg transition-all text-black"><ChevronRight size={20} /></button>
-        </div>
         <h2 className="text-xl font-extrabold text-black ml-2 capitalize">{label}</h2>
+        <div className="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-200">
+          <button onClick={() => onNavigate('PREV')} className="p-1.5 hover:bg-white rounded-lg transition-all text-[#2C2C2C]"><ChevronLeft size={20} /></button>
+          <button onClick={() => onNavigate('NEXT')} className="p-1.5 hover:bg-white rounded-lg transition-all text-[#2C2C2C]"><ChevronRight size={20} /></button>
+        </div>
+        <button onClick={() => onNavigate('TODAY')} className="px-5 py-2 text-sm bg-[#EFEDE7] font-bold text-[#2C2C2C] bg-gray-50 hover:bg-gray-100 rounded-xl transition-all border border-gray-200">Hoy</button>
+
+
       </div>
       <div className="flex bg-gray-100 p-1 rounded-xl border border-gray-200">
         {[
@@ -30,7 +32,7 @@ const CustomToolbar = (props: ToolbarProps<any, any>) => {
           { id: Views.DAY, label: 'Día' },
           { id: Views.AGENDA, label: 'Agenda' }
         ].map((v) => (
-          <button key={v.id} onClick={() => onView(v.id as View)} className={`px-4 py-1.5 text-sm font-bold rounded-lg transition-all ${view === v.id ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>{v.label}</button>
+          <button key={v.id} onClick={() => onView(v.id as View)} className={`px-4 py-1.5 text-sm font-bold rounded-lg transition-all ${view === v.id ? 'bg-white text-[#2C2C2C] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>{v.label}</button>
         ))}
       </div>
     </div>
@@ -49,9 +51,7 @@ export default function CalendarioEventos({ eventos }: { eventos: any[] }) {
   // PROCESAMIENTO CRÍTICO: Esta es la parte que limpia el desfase UTC
   const eventosProcesados = useMemo(() => {
     return eventos.map(event => {
-      // 1. Extraer el string de fecha puro (YYYY-MM-DD)
-      // Si es un string ISO, hacemos split. Si es un objeto Date, usamos format de date-fns
-      // pero teniendo cuidado de no dejar que la zona horaria lo mueva.
+     
       let dateStr = "";
       if (typeof event.start === 'string') {
         dateStr = event.start.split('T')[0];
@@ -94,7 +94,7 @@ export default function CalendarioEventos({ eventos }: { eventos: any[] }) {
     <div className="h-[85vh] relative font-sans">
       <Calendar
         localizer={localizer}
-        events={eventosProcesados} // <--- CAMBIO CLAVE: Usa la lista procesada
+        events={eventosProcesados} 
         view={view}
         onView={setView}
         date={date}
@@ -118,7 +118,7 @@ export default function CalendarioEventos({ eventos }: { eventos: any[] }) {
         <DetalleTareaModal
           tarea={tareaSeleccionada}
           onClose={() => setTareaSeleccionada(null)}
-          // Si necesitas que el botón "Ver más" funcione, agrégalo aquí
+        // Si necesitas que el botón "Ver más" funcione, agrégalo aquí
         />
       )}
     </div>
