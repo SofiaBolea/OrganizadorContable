@@ -76,12 +76,13 @@ export async function obtenerEventosCalendario(clerkOrgId: string, clerkUserId: 
             allDay: true,
             resource: {
                 type: 'tarea',
-                id: t.ocurrenciaId || t.tareaAsignacionId,
+                id:  t.tareaAsignacionId,
                 descripcion: t.descripcion,
                 prioridad: t.prioridad,
                 estado: t.estado,
                 color: t.refColorHexa,
-                asistentes: t.asignadoNombre
+                asistentes: t.asignadoNombre,
+                tipoTarea: t.tipoTarea
             }
         }));
 

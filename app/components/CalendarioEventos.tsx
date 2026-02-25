@@ -86,7 +86,8 @@ export default function CalendarioEventos({ eventos }: { eventos: any[] }) {
       color: getEventColor(event),
       // Al usar el evento procesado, event.start ya es la fecha local corregida
       fecha: format(event.start, "EEEE, d 'de' MMMM", { locale: es }),
-      type: event.resource?.type
+      type: event.resource?.type,
+      tipoTarea: event.resource?.tipoTarea,
     });
   };
 
