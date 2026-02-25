@@ -80,7 +80,7 @@ export async function getReporteData(periodo: string, clerkOrgId: string, userId
             estado: o.estado,
             tituloOverride: o.tituloOverride,
             fechaOverride: o.fechaOverride?.toISOString() || null,
-            colorOverride: o.colorOverride,
+            colorOverride: null,
             descripcionOverride: o.descripcionOverride,
             prioridadOverride: o.prioridadOverride,
             // FIX: Agregamos estos campos como null para cumplir con la interfaz
