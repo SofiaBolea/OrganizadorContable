@@ -10,8 +10,8 @@ export default async function Page() {
   }
 
   return (
-    <main className="max-w-7xl mx-auto py-10 px-6">
+    <main className="flex-1 pr-12 pl-12 pt-4 overflow-auto justify-center">
       <ReporteDashboard />
-    </main>
+    </main> 
   );
 }

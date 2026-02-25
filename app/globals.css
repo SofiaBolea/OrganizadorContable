@@ -53,6 +53,7 @@ body {
   background: var(--color-app-bg);
   color: var(--color-text-main);
   font-family: 'Montserrat', sans-serif;
+  padding: 0%;
 }
 
 /* =========================
@@ -516,13 +517,14 @@ body {
 
 /* Header */
 .table-card-header {
-  @apply px-6
-         py-6
-         border-b
-         border-slate-200
-         flex
-         items-center
-         justify-between;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /* Tabla */

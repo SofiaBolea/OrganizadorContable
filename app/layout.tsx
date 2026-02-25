@@ -21,7 +21,7 @@ export default function RootLayout({
       <html lang="es">
         <body>
           <SignedIn>
-            <div className="flex h-screen bg-[#EFEDE7]">
+            <div className="flex bg-[#EFEDE7]">
               <Sidebar />
               <div className="flex flex-col flex-1">
                 <Header />
