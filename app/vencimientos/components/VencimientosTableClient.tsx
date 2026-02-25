@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Edit, Trash2, Search } from "lucide-react";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { ModalError } from "./modalError";
 
 interface VencimientoOcurrencia {
   id: string;
@@ -30,6 +31,8 @@ export default function VencimientosTableClient({
 }: VencimientosTableClientProps) {
   const [ocurrencias, setOcurrencias] = useState(initialOcurrencias);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     ocurrencia: VencimientoOcurrencia | null;
@@ -40,6 +43,7 @@ export default function VencimientosTableClient({
   const [filtroTipo, setFiltroTipo] = useState("");
   const [filtroDespuesDe, setFiltroDespuesDe] = useState("");
   const [filtroAntesDe, setFiltroAntesDe] = useState("");
+  
 
   const ocurrenciasFiltradas = useMemo(() => {
     return ocurrencias.filter((o) => {
@@ -97,7 +101,7 @@ export default function VencimientosTableClient({
 
       if (!response.ok) {
         const data = await response.json();
-        alert(data.error || "Error al eliminar");
+        setErrorMsg(data.error || "Error al eliminar");
         return;
       }
 
@@ -107,7 +111,7 @@ export default function VencimientosTableClient({
       );
       setDeleteModal({ isOpen: false, ocurrencia: null });
     } catch (error) {
-      alert("Error al conectar con el servidor");
+      setErrorMsg("Error al conectar con el servidor");
     } finally {
       setLoading(false);
     }
@@ -129,7 +133,7 @@ export default function VencimientosTableClient({
 
       if (!response.ok) {
         const data = await response.json();
-        alert(data.error || "Error al eliminar");
+        setErrorMsg(data.error || "Error al eliminar");
         return;
       }
 
@@ -144,7 +148,7 @@ export default function VencimientosTableClient({
       setOcurrencias(filteredOcurrencias);
       setDeleteModal({ isOpen: false, ocurrencia: null });
     } catch (error) {
-      alert("Error al conectar con el servidor");
+      setErrorMsg("Error al conectar con el servidor");
     } finally {
       setLoading(false);
     }
@@ -359,6 +363,13 @@ export default function VencimientosTableClient({
         onDeleteAndFollowing={handleDeleteAndFollowing}
         isLast={isLastOcurrence}
       />
+      
+      {errorMsg && (
+        <ModalError
+          mensaje={errorMsg}
+          onClose={() => setErrorMsg(null)}
+        />
+      )}
     </>
   );
 }

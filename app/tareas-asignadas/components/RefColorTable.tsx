@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Eye, Edit, Trash2, Plus } from "lucide-react";
+import { ModalError } from "./modalError";
 
 interface RefColor {
   id: string;
@@ -21,6 +22,7 @@ export default function RefColorTable() {
   const [formTitulo, setFormTitulo] = useState("");
   const [formCodigoHexa, setFormCodigoHexa] = useState("#4A90D9");
   const [saving, setSaving] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Delete confirm
   const [deleteConfirm, setDeleteConfirm] = useState<RefColor | null>(null);
@@ -38,7 +40,7 @@ export default function RefColorTable() {
         setColores(data);
       }
     } catch {
-      console.error("Error cargando colores");
+      setErrorMsg("Error cargando colores");
     } finally {
       setLoading(false);
     }
@@ -89,7 +91,7 @@ export default function RefColorTable() {
           setColores((prev) => [...prev, data]);
           closeModal();
         } else {
-          alert("Error al crear color");
+          setErrorMsg("Error al crear color");
         }
       } else if (modalMode === "editar" && modalColor) {
         const res = await fetch(`/api/ref-colores/${modalColor.id}`, {
@@ -102,11 +104,11 @@ export default function RefColorTable() {
           setColores((prev) => prev.map((c) => (c.id === modalColor.id ? data : c)));
           closeModal();
         } else {
-          alert("Error al actualizar color");
+          setErrorMsg("Error al actualizar color");
         }
       }
-    } catch {
-      alert("Error al conectar con el servidor");
+    } catch (error) {
+      setErrorMsg("Error al conectar con el servidor");
     } finally {
       setSaving(false);
     }
@@ -127,10 +129,10 @@ export default function RefColorTable() {
         setColores((prev) => prev.filter((c) => c.id !== deleteConfirm.id));
         setDeleteConfirm(null);
       } else {
-        alert("Error al eliminar color");
+        setErrorMsg("Error al eliminar color");
       }
-    } catch {
-      alert("Error al conectar con el servidor");
+    } catch (error) {
+      setErrorMsg("Error al conectar con el servidor");
     } finally {
       setDeleting(false);
     }
@@ -328,6 +330,10 @@ export default function RefColorTable() {
           </div>
         </div>
       )}
+      
+      {errorMsg && (
+        <ModalError mensaje={errorMsg} onClose={() => setErrorMsg(null)} />
+      )}  
     </>
   );
 }
