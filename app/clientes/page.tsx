@@ -55,12 +55,6 @@ async function ClientesTableContainer({ searchParams, orgId }: { searchParams: a
 
   const mockRequest = { nextUrl: { searchParams: params } } as any;
   const clientes = await listarClientes(mockRequest);
-  
-  const asistentes = await prisma.usuario.findMany({
-    where: { organizacionId: orgId },
-    select: { id: true, nombreCompleto: true }
-  });
-
   const puedeEditar = await Permisos.puedeEditarCliente();
   const puedeEliminar = await Permisos.puedeEliminarCliente();
 
