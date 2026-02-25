@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation'; // Importamos el router para la nav
 interface DetalleTareaModalProps {
   tarea: {
     id: string;
-    tareaId: string;       // Requerido para /tareas-propias/[id]
-    taId: string;          // Requerido para ?taId=...
-    fechaOc: string;       // Requerido para &fechaOc=...
+    type: 'tarea' | 'vencimiento'; // Agregamos discriminador
+    tareaId?: string;
+    taId?: string;
+    vencimientoId?: string; // ID base del vencimiento
+    fechaOc: string;
     titulo: string;
     descripcion?: string;
     fecha: string;
@@ -29,37 +31,19 @@ const DetalleTareaModal = ({ tarea, onClose }: DetalleTareaModalProps) => {
   };
 
   const handleEdit = () => {
-    // Determinar la base del path (tareas-propias o tareas-asignadas)
-    const basePath = tarea.tipoTarea === 'PROPIA' ? 'tareas-propias' : 'tareas-asignadas';
-
-    // Construir la URL completa: /[base]/[id]/modificar?taId=[...]&fechaOc=[...]
-    const url = `/${basePath}/${tarea.tareaId}/modificar?taId=${tarea.taId}&fechaOc=${tarea.fechaOc}`;
-
-    router.push(url);
-  };
-  // Función para eliminar la asignación de la tarea
-  const handleDelete = async () => {
-    if (!confirm("¿Estás seguro de que deseas eliminar esta tarea?")) return;
-
-    try {
-      // Llamada al endpoint de eliminación de asignaciones
-      const response = await fetch(`/api/tareas/asignaciones/${tarea.id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        onClose();
-        router.refresh(); // Refresca la página para actualizar el calendario
-      } else {
-        const errorData = await response.json();
-        alert(`Error al eliminar: ${errorData.error || 'Intente nuevamente'}`);
-      }
-    } catch (error) {
-      console.error("Error eliminando la tarea:", error);
-      alert("Hubo un error en la conexión.");
+    if (tarea.type === 'vencimiento') {
+      // Ruta para vencimientos: /vencimientos/[id]/modificar?voId=...&fechaOc=...
+      const url = `/vencimientos/${tarea.vencimientoId}/modificar?voId=${tarea.id}&fechaOc=${tarea.fechaOc}`;
+      router.push(url);
+    } else {
+      // Ruta para tareas (existente)
+      const basePath = tarea.tipoTarea === 'PROPIA' ? 'tareas-propias' : 'tareas-asignadas';
+      const url = `/${basePath}/${tarea.tareaId}/modificar?taId=${tarea.taId}&fechaOc=${tarea.fechaOc}`;
+      router.push(url);
     }
   };
 
+  
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm font-['Montserrat',sans-serif]">
       <div className="relative bg-white w-full max-w-2xl rounded-[35px] shadow-2xl overflow-hidden p-8 md:p-10 animate-in zoom-in-95 duration-200">
@@ -80,13 +64,7 @@ const DetalleTareaModal = ({ tarea, onClose }: DetalleTareaModalProps) => {
               >
                 <Pencil size={20} />
               </button>
-              {/* Botón de Eliminación */}
-              <button
-                onClick={handleDelete}
-                className="text-[#e67e22] hover:text-red-500 transition-colors"
-              >
-                <Trash2 size={20} />
-              </button>
+             
             </div>
           </div>
           <button onClick={onClose} className="ml-2 text-gray-300 hover:text-gray-600">
