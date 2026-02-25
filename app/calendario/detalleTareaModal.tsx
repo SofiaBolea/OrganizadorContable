@@ -5,7 +5,10 @@ import { useRouter } from 'next/navigation'; // Importamos el router para la nav
 
 interface DetalleTareaModalProps {
   tarea: {
-    id: string; // Asegúrate de que el objeto tarea incluya el ID
+    id: string;
+    tareaId: string;       // Requerido para /tareas-propias/[id]
+    taId: string;          // Requerido para ?taId=...
+    fechaOc: string;       // Requerido para &fechaOc=...
     titulo: string;
     descripcion?: string;
     fecha: string;
@@ -25,12 +28,15 @@ const DetalleTareaModal = ({ tarea, onClose }: DetalleTareaModalProps) => {
     return 'bg-red-400 text-white';
   };
 
-  // Función para ir a la página de edición según el tipo de tarea
   const handleEdit = () => {
+    // Determinar la base del path (tareas-propias o tareas-asignadas)
     const basePath = tarea.tipoTarea === 'PROPIA' ? 'tareas-propias' : 'tareas-asignadas';
-    router.push(`/${basePath}/${tarea.id}/modificar`);
-  };
 
+    // Construir la URL completa: /[base]/[id]/modificar?taId=[...]&fechaOc=[...]
+    const url = `/${basePath}/${tarea.tareaId}/modificar?taId=${tarea.taId}&fechaOc=${tarea.fechaOc}`;
+
+    router.push(url);
+  };
   // Función para eliminar la asignación de la tarea
   const handleDelete = async () => {
     if (!confirm("¿Estás seguro de que deseas eliminar esta tarea?")) return;
@@ -68,14 +74,14 @@ const DetalleTareaModal = ({ tarea, onClose }: DetalleTareaModalProps) => {
             </span>
             <div className="flex items-center gap-3">
               {/* Botón de Edición */}
-              <button 
+              <button
                 onClick={handleEdit}
                 className="text-gray-400 hover:text-blue-500 transition-colors"
               >
                 <Pencil size={20} />
               </button>
               {/* Botón de Eliminación */}
-              <button 
+              <button
                 onClick={handleDelete}
                 className="text-[#e67e22] hover:text-red-500 transition-colors"
               >
