@@ -28,9 +28,20 @@ export default function Header() {
     if (pathname.startsWith("/vencimientos")) return "Vencimientos Impositivos"
     if (pathname.startsWith("/organizacion")) return "Organización"
     if (pathname.startsWith("/tareas-asignadas")) return "Tareas Asignadas"
-    if (pathname.startsWith("/tareas-propias")) return "Tareas Propias"
-    if (pathname.startsWith("/recursos-ref")) return "Recursos Adicionales"
+    if (pathname.startsWith("/tareas-propias")) return "Mis Tareas"
+    if (pathname.startsWith("/recursos-ref")) return "Recursos de Referencia"
     return "Tablero General"
+  }
+
+  const getSubTitle = () => {
+  if (pathname.startsWith("/clientes")) return "Gestionar clientes, proveedores y otros contactos"
+  if (pathname.startsWith("/asistentes")) return "Gestionar tu equipo de asistentes virtuales, asignar tareas y supervisar su desempeño"
+  if (pathname.startsWith("/vencimientos")) return "Visualizar y gestionar los vencimientos de impuestos nacionales, provinciales y municipales"
+  if (pathname.startsWith("/organizacion")) return "Configurar y administrar los detalles de tu organización"
+  if (pathname.startsWith("/tareas-asignadas")) return "Visualizar y gestionar las tareas asignadas"
+  if (pathname.startsWith("/tareas-propias")) return "Visualizar y gestionar las tareas que tienes asignadas como usuario"
+  if (pathname.startsWith("/recursos-ref")) return "Acceder a recursos adicionales"
+  return "Tablero General"
   }
 
   const [isAdmin, setIsAdmin] = useState(false);
@@ -59,13 +70,13 @@ export default function Header() {
   }, [organization?.id]);
 
   return (
-    <header className="h-25 flex items-center justify-between px-15 ">
+    <header className="h-25 flex items-center mt-4 justify-between px-15 ">
 
-      <div className="flex flex-col items-baseline md:items-start">
+      <div className="flex flex-col items-baseline md:items-start gap-2">
         <h1 className="text-3xl font-bold text-text">
           {getTitle()}
         </h1>
-        <p className="text-text/50">Gestionar vencimientos de impuestos nacionales, provinciales y municipales</p>
+        <p className="text-text/50">{getSubTitle()}</p>
       </div>
 
 

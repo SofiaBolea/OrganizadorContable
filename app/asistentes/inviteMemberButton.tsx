@@ -22,9 +22,8 @@ export function InviteMemberButton() {
   return (
     <Button variant="primario"
       onClick={handleOpenMembers}
-      className="flex items-center gap-2  text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-500/20 active:scale-95"
     >
-      <UserPlus className="w-4 h-4" />
+      <UserPlus className="w-4 h-4 mr-2s" />
       Gestionar Miembros
     </Button>
   );

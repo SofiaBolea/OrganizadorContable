@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { ShieldAlert, Lock } from "lucide-react";
+import { ShieldAlert, Lock, Plus } from "lucide-react";
 import { getTareasAsignadasAdmin, getTareasAsignadasAsistente } from "@/lib/tareas";
 import { Permisos } from "@/lib/permisos";
 import Link from "next/link";
@@ -13,7 +13,7 @@ export default async function TareasAsignadasPage() {
 
   if (!orgId || !userId) {
     return (
-      <main className="flex min-h-[80vh] items-center justify-center p-6 bg-[#030712]">
+      <main>
         <div className="bg-[#0a0a0a] border border-white/5 p-12 rounded-[3rem] text-center max-w-sm shadow-2xl">
           <ShieldAlert className="w-12 h-12 text-blue-500/40 mx-auto mb-6" />
           <h2 className="text-xl font-bold text-white mb-2">Organización Requerida</h2>
@@ -53,23 +53,17 @@ export default async function TareasAsignadasPage() {
     : await getTareasAsignadasAsistente(orgId, userId);
 
   return (
-    <main className="p-8">
-      <div className="flex justify-between items-center mb-2">
-        <h1 className="text-3xl font-bold text-text">Tareas Asignadas</h1>
+    <main>
+      <div className="flex w-full justify-end mb-8">
         {esAdmin && canCreate && (
           <Button variant="primario">
+            <Plus className="w-4 h-4 mr-2" />
             <Link href="/tareas-asignadas/nueva">
               Nueva Tarea
             </Link>
           </Button>
         )}
       </div>
-      <p className="text-text/50 mb-8">
-        {esAdmin
-          ? "Gestionar tareas asignadas a tus asistentes"
-          : "Tareas asignadas por tu administrador"
-        }
-      </p>
 
       <TareasTableClient
         tareas={tareas}

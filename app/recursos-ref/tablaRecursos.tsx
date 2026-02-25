@@ -75,21 +75,14 @@ export function TablaRecursos({ initialRecursos, permisos }: Props) {
   return (
     <>
       {/* Encabezado y Tabla (Misma lógica visual de antes) */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-primary-foreground text-[10px] font-black uppercase tracking-widest">
-            <UserCheck className="w-3 h-3" />
-            Links importantes
-          </div>
-          <h1 className="text-5xl font-black tracking-tighter text-text">Recursos de Referencia</h1>
-          <p className="text-gray-500">Gestiona tus enlaces</p>
-        </div>
-        <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2">
-          <Plus size={18} /> Nuevo Recurso
+      <div className="flex w-full justify-end mb-8">
+        
+        <Button onClick={() => setIsModalOpen(true)} className="flex items-center">
+          <Plus size={18} className="w-4 h-4 mr-2" /> Nuevo Recurso
         </Button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="table-card">
         {recursos.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 text-center">
             <FolderOpen size={48} className="text-gray-400 mb-4" />
@@ -98,12 +91,12 @@ export function TablaRecursos({ initialRecursos, permisos }: Props) {
           </div>
         ) : (
           <>
-            <table className="w-full text-left">
-              <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
+            <table className="table-base">
+              <thead>
                 <tr>
-                  <th className="px-6 py-3">Título</th>
-                  <th className="px-6 py-3">Tipo</th>
-                  <th className="px-6 py-3">URL</th>
+                  <th>Título</th>
+                  <th>Tipo</th>
+                  <th>URL</th>
                   <th className="px-6 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
@@ -114,7 +107,7 @@ export function TablaRecursos({ initialRecursos, permisos }: Props) {
                   const puedeEliminar = esGlobal ? permisos.puedeEliminarGlobal : true;
 
                   return (
-                    <tr key={r.id} className="hover:bg-gray-50">
+                    <tr key={r.id} className="table-row">
                       <td className="px-6 py-4 font-medium">{r.titulo}</td>
                       <td className="px-6 py-4">
                         <span

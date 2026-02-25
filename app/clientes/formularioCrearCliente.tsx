@@ -125,15 +125,21 @@ export function FormularioCrearCliente({ onClienteCreado }: { onClienteCreado?: 
   return (
     <>
       <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4 text-left">
-        <div className="bg-[#f2f1eb] p-8 rounded-[40px] shadow-xl w-full max-w-2xl border border-white">
+        <div className="card shadow-xl w-full max-w-2xl">
+
+          <div>
+            <h1 className="text-xl pb-4">
+              Crear Nuevo Cliente
+            </h1>
+          </div>
           <form onSubmit={handleOnSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input name="nombre" placeholder="Nombre / Razón Social" required className="bg-[#e9e8e0] p-4 rounded-full outline-none text-gray-700 border-none focus:ring-2 focus:ring-[#98c18c]" />
-              <input name="cuit" placeholder="CUIT" className="bg-[#e9e8e0] p-4 rounded-full outline-none text-gray-700 border-none focus:ring-2 focus:ring-[#98c18c]" />
+              <input name="nombre" placeholder="Nombre / Razón Social" required className="input-base" />
+              <input name="cuit" placeholder="CUIT" className="input-base" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input name="email" type="email" placeholder="Email" className="bg-[#e9e8e0] p-4 rounded-full outline-none text-gray-700 border-none focus:ring-2 focus:ring-[#98c18c]" />
-              <input name="telefono" placeholder="Teléfono" className="bg-[#e9e8e0] p-4 rounded-full outline-none text-gray-700 border-none focus:ring-2 focus:ring-[#98c18c]" />
+              <input name="email" type="email" placeholder="Email" className="input-base" />
+              <input name="telefono" placeholder="Teléfono" className="input-base" />
             </div>
 
             <div className="bg-[#ecebe4] rounded-[30px] p-6 shadow-inner">
@@ -162,7 +168,7 @@ export function FormularioCrearCliente({ onClienteCreado }: { onClienteCreado?: 
             <div className="flex justify-between gap-4 pt-4">
               <Button type="button" onClick={() => setIsOpen(false)} variant="peligro" >Cancelar</Button>
               <Button type="submit" disabled={loading} variant="primario" >
-                {loading ? "Guardando..." : "Guardar Cliente"}
+                {loading ? "Guardando..." : "Guardar"}
               </Button>
             </div>
           </form>

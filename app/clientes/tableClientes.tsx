@@ -42,32 +42,41 @@ function TableCliente({ initialClientes, permisos }: any) {
   }, [searchParams]); // Se ejecuta cada vez que los filtros cambian la URL
 
   return (
-    <table className="w-full text-left border-collapse">
-      <thead className="border-b border-slate-200 bg-slate-50">
-        <tr className="text-sm font-bold text-slate-600">
-          <th className="p-6">Nombre / Razon Social</th>
-          <th className="p-6">Email</th>
-          <th className="p-6">Teléfono</th>
-          <th className="p-6">CUIT</th>
-          {(permisos.puedeEditar || permisos.puedeEliminar) && <th className="p-6 text-center">Acciones</th>}
+  <div className="table-card">
+    <table className="table-base">
+      <thead>
+        <tr>
+          <th>Nombre / Razon Social</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>CUIT</th>
+          {(permisos.puedeEditar || permisos.puedeEliminar) && (
+            <th className="table-actions">Acciones</th>
+          )}
         </tr>
       </thead>
-      <tbody className="divide-y divide-slate-100">
+
+      <tbody>
         {initialClientes.map((cliente: any) => (
-          <tr key={cliente.id} className="hover:bg-slate-50 transition-colors">
-            <td className="p-6 text-slate-700 font-medium">{cliente.nombreCompleto}</td>
-            <td className="p-6 text-slate-600">{cliente.email || "---"}</td>
-            <td className="p-6 text-slate-600">{cliente.telefono || "---"}</td>
-            <td className="p-6 text-slate-600 font-mono">{cliente.cuit || "---"}</td>
-            <td className="p-6">
+          <tr key={cliente.id} className="table-row">
+            <td>{cliente.nombreCompleto}</td>
+            <td>{cliente.email || "---"}</td>
+            <td>{cliente.telefono || "---"}</td>
+            <td className="font-mono">{cliente.cuit || "---"}</td>
+            <td className="table-actions">
               <div className="flex justify-center">
-                <AccionesCliente cliente={cliente} asistentes={asistentes} permisos={permisos} />
+                <AccionesCliente
+                  cliente={cliente}
+                  asistentes={asistentes}
+                  permisos={permisos}
+                />
               </div>
             </td>
           </tr>
         ))}
       </tbody>
     </table>
-  );
+  </div>
+);
 }
 export default memo(TableCliente);

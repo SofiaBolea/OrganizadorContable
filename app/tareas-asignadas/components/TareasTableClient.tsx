@@ -499,12 +499,11 @@ export default function TareasTableClient({
   return (
     <>
       {/* Filtros */}
-      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-6 mb-6">
-        <h2 className="text-lg font-bold text-text mb-4">Filtros de Búsqueda</h2>
+      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-6 mb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
           {mostrarColumnaAsistente && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+              <label className="text-xs text-text/60 uppercase tracking-wide">
                 Asistente
               </label>
               <select
@@ -513,7 +512,7 @@ export default function TareasTableClient({
                   setFiltroAsistente(e.target.value);
                   setFilasVisibles(FILAS_POR_PAGINA);
                 }}
-                className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 focus:ring-2 focus:ring-[#98c18c] appearance-none cursor-pointer transition-all"
+                className="input-base"
               >
                 <option value="">Todos</option>
                 {asistentesUnicos.map((a) => (
@@ -524,7 +523,7 @@ export default function TareasTableClient({
           )}
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+            <label className="text-xs text-text/60 uppercase tracking-wide">
               Título
             </label>
             <input
@@ -535,12 +534,12 @@ export default function TareasTableClient({
                 setFiltroTitulo(e.target.value);
                 setFilasVisibles(FILAS_POR_PAGINA);
               }}
-              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-[#98c18c] transition-all"
+              className="w-full input-base"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+            <label className="text-xs text-text/60 uppercase tracking-wide">
               Prioridad
             </label>
             <select
@@ -549,7 +548,7 @@ export default function TareasTableClient({
                 setFiltroPrioridad(e.target.value);
                 setFilasVisibles(FILAS_POR_PAGINA);
               }}
-              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 focus:ring-2 focus:ring-[#98c18c] appearance-none cursor-pointer transition-all"
+              className="w-full input-base"
             >
               <option value="">Todas</option>
               <option value="ALTA">Alta</option>
@@ -559,7 +558,7 @@ export default function TareasTableClient({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+            <label className="text-xs text-text/60 uppercase tracking-wide">
               Estado
             </label>
             <select
@@ -568,7 +567,7 @@ export default function TareasTableClient({
                 setFiltroEstado(e.target.value);
                 setFilasVisibles(FILAS_POR_PAGINA);
               }}
-              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 focus:ring-2 focus:ring-[#98c18c] appearance-none cursor-pointer transition-all"
+              className="w-full input-base"
             >
               <option value="">Todos</option>
               <option value="PENDIENTE">Pendiente</option>
@@ -579,7 +578,7 @@ export default function TareasTableClient({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+            <label className="text-xs text-text/60 uppercase tracking-wide">
               Vence después de
             </label>
             <input
@@ -589,12 +588,12 @@ export default function TareasTableClient({
                 setFiltroDespuesDe(e.target.value);
                 setFilasVisibles(FILAS_POR_PAGINA);
               }}
-              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 focus:ring-2 focus:ring-[#98c18c] transition-all"
+              className="w-full input-base"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+            <label className="text-xs text-text/60 uppercase tracking-wide">
               Vence antes de
             </label>
             <input
@@ -604,7 +603,7 @@ export default function TareasTableClient({
                 setFiltroAntesDe(e.target.value);
                 setFilasVisibles(FILAS_POR_PAGINA);
               }}
-              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 focus:ring-2 focus:ring-[#98c18c] transition-all"
+              className="w-full input-base"
             />
           </div>
         </div>
@@ -622,15 +621,15 @@ export default function TareasTableClient({
       </div>
 
       {/* Tabla */}
-      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-6">
-        <h2 className="text-lg font-bold text-text mb-4">
-          Lista de Tareas
-          {tieneAlgunFiltro && (
+      <div className="table-card">
+
+        {tieneAlgunFiltro && (
+          <h2 className="text-lg font-bold text-text mb-4">
             <span className="ml-2 text-sm font-normal text-text/50">
-              ({filasFiltradas.length} de {todasLasFilas.length})
+              Tareas encontradas ({filasFiltradas.length} de {todasLasFilas.length})
             </span>
-          )}
-        </h2>
+          </h2>
+        )}
 
         {filasFiltradas.length === 0 ? (
           <p className="text-text/50 text-sm py-8 text-center">
@@ -641,30 +640,30 @@ export default function TareasTableClient({
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="min-w-full">
+              <table className="table-base">
                 <thead>
                   <tr className="border-b border-black/10">
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">
+                    <th>
                       Título
                     </th>
                     {mostrarColumnaAsistente && (
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">
+                      <th>
                         Asistente
                       </th>
                     )}
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">
+                    <th>
                       Prioridad
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">
+                    <th>
                       Estado
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">
+                    <th>
                       Fecha
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">
+                    <th>
                       Días
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">
+                    <th>
                       Acciones
                     </th>
                   </tr>
@@ -677,7 +676,7 @@ export default function TareasTableClient({
                     return (
                       <tr
                         key={row.key}
-                        className="border-b border-black/5 hover:bg-black/[0.02] transition-colors"
+                        className="table-row"
                         style={
                           row.refColorHexa
                             ? { borderLeft: `4px solid ${row.refColorHexa}` }
@@ -690,9 +689,6 @@ export default function TareasTableClient({
                             {row.titulo}
                             {row.tieneRecurrencia && (
                               <span className="badge-recurrencia">{row.frecuencia}</span>
-                            )}
-                            {row.esVirtual && (
-                              <span className="badge-virtual">Virtual</span>
                             )}
                           </div>
                         </td>

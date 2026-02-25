@@ -8,7 +8,7 @@ import { EmptyState } from "../components/emptyState";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export function TablaAsistentes({ canInvite }: {canInvite: boolean }) {
+export function TablaAsistentes({ canInvite }: { canInvite: boolean }) {
     const searchParams = useSearchParams();
     const [loading, setLoading] = useState(true);
     const [asistentes, setAsistentes] = useState<any[]>([]);
@@ -34,16 +34,10 @@ export function TablaAsistentes({ canInvite }: {canInvite: boolean }) {
 
     return (
         <>
-            <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
-                <div className="space-y-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-primary-foreground text-[10px] font-black uppercase tracking-widest">
-                        <UserCheck className="w-3 h-3" /> Gestión de Staff
-                    </div>
-                    <h1 className="text-5xl font-black tracking-tighter text-text">Asistentes Contables</h1>
-                </div>
+            <header className="flex w-full justify-end items-center mb-6 gap-4">
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-4 bg-card border border-black/5 px-6 py-3 rounded-xl shadow-sm">
-                        <div className="text-right">
+                        <div className="text-right flex flex-row items-center gap-4">
                             <span className="block text-[10px] font-bold text-text/40 uppercase tracking-widest">Total</span>
                             <span className="text-2xl font-black text-text leading-none">{asistentes.length}</span>
                         </div>
@@ -55,7 +49,7 @@ export function TablaAsistentes({ canInvite }: {canInvite: boolean }) {
 
             <FiltrosAsistentes />
 
-            <div className="overflow-hidden rounded-xl border border-black/5 bg-card shadow-sm">
+            <div className="table-card">
                 {asistentes.length === 0 ? (
                     <EmptyState
                         icon={UserPlus}
@@ -63,18 +57,19 @@ export function TablaAsistentes({ canInvite }: {canInvite: boolean }) {
                         description="Invita a tu equipo para empezar a delegar tareas."
                     />
                 ) : (
-                    <table className="w-full text-left border-collapse">
+                    
+                    <table className="table-base">
                         <thead>
-                            <tr className="border-b border-black/5 bg-black/[0.02]">
-                                <th className="px-8 py-5 text-[10px] font-black text-text/40 uppercase tracking-[0.2em]">Asistente</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-text/40 uppercase tracking-[0.2em]">Contacto</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-text/40 uppercase tracking-[0.2em]">Permisos</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-text/40 uppercase tracking-[0.2em] text-right">Estado</th>
+                            <tr>
+                                <th>Asistente</th>
+                                <th>Contacto</th>
+                                <th>Permisos</th>
+                                <th>Estado</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-black/[0.03]">
                             {asistentes.map((usuario) => (
-                                <tr key={usuario.id} className="group hover:bg-black/[0.01] transition-colors">
+                                <tr key={usuario.id} className="table-row">
                                     <td className="px-8 py-6">
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 rounded-xl bg-sidebar flex items-center justify-center font-bold text-white shrink-0">

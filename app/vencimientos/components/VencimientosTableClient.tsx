@@ -43,7 +43,7 @@ export default function VencimientosTableClient({
   const [filtroTipo, setFiltroTipo] = useState("");
   const [filtroDespuesDe, setFiltroDespuesDe] = useState("");
   const [filtroAntesDe, setFiltroAntesDe] = useState("");
-  
+
 
   const ocurrenciasFiltradas = useMemo(() => {
     return ocurrencias.filter((o) => {
@@ -156,7 +156,7 @@ export default function VencimientosTableClient({
 
   const isLastOcurrence = deleteModal.ocurrencia
     ? deleteModal.ocurrencia.id ===
-      ocurrencias[ocurrencias.length - 1]?.id
+    ocurrencias[ocurrencias.length - 1]?.id
     : false;
 
   if (ocurrencias.length === 0) {
@@ -168,32 +168,31 @@ export default function VencimientosTableClient({
   return (
     <>
       {/* Card de Filtros */}
-      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-6 mb-6">
-        <h2 className="text-lg font-bold text-text mb-4">Filtros de Búsqueda</h2>
+      <div className="card">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
           {/* Nombre impuesto */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
-              Nombre Impuesto
+            <label className="text-xs text-text/60 uppercase tracking-wide">
+              Nombre del impuesto
             </label>
             <input
               type="text"
               placeholder="Buscar por nombre..."
               value={filtroNombre}
               onChange={(e) => setFiltroNombre(e.target.value)}
-              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-[#98c18c] transition-all"
+              className="input-base"
             />
           </div>
 
           {/* Tipo impuesto */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
-              Tipo Impuesto
+            <label className="text-xs text-text/60 uppercase tracking-wide">
+              Tipo de impuesto
             </label>
             <select
               value={filtroTipo}
               onChange={(e) => setFiltroTipo(e.target.value)}
-              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 focus:ring-2 focus:ring-[#98c18c] appearance-none cursor-pointer transition-all"
+              className="input-base"
             >
               <option value="">Todos</option>
               <option value="Nacional">Nacional</option>
@@ -204,27 +203,27 @@ export default function VencimientosTableClient({
 
           {/* Vence después de */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+            <label className="text-xs text-text/60 uppercase tracking-wide">
               Vence después de
             </label>
             <input
               type="date"
               value={filtroDespuesDe}
               onChange={(e) => setFiltroDespuesDe(e.target.value)}
-              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 focus:ring-2 focus:ring-[#98c18c] transition-all"
+              className="input-base"
             />
           </div>
 
           {/* Vence antes de */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-text/60 uppercase tracking-wide">
+            <label className="text-xs text-text/60 uppercase tracking-wide">
               Vence antes de
             </label>
             <input
               type="date"
               value={filtroAntesDe}
               onChange={(e) => setFiltroAntesDe(e.target.value)}
-              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 focus:ring-2 focus:ring-[#98c18c] transition-all"
+              className="input-base"
             />
           </div>
         </div>
@@ -243,15 +242,16 @@ export default function VencimientosTableClient({
       </div>
 
       {/* Card de Tabla */}
-      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-6">
-        <h2 className="text-lg font-bold text-text mb-4">
-          Lista de Vencimientos
-          {tieneAlgunFiltro && (
-            <span className="ml-2 text-sm font-normal text-text/50">
-              ({ocurrenciasFiltradas.length} de {ocurrencias.length})
+      <div className="table-card">
+
+        {tieneAlgunFiltro && (
+          <h2 className="text-lg font-bold text-text flex items-center gap-2 m-4">
+            <span className="text-sm font-normal text-text/50">
+              Vencimeintos encontrados ({ocurrenciasFiltradas.length} de {ocurrencias.length})
             </span>
-          )}
-        </h2>
+          </h2>
+        )}
+
 
         {ocurrenciasFiltradas.length === 0 ? (
           <p className="text-text/50 text-sm py-8 text-center">
@@ -259,15 +259,15 @@ export default function VencimientosTableClient({
           </p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full">
+            <table className="table-base">
               <thead>
-                <tr className="border-b border-black/10">
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Impuesto</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Categoría</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Vencimiento</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Días Faltantes</th>
+                <tr>
+                  <th>Impuesto</th>
+                  <th>Categoría</th>
+                  <th>Vencimiento</th>
+                  <th>Días Faltantes</th>
                   {(canModify || canDelete) && (
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">Acciones</th>
+                    <th>Acciones</th>
                   )}
                 </tr>
               </thead>
@@ -297,7 +297,7 @@ export default function VencimientosTableClient({
                   const badgeClass = tipoBadgeColor[o.vencimiento.tipoVencimiento] || "bg-gray-100 text-gray-600";
 
                   return (
-                    <tr key={o.id} className="border-b border-black/5 hover:bg-black/[0.02] transition-colors">
+                    <tr key={o.id} className="table-row">
                       <td className="px-4 py-3 font-medium text-text">{o.vencimiento.titulo}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${badgeClass}`}>
@@ -363,7 +363,7 @@ export default function VencimientosTableClient({
         onDeleteAndFollowing={handleDeleteAndFollowing}
         isLast={isLastOcurrence}
       />
-      
+
       {errorMsg && (
         <ModalError
           mensaje={errorMsg}

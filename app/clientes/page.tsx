@@ -28,7 +28,7 @@ export default async function ClientesPage(props: { searchParams: Promise<any> }
 
   return (
     <div className="max-w-7xl mx-auto">
-      <header className="flex justify-between items-end mb-10">
+      <header className="flex justify-between items-end mb-8">
         {puedeCrear && <FormularioCrearCliente />}
       </header>
 

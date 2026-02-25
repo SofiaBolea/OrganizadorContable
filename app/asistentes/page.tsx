@@ -57,8 +57,8 @@ export default async function AsistentesPage(props: { searchParams: Promise<any>
   }
 
   return (
-    <div className="min-h-screen bg-app text-text font-medium">
-      <main className="p-6 md:p-10 max-w-7xl mx-auto">
+    <div className="min-h-screen text-text font-medium">
+      <main className="max-w-7xl mx-auto">
         <Suspense fallback={<p className="p-10 italic text-center text-text/40">Cargando gestión de staff...</p>}>
             <AsistentesDataWrapper searchParams={searchParams} has={has} />
         </Suspense>

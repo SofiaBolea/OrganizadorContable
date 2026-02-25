@@ -62,7 +62,7 @@ export function FiltrosClientes({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 dashboard-card ">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 card ">
       {/* Filtro por Nombre */}
       <div className="relative">
         <input
@@ -81,7 +81,7 @@ export function FiltrosClientes({
           placeholder="Buscar por CUIT..."
           defaultValue={searchParams.get("cuit")?.toString()}
           onChange={(e) => handleSearch(e.target.value, "cuit")}
-          className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-[#98c18c] transition-all"
+          className="input-base"
         />
       </div>
 
@@ -90,7 +90,7 @@ export function FiltrosClientes({
         <select
           defaultValue={searchParams.get("asistenteId")?.toString()}
           onChange={(e) => handleSearch(e.target.value, "asistenteId")}
-          className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-slate-700 focus:ring-2 focus:ring-[#98c18c] appearance-none cursor-pointer"
+          className="input-base"
         >
           <option value="">Todos los asistentes</option>
           {asistentes.map((a) => (
