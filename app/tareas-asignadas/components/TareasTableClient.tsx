@@ -10,6 +10,7 @@ import type {
   TareaDisplayRow,
 } from "@/lib/tareas-shared";
 import { expandirTareasADisplayRows } from "@/lib/tareas-shared";
+import { ModalError } from "./modalError";
 
 // ═══════════════════════════════════════
 // HELPERS
@@ -43,12 +44,12 @@ function getDiasFaltantes(fechaStr: string | null) {
   const año = parseInt(fechaParts[0]);
   const mes = parseInt(fechaParts[1]);
   const día = parseInt(fechaParts[2]);
-  
+
   // Crear ambas fechas a medianoche UTC para comparación consistente
   const hoy = new Date();
   const hoyUTC = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate(), 0, 0, 0, 0));
   const fechaVenc = new Date(Date.UTC(año, mes - 1, día, 0, 0, 0, 0));
-  
+
   const diffMs = fechaVenc.getTime() - hoyUTC.getTime();
   return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 }
@@ -84,6 +85,7 @@ export default function TareasTableClient({
   const [tareasBase, setTareasBase] = useState(initialTareas);
   const [loading, setLoading] = useState(false);
   const [filasVisibles, setFilasVisibles] = useState(FILAS_POR_PAGINA);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Filtros
   const [filtroTitulo, setFiltroTitulo] = useState("");
@@ -111,8 +113,6 @@ export default function TareasTableClient({
     () => expandirTareasADisplayRows(tareasBase),
     [tareasBase]
   );
-
-  console.log("TareasTableClient - tareasBase:", todasLasFilas);
 
   // ─── Asistentes únicos para filtro ───
   const asistentesUnicos = useMemo(() => {
@@ -202,7 +202,7 @@ export default function TareasTableClient({
         });
         if (!res.ok) {
           const data = await res.json();
-          alert(data.error || "Error al cambiar estado");
+          setErrorMsg(data.error || "Error al cambiar estado");
           return;
         }
         const { data: ocurrencia } = await res.json();
@@ -218,25 +218,8 @@ export default function TareasTableClient({
               ...t,
               ocurrenciasMaterializadas: yaExiste
                 ? t.ocurrenciasMaterializadas.map((o) =>
-                    o.fechaOriginal.split("T")[0] === fechaKey
-                      ? {
-                          id: ocurrencia.id,
-                          fechaOriginal: ocurrencia.fechaOriginal,
-                          estado: ocurrencia.estado,
-                          tituloOverride: ocurrencia.tituloOverride,
-                          fechaOverride: ocurrencia.fechaOverride,
-                          colorOverride: ocurrencia.colorOverride,
-                          prioridadOverride: ocurrencia.prioridadOverride,
-                          descripcionOverride: ocurrencia.descripcionOverride,
-                          refColorId: ocurrencia.refColorId || null,
-                          refColorHexa: ocurrencia.refColorHexa || null,
-                          refColorTitulo: ocurrencia.refColorTitulo || null,
-                        }
-                      : o
-                  )
-                : [
-                    ...t.ocurrenciasMaterializadas,
-                    {
+                  o.fechaOriginal.split("T")[0] === fechaKey
+                    ? {
                       id: ocurrencia.id,
                       fechaOriginal: ocurrencia.fechaOriginal,
                       estado: ocurrencia.estado,
@@ -248,13 +231,30 @@ export default function TareasTableClient({
                       refColorId: ocurrencia.refColorId || null,
                       refColorHexa: ocurrencia.refColorHexa || null,
                       refColorTitulo: ocurrencia.refColorTitulo || null,
-                    },
-                  ],
+                    }
+                    : o
+                )
+                : [
+                  ...t.ocurrenciasMaterializadas,
+                  {
+                    id: ocurrencia.id,
+                    fechaOriginal: ocurrencia.fechaOriginal,
+                    estado: ocurrencia.estado,
+                    tituloOverride: ocurrencia.tituloOverride,
+                    fechaOverride: ocurrencia.fechaOverride,
+                    colorOverride: ocurrencia.colorOverride,
+                    prioridadOverride: ocurrencia.prioridadOverride,
+                    descripcionOverride: ocurrencia.descripcionOverride,
+                    refColorId: ocurrencia.refColorId || null,
+                    refColorHexa: ocurrencia.refColorHexa || null,
+                    refColorTitulo: ocurrencia.refColorTitulo || null,
+                  },
+                ],
             };
           })
         );
-      } catch {
-        alert("Error al conectar con el servidor");
+      } catch (err) {
+        setErrorMsg("Error al conectar con el servidor");
       } finally {
         setLoading(false);
       }
@@ -285,7 +285,7 @@ export default function TareasTableClient({
         });
         if (!res.ok) {
           const data = await res.json();
-          alert(data.error || "Error al cancelar");
+          setErrorMsg(data.error || "Error al cancelar");
           return;
         }
       } else {
@@ -302,7 +302,7 @@ export default function TareasTableClient({
         });
         if (!res.ok) {
           const data = await res.json();
-          alert(data.error || "Error al cancelar");
+          setErrorMsg(data.error || "Error al cancelar");
           return;
         }
       }
@@ -320,32 +320,32 @@ export default function TareasTableClient({
             ...t,
             ocurrenciasMaterializadas: yaExiste
               ? t.ocurrenciasMaterializadas.map((o) =>
-                  o.fechaOriginal.split("T")[0] === fechaKey
-                    ? { ...o, estado: "CANCELADA" }
-                    : o
-                )
+                o.fechaOriginal.split("T")[0] === fechaKey
+                  ? { ...o, estado: "CANCELADA" }
+                  : o
+              )
               : [
-                  ...t.ocurrenciasMaterializadas,
-                  {
-                    id: "temp",
-                    fechaOriginal: fechaKey,
-                    estado: "CANCELADA",
-                    tituloOverride: null,
-                    fechaOverride: null,
-                    colorOverride: null,
-                    prioridadOverride: null,
-                    descripcionOverride: null,
-                    refColorId: null,
-                    refColorHexa: null,
-                    refColorTitulo: null,
-                  },
-                ],
+                ...t.ocurrenciasMaterializadas,
+                {
+                  id: "temp",
+                  fechaOriginal: fechaKey,
+                  estado: "CANCELADA",
+                  tituloOverride: null,
+                  fechaOverride: null,
+                  colorOverride: null,
+                  prioridadOverride: null,
+                  descripcionOverride: null,
+                  refColorId: null,
+                  refColorHexa: null,
+                  refColorTitulo: null,
+                },
+              ],
           };
         })
       );
       setDeleteModal({ isOpen: false, row: null });
-    } catch {
-      alert("Error al conectar con el servidor");
+    } catch (err) {
+      setErrorMsg("Error al conectar con el servidor");
     } finally {
       setLoading(false);
     }
@@ -371,7 +371,7 @@ export default function TareasTableClient({
         });
         if (!res.ok) {
           const data = await res.json();
-          alert(data.error || "Error al cancelar");
+          setErrorMsg(data.error || "Error al cancelar");
           return;
         }
 
@@ -427,7 +427,7 @@ export default function TareasTableClient({
           });
           if (!res.ok) {
             const data = await res.json();
-            alert(data.error || "Error al cancelar");
+            setErrorMsg(data.error || "Error al cancelar");
             return;
           }
         } else {
@@ -442,7 +442,7 @@ export default function TareasTableClient({
           });
           if (!res.ok) {
             const data = await res.json();
-            alert(data.error || "Error al cancelar");
+            setErrorMsg(data.error || "Error al cancelar");
             return;
           }
         }
@@ -459,34 +459,34 @@ export default function TareasTableClient({
               ...t,
               ocurrenciasMaterializadas: yaExiste
                 ? t.ocurrenciasMaterializadas.map((o) =>
-                    o.fechaOriginal.split("T")[0] === fechaKey
-                      ? { ...o, estado: "CANCELADA" }
-                      : o
-                  )
+                  o.fechaOriginal.split("T")[0] === fechaKey
+                    ? { ...o, estado: "CANCELADA" }
+                    : o
+                )
                 : [
-                    ...t.ocurrenciasMaterializadas,
-                    {
-                      id: "temp",
-                      fechaOriginal: fechaKey,
-                      estado: "CANCELADA",
-                      tituloOverride: null,
-                      fechaOverride: null,
-                      colorOverride: null,
-                      prioridadOverride: null,
-                      descripcionOverride: null,
-                      refColorId: null,
-                      refColorHexa: null,
-                      refColorTitulo: null,
-                    },
-                  ],
+                  ...t.ocurrenciasMaterializadas,
+                  {
+                    id: "temp",
+                    fechaOriginal: fechaKey,
+                    estado: "CANCELADA",
+                    tituloOverride: null,
+                    fechaOverride: null,
+                    colorOverride: null,
+                    prioridadOverride: null,
+                    descripcionOverride: null,
+                    refColorId: null,
+                    refColorHexa: null,
+                    refColorTitulo: null,
+                  },
+                ],
             };
           })
         );
       }
 
       setDeleteModal({ isOpen: false, row: null });
-    } catch {
-      alert("Error al conectar con el servidor");
+    } catch (err) {
+      setErrorMsg("Error al conectar con el servidor");
     } finally {
       setLoading(false);
     }
@@ -812,8 +812,12 @@ export default function TareasTableClient({
         onConfirm={handleConfirmEstado}
       />
 
-      {/* Modal Cambiar Prioridad */}
-
+      {/* Error */}
+      {errorMsg && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow">
+          {errorMsg}
+        </div>
+      )}
 
     </>
   );
