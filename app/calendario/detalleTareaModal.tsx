@@ -1,10 +1,6 @@
 "use client";
 
-import React from 'react';
 import { Pencil, Trash2, X } from 'lucide-react';
-
-// Nota: Asegúrate de importar Montserrat en tu CSS global o tailwind.config.js
-// @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
 
 interface DetalleTareaModalProps {
   tarea: {
@@ -31,7 +27,7 @@ const DetalleTareaModal = ({ tarea, onClose }: DetalleTareaModalProps) => {
 
         {/* Header */}
         <div className="flex justify-between items-center mb-6 px-2">
-          <h2 className="text-2xl font-medium text-gray-500 tracking-tight">Detalle Tarea</h2>
+          <h2 className="text-2xl font-medium text-gray-500 tracking-tight">Detalle</h2>
 
           <div className="flex items-center gap-5">
             <span className="text-2xl font-semibold text-[#f5b041]">

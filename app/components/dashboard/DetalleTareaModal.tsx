@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Pencil, Trash2, X } from "lucide-react";
+import { X } from "lucide-react";
 
 interface DetalleTareaModalProps {
   tarea: {
