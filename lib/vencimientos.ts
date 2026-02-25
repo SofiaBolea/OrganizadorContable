@@ -293,13 +293,14 @@ async function evaluarEstadoVencimiento(vencimientoId: string) {
  * Luego evalúa si cada vencimiento padre afectado debe pasar a "BAJA".
  */
 async function eliminarOcurrenciasVencidasAlLeer(organizacionId: string) {
+  // Crear fecha de hoy a medianoche UTC para comparación consistente
   const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
+  const hoyDate = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate(), 0, 0, 0, 0));
 
   // Buscar ocurrencias vencidas para saber qué vencimientos padres se afectan
   const ocurrenciasVencidas = await prisma.vencimientoOcurrencia.findMany({
     where: {
-      fechaVencimiento: { lt: hoy },
+      fechaVencimiento: { lt: hoyDate },
       vencimiento: {
         recurso: { organizacionId },
       },

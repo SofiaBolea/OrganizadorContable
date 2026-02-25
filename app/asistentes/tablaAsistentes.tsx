@@ -110,3 +110,4 @@ export function TablaAsistentes({ canInvite }: {canInvite: boolean }) {
         </>
     );
 }
+

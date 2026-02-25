@@ -218,7 +218,9 @@ export async function getTareasAsignadasAdmin(
           descripcionOverride: true,
           fechaOverride: true,
           colorOverride: true,
+          refColorId: true,
           prioridadOverride: true,
+          refColor: { select: { id: true, titulo: true, codigoHexa: true } },
         },
       },
     },
@@ -277,6 +279,7 @@ export async function getTareasAsignadasAsistente(
           descripcionOverride: true,
           fechaOverride: true,
           colorOverride: true,
+          refColorId: true,
           prioridadOverride: true,
         },
       },
@@ -334,7 +337,9 @@ export async function getTareasPropias(
           descripcionOverride: true,
           fechaOverride: true,
           colorOverride: true,
+          refColorId: true,
           prioridadOverride: true,
+          refColor: { select: { id: true, titulo: true, codigoHexa: true } },
         },
       },
     },
@@ -507,7 +512,7 @@ export async function actualizarTarea(
   }
 
   // Actualizar refColorId en asignaciones si es tarea PROPIA y se cambió el color
-  if (datos.refColorId !== undefined && tareaExistente.tipoTarea === "PROPIA") {
+  if (datos.refColorId !== undefined) {
     await prisma.tareaAsignacion.updateMany({
       where: { tareaId },
       data: { refColorId: datos.refColorId || null },
@@ -549,8 +554,8 @@ export async function limpiarOverridesOcurrencias(
   if (camposParaLimpiar.prioridadOverride) {
     datosActualizar.prioridadOverride = null;
   }
-  if (camposParaLimpiar.colorOverride) {
-    datosActualizar.colorOverride = null;
+  if (camposParaLimpiar.refColorId) {
+    datosActualizar.refColorId = null;
   }
 
   // Si no hay campos para limpiar, retornar
@@ -696,6 +701,7 @@ export async function materializarOcurrencia(
     fechaOverride?: string | null;
     tituloOverride?: string | null;
     descripcionOverride?: string | null;
+    refColorId?: string | null;
     colorOverride?: string | null;
     prioridadOverride?: string | null;
   }
@@ -731,7 +737,7 @@ export async function materializarOcurrencia(
           ? (datos.fechaOverride ? new Date(datos.fechaOverride) : null)
           : existente.fechaOverride,
         tituloOverride: datos.tituloOverride !== undefined ? datos.tituloOverride : existente.tituloOverride,
-        colorOverride: datos.colorOverride !== undefined ? datos.colorOverride : existente.colorOverride,
+        refColorId: datos.refColorId !== undefined ? datos.refColorId : existente.refColorId,
         descripcionOverride: datos.descripcionOverride !== undefined ? datos.descripcionOverride : existente.descripcionOverride,
         prioridadOverride: datos.prioridadOverride !== undefined ? datos.prioridadOverride : existente.prioridadOverride,
         fechaEjecucion: datos.estado === "COMPLETADA" ? new Date() : existente.fechaEjecucion,
@@ -746,6 +752,7 @@ export async function materializarOcurrencia(
         fechaOverride: datos.fechaOverride ? new Date(datos.fechaOverride) : null,
         tituloOverride: datos.tituloOverride || null,
         descripcionOverride: datos.descripcionOverride || null,
+        refColorId: datos.refColorId || null,
         colorOverride: datos.colorOverride !== undefined ? datos.colorOverride : null,
         prioridadOverride: datos.prioridadOverride || null,
         fechaEjecucion: datos.estado === "COMPLETADA" ? new Date() : null,
@@ -811,22 +818,21 @@ export async function cancelarDesdeAqui(
     },
   });
 
-
   if (!asignacion) throw new Error("Asignación no encontrada");
   if (!asignacion.tarea.recurrencia) throw new Error("Solo se puede cancelar desde aquí en tareas recurrentes");
 
   // Parsear fecha manualmente (YYYY-MM-DD o YYYY-MM-DDTHH:mm:ss)
-  // Esto evita problemas de zona horaria que causaban cancelar un día antes de lo esperado
   const fechaStr = fechaDesde.split('T')[0]; // "2026-02-05"
   const [año, mes, día] = fechaStr.split('-').map(Number);
   
-  // Crear fechaCorte a las 00:00:00 en zona local (será interpretado consistentemente en la BD)
-  const fechaCorte = new Date(año, mes - 1, día, 0, 0, 0, 0);
+  // Crear fechaCorte a las 00:00:00 UTC
+  const fechaCorte = new Date(Date.UTC(año, mes - 1, día, 0, 0, 0, 0));
+  const fechaCortStr = getFechaStr(fechaCorte);
   
-  // Día anterior a las 00:00:00 (última ocurrencia que NO se cancelará)
-  const diaAnterior = new Date(año, mes - 1, día - 1, 0, 0, 0, 0);
+  // Día anterior a las 00:00:00 UTC
+  const diaAnterior = new Date(Date.UTC(año, mes - 1, día - 1, 0, 0, 0, 0));
 
-  console.log(`Cancelando ocurrencias desde ${fechaCorte.toISOString()} en adelante. Nueva hastaFecha: ${diaAnterior.toISOString()}`);
+  console.log(`Cancelando ocurrencias desde ${fechaCortStr} en adelante. Nueva hastaFecha: ${getFechaStr(diaAnterior)}`);
 
   // Actualizar hastaFecha de la recurrencia
   await prisma.recurrencia.update({
@@ -834,33 +840,49 @@ export async function cancelarDesdeAqui(
     data: { hastaFecha: diaAnterior },
   });
 
-  const estados = ["PENDIENTE", "COMPLETADA"];
+  const estados = ["PENDIENTE", "COMPLETADA", "VENCIDA"];
 
-  // Marcar como CANCELADA todas las ocurrencias desde la fecha indicada en adelante
-  // Comparar normalizando ambas fechas a YYYYMMDD para evitar problemas de zona horaria
-  const fechaCorteNum = fechaCorte.getFullYear() * 10000 + (fechaCorte.getMonth() + 1) * 100 + fechaCorte.getDate();
-  
+  // Marcar como CANCELADA: ocurrencias cuya fecha ISO >= fechaCorte y estado esté en lista
   const ocurrenciasACancelar = asignacion.ocurrencias.filter((oc) => {
-    const ocDate = new Date(oc.fechaOriginal);
-    const ocDateNum = ocDate.getUTCFullYear() * 10000 + (ocDate.getUTCMonth() + 1) * 100 + ocDate.getUTCDate();
-    return ocDateNum >= fechaCorteNum && estados.includes(oc.estado);
+    const ocStr = getFechaStr(oc.fechaOriginal);
+    return ocStr >= fechaCortStr && estados.includes(oc.estado);
   });
 
-  await prisma.ocurrencia.updateMany({
-    where: {
-      tareaAsignacionId,
-      fechaOriginal: {
-        gte: fechaCorte,
+  console.log(`Ocurrencias a cancelar: ${ocurrenciasACancelar.map(oc => getFechaStr(oc.fechaOriginal)).join(', ')}`);
+
+  // Actualizar en BD usando IDs específicos
+  if (ocurrenciasACancelar.length > 0) {
+    await prisma.ocurrencia.updateMany({
+      where: {
+        id: { in: ocurrenciasACancelar.map(oc => oc.id) },
       },
-    },
-    data: {
-      estado: "CANCELADA",
-    },
-  });
+      data: {
+        estado: "CANCELADA",
+      },
+    });
+  }
 
   await evaluarEstadoAsignacion(tareaAsignacionId);
 
-  return { canceladas: ocurrenciasACancelar.length, nuevaHastaFecha: diaAnterior.toISOString() };
+  // Si la recurrencia quedó totalmente agotada (hastaFecha < fechaVencimientoBase),
+  // y no hay ocurrencias pendientes, forzar FINALIZADA
+  const baseStr = asignacion.tarea.fechaVencimientoBase
+    ? getFechaStr(asignacion.tarea.fechaVencimientoBase)
+    : null;
+  if (baseStr && getFechaStr(diaAnterior) < baseStr) {
+    const asigActualizada = await prisma.tareaAsignacion.findUnique({
+      where: { id: tareaAsignacionId },
+      select: { estado: true },
+    });
+    if (asigActualizada?.estado === "ACTIVA") {
+      await prisma.tareaAsignacion.update({
+        where: { id: tareaAsignacionId },
+        data: { estado: "FINALIZADA" },
+      });
+    }
+  }
+
+  return { canceladas: ocurrenciasACancelar.length, nuevaHastaFecha: getFechaStr(diaAnterior) };
 }
 
 // ═══════════════════════════════════════
@@ -1010,6 +1032,20 @@ export async function getAsistentesOrganizacion(orgId: string) {
 // ═══════════════════════════════════════
 
 /**
+ * Obtiene la fecha en formato YYYY-MM-DD desde cualquier tipo de fecha
+ * Funciona tanto con Date objects como con strings ISO
+ */
+function getFechaStr(fecha: Date | string | null): string {
+  if (!fecha) return "";
+  // Si es string, extraer la parte YYYY-MM-DD
+  if (typeof fecha === 'string') {
+    return fecha.split('T')[0];
+  }
+  // Si es Date, convertir a ISO y extraer YYYY-MM-DD
+  return fecha.toISOString().split('T')[0];
+}
+
+/**
  * Marca como VENCIDA las ocurrencias PENDIENTES cuya fecha ya pasó.
  * Para tareas sin recurrencia, crea una ocurrencia con estado VENCIDA
  * si su fechaVencimientoBase ya pasó y la asignación está ACTIVA.
@@ -1017,9 +1053,9 @@ export async function getAsistentesOrganizacion(orgId: string) {
  * Se ejecuta al leer las tareas para mantener los estados actualizados
  * sin necesidad de un cron job.
  */
-async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
+export async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
+  // Usar la parte de fecha del ISO string de hoy para comparaciones consistentes
+  const hoyStr = new Date().toISOString().split('T')[0];
 
   const idsOcurrenciasAVencer: string[] = [];
   // Para tareas únicas sin ocurrencia existente: crear una con VENCIDA
@@ -1032,9 +1068,9 @@ async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
     // Marcar ocurrencias materializadas PENDIENTES cuya fecha ya pasó
     for (const oc of asig.ocurrencias || []) {
       if (oc.estado === "PENDIENTE") {
-        const fechaOc = new Date(oc.fechaOriginal);
-        fechaOc.setHours(0, 0, 0, 0);
-        if (fechaOc < hoy) {
+        // Comparar usando strings ISO YYYY-MM-DD
+        const fechaOcStr = getFechaStr(oc.fechaOriginal);
+        if (fechaOcStr < hoyStr) {
           idsOcurrenciasAVencer.push(oc.id);
           oc.estado = "VENCIDA"; // Actualizar en memoria también
         }
@@ -1048,9 +1084,8 @@ async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
       asig.tarea.fechaVencimientoBase &&
       asig.estado === "ACTIVA"
     ) {
-      const fechaVenc = new Date(asig.tarea.fechaVencimientoBase);
-      fechaVenc.setHours(0, 0, 0, 0);
-      if (fechaVenc < hoy) {
+      const fechaVencStr = getFechaStr(asig.tarea.fechaVencimientoBase);
+      if (fechaVencStr < hoyStr) {
         const ocurrencias = asig.ocurrencias || [];
         const yaResuelta = ocurrencias.some(
           (oc: any) => ["COMPLETADA", "VENCIDA", "CANCELADA"].includes(oc.estado)
@@ -1081,13 +1116,12 @@ async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
         ? asig.tarea.fechaVencimientoBase.toISOString()
         : null;
       const fechasGeneradas = generarFechasRecurrencia(recData, fechaBaseStr);
-      const hoyStr = formatDateISO(hoy);
       const ocurrencias = asig.ocurrencias || [];
 
       // Índice de ocurrencias materializadas por fechaOriginal (YYYY-MM-DD)
       const matPorFecha = new Map<string, any>();
       for (const oc of ocurrencias) {
-        const key = formatDateISO(new Date(oc.fechaOriginal));
+        const key = getFechaStr(oc.fechaOriginal);
         matPorFecha.set(key, oc);
       }
 
@@ -1149,7 +1183,7 @@ async function marcarVencidasAlLeer(asignaciones: any[]): Promise<void> {
   }
 }
 
-function mapToRow(asignacion: any): TareaAsignacionRow {
+export function mapToRow(asignacion: any): TareaAsignacionRow {
   const rec = asignacion.tarea.recurrencia;
   return {
     tareaAsignacionId: asignacion.id,
@@ -1181,16 +1215,25 @@ function mapToRow(asignacion: any): TareaAsignacionRow {
           conteoMaximo: rec.conteoMaximo,
         }
       : null,
-    ocurrenciasMaterializadas: (asignacion.ocurrencias || []).map((o: any) => ({
-      id: o.id,
-      fechaOriginal: o.fechaOriginal.toISOString(),
-      estado: o.estado,
-      tituloOverride: o.tituloOverride,
-      fechaOverride: o.fechaOverride ? o.fechaOverride.toISOString() : null,
-      colorOverride: o.colorOverride,
-      prioridadOverride: o.prioridadOverride,
-      descripcionOverride: o.descripcionOverride,
-    })),
+    ocurrenciasMaterializadas: (asignacion.ocurrencias || []).map((o: any) => {
+      // Si la ocurrencia tiene refColorId (override), usar su refColor
+      const colorOverrideTitulo = o.refColor?.titulo || null;
+      const colorOverrideHexa = o.refColor?.codigoHexa || null;
+      
+      return {
+        id: o.id,
+        fechaOriginal: o.fechaOriginal.toISOString(),
+        estado: o.estado,
+        tituloOverride: o.tituloOverride,
+        fechaOverride: o.fechaOverride ? o.fechaOverride.toISOString() : null,
+        colorOverride: o.colorOverride,
+        refColorId: o.refColorId,
+        refColorHexa: colorOverrideHexa,
+        refColorTitulo: colorOverrideTitulo,
+        prioridadOverride: o.prioridadOverride,
+        descripcionOverride: o.descripcionOverride,
+      };
+    }),
   };
 }
 
@@ -1209,10 +1252,11 @@ export async function obtenerOcurrenciaMaterializada(
       fechaOriginal: new Date(fechaOcurrencia),
     },
     include: {
+      refColor: true, // Para obtener el colorOverride si existe
       tareaAsignacion: {
         include: {
           tarea: true,
-          refColor: { select: { titulo: true, codigoHexa: true } },
+          refColor: true, // Para obtener el color de la asignación si no hay override
         },
       },
     },
@@ -1225,7 +1269,7 @@ export async function obtenerOcurrenciaMaterializada(
       where: { id: tareaAsignacionId },
       include: {
         tarea: true,
-        refColor: { select: { titulo: true, codigoHexa: true } },
+        refColor: true,
       },
     });
 
@@ -1240,8 +1284,8 @@ export async function obtenerOcurrenciaMaterializada(
       descripcion: tarea.descripcion,
       prioridad: tarea.prioridad,
       fecha: fechaOcurrencia,
-      fechaOriginal: fechaOcurrencia,
-      refColorHexa: asignacion.refColor?.codigoHexa || null,
+      refColorId: asignacion?.refColorId || null,
+      refColorHexa: asignacion?.refColor?.codigoHexa || null,
       refColorTitulo: asignacion.refColor?.titulo || null,
       tituloOverride: null,
       descripcionOverride: null,
@@ -1259,23 +1303,12 @@ export async function obtenerOcurrenciaMaterializada(
   const asignacion = ocurrencia.tareaAsignacion;
 
   // Si hay colorOverride, usar ese código hex. Si no, usar el color de la asignación
-  let refColorTitulo = asignacion.refColor?.titulo || null;
-  let refColorHexa = asignacion.refColor?.codigoHexa || null;
+  const refColorTitulo = ocurrencia.refColor?.titulo || 
+                        ocurrencia.tareaAsignacion.refColor?.titulo;
   
-  if (ocurrencia.colorOverride) {
-    // colorOverride es el código hex guardado directamente
-    refColorHexa = ocurrencia.colorOverride;
-    // Buscar si existe un RefColor con ese código hex para obtener el nombre
-    try {
-      const colorConEseHex = await prisma.refColor.findFirst({
-        where: { codigoHexa: ocurrencia.colorOverride },
-        select: { titulo: true },
-      });
-      refColorTitulo = colorConEseHex?.titulo || null;
-    } catch {
-      refColorTitulo = null;
-    }
-  }
+
+  const colorFinalHex = ocurrencia.refColor?.codigoHexa || 
+                        ocurrencia.tareaAsignacion.refColor?.codigoHexa;
 
   return {
     id: ocurrencia.id,
@@ -1286,8 +1319,9 @@ export async function obtenerOcurrenciaMaterializada(
       ? ocurrencia.fechaOverride.toISOString()
       : ocurrencia.fechaOriginal.toISOString(),
     colorOverride: ocurrencia.colorOverride,
+    refColorId: ocurrencia.refColorId || ocurrencia.tareaAsignacion.refColorId,
     refColorTitulo: refColorTitulo,
-    refColorHexa: refColorHexa,
+    refColorHexa: colorFinalHex,
     tituloOverride: ocurrencia.tituloOverride,
     descripcionOverride: ocurrencia.descripcionOverride,
     prioridadOverride: ocurrencia.prioridadOverride,

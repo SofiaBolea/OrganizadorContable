@@ -127,7 +127,36 @@ body {
 /* =========================
    BADGES – PRIORIDAD
 ========================= */
+/* app/globals.css */
+@layer utilities {
+  /* Animación de rebote suave */
+  @keyframes bounce-slow {
+    0%, 100% {
+      transform: translateY(-5%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+  .animate-bounce-slow {
+    animation: bounce-slow 2s infinite;
+  }
 
+  /* Animación de brillo pulsante */
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.6);
+    }
+  }
+  .animate-glow-pulse {
+    animation: glow-pulse 2s infinite;
+  }
+}
 @layer components {
   .badge-prioridad {
     display: inline-block;
@@ -214,4 +243,210 @@ body {
     border-radius: 9999px;
     font-weight: 600;
   }
+}
+
+/* =========================
+   DASHBOARD STYLES
+========================= */
+
+.dashboard-container {
+  padding: 2rem;
+  min-height: calc(100vh - 80px);
+  background-color: var(--color-app-bg);
+}
+
+.dashboard-grid-full {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.dashboard-grid-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-grid-two {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Card Base */
+.dashboard-card {
+  background: var(--color-card-bg);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.dashboard-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin-bottom: 1rem;
+  font-family: "Montserrat", sans-serif;
+}
+
+/* Vencimientos */
+.dashboard-vencimientos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dashboard-vencimiento-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f9d5b8 0%, #f5c6a1 100%);
+  border-radius: 1rem;
+  align-items: center;
+  border-left: 4px solid #e87a58;
+}
+
+.dashboard-vencimiento-fecha {
+  min-width: 70px;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-align: center;
+  color: #444;
+}
+
+.dashboard-vencimiento-content {
+  flex: 1;
+}
+
+.dashboard-vencimiento-titulo {
+  font-weight: 600;
+  color: #494e5f;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-vencimiento-jurisdiccion {
+  display: inline-block;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Tareas */
+.dashboard-tareas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dashboard-tarea-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.dashboard-tarea-item:hover {
+  border-color: #d1d5db;
+  background: #f5f5f5;
+}
+
+.dashboard-tarea-checkbox {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.dashboard-tarea-checkbox:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+.dashboard-tarea-checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.dashboard-tarea-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-tarea-titulo {
+  font-weight: 600;
+  color: var(--color-text-main);
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+.dashboard-tarea-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.dashboard-tarea-fecha {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.dashboard-tarea-prioridad {
+  font-size: 0.7rem;
+}
+
+.dashboard-tarea-color-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dashboard-tarea-detalle {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  background: var(--color-primary-bg);
+  color: var(--color-primary-text);
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.dashboard-tarea-detalle:hover {
+  opacity: 0.85;
+}
+
+/* Empty State */
+.dashboard-empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #9ca3af;
+}
+
+.dashboard-empty-state p {
+  font-size: 0.95rem;
+  font-weight: 500;
 }

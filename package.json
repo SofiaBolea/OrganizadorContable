@@ -14,6 +14,7 @@
     "@clerk/nextjs": "^6.38.1",
     "@prisma/adapter-pg": "^7.4.0",
     "@prisma/client": "^7.4.0",
+    "autoprefixer": "^10.4.24",
     "date-fns": "^4.1.0",
     "dotenv": "^17.3.1",
     "lucide-react": "^0.563.0",
@@ -36,7 +37,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "prisma": "^7.4.0",
-    "tailwindcss": "^4.1.18",
+    "tailwindcss": "^4.2.1",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.21.0",
     "typescript": "^5"

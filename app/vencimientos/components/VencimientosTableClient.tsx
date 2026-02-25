@@ -275,9 +275,13 @@ export default function VencimientosTableClient({
 
                   // Calcular días faltantes
                   const hoy = new Date();
-                  hoy.setHours(0, 0, 0, 0);
-                  const fechaVenc = new Date(str.split("T")[0] + "T00:00:00");
-                  const diffMs = fechaVenc.getTime() - hoy.getTime();
+                  const hoyUTC = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate(), 0, 0, 0, 0));
+                  const fechaParts = str.split("T")[0].split("-");
+                  const año = parseInt(fechaParts[0]);
+                  const mes = parseInt(fechaParts[1]);
+                  const día = parseInt(fechaParts[2]);
+                  const fechaVenc = new Date(Date.UTC(año, mes - 1, día, 0, 0, 0, 0));
+                  const diffMs = fechaVenc.getTime() - hoyUTC.getTime();
                   const diasFaltantes = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
                   // Color badge para tipo

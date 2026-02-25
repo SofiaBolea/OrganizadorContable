@@ -10,9 +10,6 @@ import type {
   TareaDisplayRow,
 } from "@/lib/tareas-shared";
 import { expandirTareasADisplayRows } from "@/lib/tareas-shared";
-import { get } from "http";
-import { getTareasAsignadasAdmin, getTareasAsignadasAsistente } from "@/lib/tareas";
-import { auth } from "@clerk/nextjs/server";
 
 // ═══════════════════════════════════════
 // HELPERS
@@ -41,10 +38,18 @@ function formatFecha(fechaStr: string | null) {
 
 function getDiasFaltantes(fechaStr: string | null) {
   if (!fechaStr) return null;
+  // Extraer YYYY-MM-DD y crear fecha a medianoche UTC
+  const fechaParts = fechaStr.split("T")[0].split("-");
+  const año = parseInt(fechaParts[0]);
+  const mes = parseInt(fechaParts[1]);
+  const día = parseInt(fechaParts[2]);
+  
+  // Crear ambas fechas a medianoche UTC para comparación consistente
   const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  const fecha = new Date(fechaStr.split("T")[0] + "T00:00:00");
-  const diffMs = fecha.getTime() - hoy.getTime();
+  const hoyUTC = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate(), 0, 0, 0, 0));
+  const fechaVenc = new Date(Date.UTC(año, mes - 1, día, 0, 0, 0, 0));
+  
+  const diffMs = fechaVenc.getTime() - hoyUTC.getTime();
   return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 }
 
@@ -59,7 +64,7 @@ interface TareasTableClientProps {
   mostrarColumnaAsistente?: boolean;
   canModify: boolean;
   canDelete: boolean;
-  canRevertEstado: boolean;
+  canRevertEstado?: boolean;
   basePath: string;
 }
 
@@ -74,7 +79,6 @@ export default function TareasTableClient({
   mostrarColumnaAsistente = false,
   canModify,
   canDelete,
-  canRevertEstado,
   basePath,
 }: TareasTableClientProps) {
   const [tareasBase, setTareasBase] = useState(initialTareas);
@@ -100,26 +104,7 @@ export default function TareasTableClient({
     row: TareaDisplayRow | null;
     nuevoEstado: string;
   }>({ isOpen: false, row: null, nuevoEstado: "" });
-  // ─── Recargar tareas sin recargar toda la página ───
-  
-  /*
-  const recargarTareas = async () => {
 
-
-    try {
-      const { orgId, userId } = await auth();
-      if (!orgId || !userId) throw new Error("UNAUTHENTICATED: No autenticado.");
-
-      const tareas = esAdmin
-        ? await getTareasAsignadasAdmin(orgId, userId)
-        : await getTareasAsignadasAsistente(orgId, userId);
-
-      setTareasBase(tareas);
-    } catch (err) {
-      console.error("Error recargando tareas:", err);
-    }
-  };
-  */
 
   // ─── Expandir tareas a filas de display ───
   const todasLasFilas = useMemo(
@@ -183,10 +168,7 @@ export default function TareasTableClient({
     // VENCIDA y CANCELADA son estados finales, no editables
     if (row.estado === "VENCIDA" || row.estado === "CANCELADA") return [];
     if (row.estado === "PENDIENTE") return ["COMPLETADA"];
-    // Si está COMPLETADA, solo mostrar PENDIENTE si tiene permiso para revertir
-    if (row.estado === "COMPLETADA") {
-      return canRevertEstado ? ["PENDIENTE"] : [];
-    }
+    if (row.estado === "COMPLETADA") return ["PENDIENTE"];
     return [];
   };
 
@@ -236,8 +218,25 @@ export default function TareasTableClient({
               ...t,
               ocurrenciasMaterializadas: yaExiste
                 ? t.ocurrenciasMaterializadas.map((o) =>
-                  o.fechaOriginal.split("T")[0] === fechaKey
-                    ? {
+                    o.fechaOriginal.split("T")[0] === fechaKey
+                      ? {
+                          id: ocurrencia.id,
+                          fechaOriginal: ocurrencia.fechaOriginal,
+                          estado: ocurrencia.estado,
+                          tituloOverride: ocurrencia.tituloOverride,
+                          fechaOverride: ocurrencia.fechaOverride,
+                          colorOverride: ocurrencia.colorOverride,
+                          prioridadOverride: ocurrencia.prioridadOverride,
+                          descripcionOverride: ocurrencia.descripcionOverride,
+                          refColorId: ocurrencia.refColorId || null,
+                          refColorHexa: ocurrencia.refColorHexa || null,
+                          refColorTitulo: ocurrencia.refColorTitulo || null,
+                        }
+                      : o
+                  )
+                : [
+                    ...t.ocurrenciasMaterializadas,
+                    {
                       id: ocurrencia.id,
                       fechaOriginal: ocurrencia.fechaOriginal,
                       estado: ocurrencia.estado,
@@ -246,22 +245,11 @@ export default function TareasTableClient({
                       colorOverride: ocurrencia.colorOverride,
                       prioridadOverride: ocurrencia.prioridadOverride,
                       descripcionOverride: ocurrencia.descripcionOverride,
-                    }
-                    : o
-                )
-                : [
-                  ...t.ocurrenciasMaterializadas,
-                  {
-                    id: ocurrencia.id,
-                    fechaOriginal: ocurrencia.fechaOriginal,
-                    estado: ocurrencia.estado,
-                    tituloOverride: ocurrencia.tituloOverride,
-                    fechaOverride: ocurrencia.fechaOverride,
-                    colorOverride: ocurrencia.colorOverride,
-                    prioridadOverride: ocurrencia.prioridadOverride,
-                    descripcionOverride: ocurrencia.descripcionOverride,
-                  },
-                ],
+                      refColorId: ocurrencia.refColorId || null,
+                      refColorHexa: ocurrencia.refColorHexa || null,
+                      refColorTitulo: ocurrencia.refColorTitulo || null,
+                    },
+                  ],
             };
           })
         );
@@ -302,7 +290,7 @@ export default function TareasTableClient({
         }
       } else {
         // Ocurrencia virtual: materializar con estado CANCELADA
-        const fechaOriginal = row.fechaOcurrencia || new Date().toISOString().split("T")[0];
+        const fechaOriginal = row.fechaOriginalOcurrencia || row.fechaOcurrencia || new Date().toISOString().split("T")[0];
         const res = await fetch("/api/tareas/ocurrencias", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -321,7 +309,7 @@ export default function TareasTableClient({
 
       // Actualizar en memoria: agregar/actualizar ocurrencia con CANCELADA
       // expandirTareasADisplayRows filtrará las CANCELADA automáticamente
-      const fechaKey = (row.fechaOcurrencia || new Date().toISOString()).split("T")[0];
+      const fechaKey = (row.fechaOriginalOcurrencia || row.fechaOcurrencia || new Date().toISOString()).split("T")[0];
       setTareasBase((prev) =>
         prev.map((t) => {
           if (t.tareaAsignacionId !== row.tareaAsignacionId) return t;
@@ -332,30 +320,30 @@ export default function TareasTableClient({
             ...t,
             ocurrenciasMaterializadas: yaExiste
               ? t.ocurrenciasMaterializadas.map((o) =>
-                o.fechaOriginal.split("T")[0] === fechaKey
-                  ? { ...o, estado: "CANCELADA" }
-                  : o
-              )
+                  o.fechaOriginal.split("T")[0] === fechaKey
+                    ? { ...o, estado: "CANCELADA" }
+                    : o
+                )
               : [
-                ...t.ocurrenciasMaterializadas,
-                {
-                  id: "temp",
-                  fechaOriginal: fechaKey,
-                  estado: "CANCELADA",
-                  tituloOverride: null,
-                  fechaOverride: null,
-                  colorOverride: null,
-                  prioridadOverride: null,
-                  descripcionOverride: null,
-                },
-              ],
+                  ...t.ocurrenciasMaterializadas,
+                  {
+                    id: "temp",
+                    fechaOriginal: fechaKey,
+                    estado: "CANCELADA",
+                    tituloOverride: null,
+                    fechaOverride: null,
+                    colorOverride: null,
+                    prioridadOverride: null,
+                    descripcionOverride: null,
+                    refColorId: null,
+                    refColorHexa: null,
+                    refColorTitulo: null,
+                  },
+                ],
           };
         })
       );
       setDeleteModal({ isOpen: false, row: null });
-      // Recargar solo la tabla
-      //await recargarTareas();
-      window.location.reload(); // Recargar toda la página para evitar inconsistencias en tareas recurrentes, se puede optimizar luego para solo recargar la tabla sin recargar toda la página
     } catch {
       alert("Error al conectar con el servidor");
     } finally {
@@ -369,7 +357,7 @@ export default function TareasTableClient({
     const row = deleteModal.row;
     setLoading(true);
     try {
-      const fechaDesde = row.fechaOcurrencia || new Date().toISOString().split("T")[0];
+      const fechaDesde = row.fechaOriginalOcurrencia || row.fechaOcurrencia || new Date().toISOString().split("T")[0];
 
       if (row.tieneRecurrencia) {
         // Tarea recurrente → cortar recurrencia y cancelar futuras
@@ -388,7 +376,6 @@ export default function TareasTableClient({
         }
 
         // Actualizar en memoria: setear hastaFecha y marcar ocurrencias futuras como CANCELADA
-        // No actualiza en la BD solo en lo que se muestra, el endpoint se encarga de actualizar correctamente la recurrencia y las ocurrencias futuras
         const fechaCorteStr = fechaDesde.split("T")[0];
         setTareasBase((prev) =>
           prev.map((t) => {
@@ -396,16 +383,39 @@ export default function TareasTableClient({
             // Actualizar hastaFecha en recurrencia (día anterior)
             const diaAnterior = new Date(fechaCorteStr + "T12:00:00");
             diaAnterior.setDate(diaAnterior.getDate() - 1);
+            const diaAnteriorIso = diaAnterior.toISOString();
+
+            // Marcar como CANCELADA todas las ocurrencias >= fechaCorte (incluye VENCIDA y COMPLETADA)
+            const nuevasMats = t.ocurrenciasMaterializadas.map((o) => {
+              const fechaOc = o.fechaOriginal.split("T")[0];
+              if (fechaOc >= fechaCorteStr && o.estado !== "CANCELADA") {
+                return { ...o, estado: "CANCELADA" };
+              }
+              return o;
+            });
+
+            // Determinar nuevo estado de la asignación
+            let nuevoEstado = t.estado;
+            const hastaStr = diaAnteriorIso.split("T")[0];
+            const baseStr = t.fechaVencimientoBase?.split("T")[0];
+            if (baseStr && hastaStr < baseStr) {
+              // Recurrencia totalmente agotada → FINALIZADA
+              nuevoEstado = "FINALIZADA";
+            } else if (nuevasMats.length > 0) {
+              const hayPendientes = nuevasMats.some((o) => o.estado === "PENDIENTE");
+              if (!hayPendientes) {
+                const todasCompletadas = nuevasMats.every((o) => o.estado === "COMPLETADA");
+                nuevoEstado = todasCompletadas ? "COMPLETADA" : "FINALIZADA";
+              }
+            }
+
             return {
               ...t,
+              estado: nuevoEstado,
               recurrencia: t.recurrencia
-                ? { ...t.recurrencia, hastaFecha: diaAnterior.toISOString() }
+                ? { ...t.recurrencia, hastaFecha: diaAnteriorIso }
                 : null,
-              ocurrenciasMaterializadas: t.ocurrenciasMaterializadas.map((o) =>
-                o.fechaOriginal.split("T")[0] >= fechaCorteStr && o.estado === "PENDIENTE"
-                  ? { ...o, estado: "CANCELADA" }
-                  : o
-              ),
+              ocurrenciasMaterializadas: nuevasMats,
             };
           })
         );
@@ -449,31 +459,32 @@ export default function TareasTableClient({
               ...t,
               ocurrenciasMaterializadas: yaExiste
                 ? t.ocurrenciasMaterializadas.map((o) =>
-                  o.fechaOriginal.split("T")[0] === fechaKey
-                    ? { ...o, estado: "CANCELADA" }
-                    : o
-                )
+                    o.fechaOriginal.split("T")[0] === fechaKey
+                      ? { ...o, estado: "CANCELADA" }
+                      : o
+                  )
                 : [
-                  ...t.ocurrenciasMaterializadas,
-                  {
-                    id: "temp",
-                    fechaOriginal: fechaKey,
-                    estado: "CANCELADA",
-                    tituloOverride: null,
-                    fechaOverride: null,
-                    colorOverride: null,
-                    prioridadOverride: null,
-                    descripcionOverride: null,
-                  },
-                ],
+                    ...t.ocurrenciasMaterializadas,
+                    {
+                      id: "temp",
+                      fechaOriginal: fechaKey,
+                      estado: "CANCELADA",
+                      tituloOverride: null,
+                      fechaOverride: null,
+                      colorOverride: null,
+                      prioridadOverride: null,
+                      descripcionOverride: null,
+                      refColorId: null,
+                      refColorHexa: null,
+                      refColorTitulo: null,
+                    },
+                  ],
             };
           })
         );
       }
 
       setDeleteModal({ isOpen: false, row: null });
-      // Recargar solo la tabla
-      window.location.reload(); // Recargar toda la página para evitar inconsistencias en tareas recurrentes, se puede optimizar luego para solo recargar la tabla sin recargar toda la página
     } catch {
       alert("Error al conectar con el servidor");
     } finally {

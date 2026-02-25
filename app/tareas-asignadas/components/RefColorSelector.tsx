@@ -66,7 +66,7 @@ export default function RefColorSelector({ selectedId, selectedHexa, refColorTit
   };
 
   const selectedColor = colores.find((c) => c.id === selectedId);
-  
+
   // Si no encontramos el color en la lista, usarefColorHexa como fallback
   const fallbackColor = selectedId && selectedHexa ? { id: selectedId, titulo: refColorTitulo || "", codigoHexa: selectedHexa } : null;
 
@@ -130,6 +130,12 @@ export default function RefColorSelector({ selectedId, selectedHexa, refColorTit
         if (res.ok) {
           const { data } = await res.json();
           setColores((prev) => prev.map((c) => (c.id === modalColor.id ? data : c)));
+
+          // Si el color editado es el seleccionado, actualizar selección para reflejar cambios
+          if (selectedId === modalColor.id) {
+            onChange(data.id, data.codigoHexa);
+          }
+
           closeModal();
         } else {
           alert("Error al actualizar color");
@@ -180,9 +186,8 @@ export default function RefColorSelector({ selectedId, selectedHexa, refColorTit
           type="button"
           disabled={disabled}
           onClick={() => setIsOpen(!isOpen)}
-          className={`w-full flex items-center justify-between bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text transition-all ${
-            disabled ? "cursor-default opacity-60" : "cursor-pointer hover:ring-2 hover:ring-primary"
-          }`}
+          className={`w-full flex items-center justify-between bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text transition-all ${disabled ? "cursor-default opacity-60" : "cursor-pointer hover:ring-2 hover:ring-primary"
+            }`}
         >
           <div className="flex items-center gap-2">
             {selectedColor || fallbackColor ? (
@@ -218,9 +223,8 @@ export default function RefColorSelector({ selectedId, selectedHexa, refColorTit
             {colores.map((c, i) => (
               <div
                 key={c.id}
-                className={`flex items-center justify-between px-5 py-3 hover:bg-black/[0.02] transition-colors ${
-                  i < colores.length - 1 ? "border-b border-text/5" : ""
-                }`}
+                className={`flex items-center justify-between px-5 py-3 hover:bg-black/[0.02] transition-colors ${i < colores.length - 1 ? "border-b border-text/5" : ""
+                  }`}
               >
                 {/* Clickable area for selection */}
                 <button
@@ -234,9 +238,8 @@ export default function RefColorSelector({ selectedId, selectedHexa, refColorTit
                 {/* Color circle */}
                 <div className="flex items-center gap-4">
                   <span
-                    className={`w-8 h-8 rounded-full inline-block flex-shrink-0 ${
-                      selectedId === c.id ? "ring-2 ring-offset-2 ring-current" : ""
-                    }`}
+                    className={`w-8 h-8 rounded-full inline-block flex-shrink-0 ${selectedId === c.id ? "ring-2 ring-offset-2 ring-current" : ""
+                      }`}
                     style={{ backgroundColor: c.codigoHexa, color: c.codigoHexa }}
                   />
 
@@ -291,8 +294,8 @@ export default function RefColorSelector({ selectedId, selectedHexa, refColorTit
               {modalMode === "crear"
                 ? "Nuevo Color de Referencia"
                 : modalMode === "editar"
-                ? "Modificar Color de Referencia"
-                : "Detalle del Color"}
+                  ? "Modificar Color de Referencia"
+                  : "Detalle del Color"}
             </h3>
 
             {/* Nombre / Título */}

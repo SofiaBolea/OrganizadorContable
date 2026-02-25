@@ -44,9 +44,8 @@ function NavItem({ href, icon: Icon, label }: NavItemProps) {
     >
       <Icon
         size={18}
-        className={`transition-colors ${
-          isActive ? "text-[#2C2C2C]" : "text-white/60 group-hover:text-white"
-        }`}
+        className={`transition-colors ${isActive ? "text-[#2C2C2C]" : "text-white/60 group-hover:text-white"
+          }`}
       />
       {label}
     </Link>
@@ -131,10 +130,15 @@ export default function Sidebar() {
           icon={Calendar}
           label="Calendario"
         />
-        
+        <NavItem
+          href="/reportes"
+          icon={LayoutGrid}
+          label="Reportes"
+        />
+
 
       </nav>
-      
+
 
       <div className="mt-auto pt-8 text-xs text-white/40">
         © {new Date().getFullYear()} Estudio
