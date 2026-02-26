@@ -87,9 +87,9 @@ const DetalleTareaModal = ({ tarea, onClose }: DetalleTareaModalProps) => {
           </div>
 
           <div className="bg-[#f2f2f0] py-3 px-7 rounded-full flex justify-between items-center">
-            <span className="text-gray-500 font-bold text-sm">Tipo Tarea</span>
+            <span className="text-gray-500 font-bold text-sm">Tipo </span>
             <span className="text-gray-700 font-bold text-sm uppercase">
-              {tarea.tipoTarea || 'No especificado'}
+              {tarea.tipoTarea || 'Vencimiento'}
             </span>
           </div>
 
