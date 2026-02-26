@@ -25,9 +25,9 @@ const DetalleTareaModal = ({ tarea, onClose }: DetalleTareaModalProps) => {
   const router = useRouter(); // Inicializamos el router
 
   const getPrioridadStyle = (prioridad: string) => {
-    if (prioridad?.toLowerCase() === 'baja') return 'bg-[#a3c981] text-white';
-    if (prioridad?.toLowerCase() === 'media') return 'bg-yellow-400 text-white';
-    return 'bg-red-400 text-white';
+    if (prioridad?.toLowerCase() === 'baja') return 'bg-[#90BF77] ';
+    if (prioridad?.toLowerCase() === 'media') return 'bg-[#F7D78C] ';
+    return 'bg-[#E87A58] ';
   };
 
   const handleEdit = () => {
@@ -53,7 +53,7 @@ const DetalleTareaModal = ({ tarea, onClose }: DetalleTareaModalProps) => {
           <h2 className="text-2xl font-medium text-gray-500 tracking-tight">Detalle</h2>
 
           <div className="flex items-center gap-5">
-            <span className="text-2xl font-semibold text-[#f5b041]">
+            <span className="text-2xl font-semibold text-[#F9C56D]">
               {tarea.estado}
             </span>
             <div className="flex items-center gap-3">
@@ -64,7 +64,6 @@ const DetalleTareaModal = ({ tarea, onClose }: DetalleTareaModalProps) => {
               >
                 <Pencil size={20} />
               </button>
-             
             </div>
           </div>
           <button onClick={onClose} className="ml-2 text-gray-300 hover:text-gray-600">

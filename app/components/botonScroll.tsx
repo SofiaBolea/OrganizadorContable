@@ -15,7 +15,7 @@ export default function BotonScroll({ targetId, label }: { targetId: string, lab
   };
 
   return (
-    <div className="flex justify-end">
+    <div className="flex justify-end p-4">
       <button 
         onClick={handleScroll} 
           className="

@@ -252,7 +252,6 @@ body {
 ========================= */
 
 .dashboard-container {
-  padding: 2rem;
   min-height: calc(100vh - 80px);
   background-color: var(--color-app-bg);
 }
@@ -266,8 +265,8 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
-  margin-top: 2rem;
   width: 100%;
+  height: 100vh
 }
 
 @media (max-width: 1024px) {
@@ -284,11 +283,20 @@ body {
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
   border: 1px solid #e5e7eb;
   margin-bottom: 2rem;
+  
 }
 
 .card-vencimientos{
   background-color: #F8A287;
   color: #2C2C2C;
+  overflow-y: auto;
+}
+.card-vencimientos::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra */
+}
+.card-vencimientos::-webkit-scrollbar-thumb {
+  background: #88888879; /* Color del "thumb" */
+  border-radius: 4px;
 }
 
 .dashboard-card-title {
@@ -297,6 +305,7 @@ body {
   color: var(--color-text-main);
   margin-bottom: 1rem;
   font-family: "Montserrat", sans-serif;
+  text-align: center;
 }
 
 /* Vencimientos */
@@ -310,12 +319,8 @@ body {
   display: flex;
   justify-content: space-around;
   gap: 1rem;
-  background: linear-gradient(135deg, #f9d5b8 0%, #f5c6a1 100%);
   border-radius: 1rem;
-  align-items: center;
-  border-left: 4px solid #e87a58;
   padding: 0.5rem 0.75rem;
-  align-items: center;;
 }
 
 .dashboard-vencimiento-fecha {
@@ -333,7 +338,7 @@ body {
   width: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-between;
   
 }
 
@@ -347,9 +352,9 @@ body {
 
 .dashboard-vencimiento-jurisdiccion {
   display: inline-block;
-  background: rgba(0, 0, 0, 0.1);
+  background: #EFEDE7;
   padding: 0.25rem 0.5rem;
-  border-radius: 0.375rem;
+  border-radius: 1rem;
   font-size: 0.75rem;
   color: #666;
   font-weight: 500;
@@ -539,10 +544,12 @@ body {
 
 .table-card {
   width: 100%;
+  height: 75vh;
   padding: 1rem;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   background-color: #fff;
   border-radius: 20px;
+  overflow-y: auto;
 }
 
 /* Header */
