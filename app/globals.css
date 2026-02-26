@@ -279,33 +279,35 @@ body {
 .card {
   background: var(--color-card-bg);
   border-radius: 1.5rem;
-  padding: 1.5rem;
+  padding: 2rem;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
   border: 1px solid #e5e7eb;
   margin-bottom: 2rem;
-  
+  position: relative;
 }
 
 .card-vencimientos{
   background-color: #F8A287;
   color: #2C2C2C;
-  overflow-y: auto;
+  /* ESTO ES CLAVE: */
+  max-height: 500px; /* O la altura que prefieras */
+  overflow-y: auto;  /* Permite el scroll dentro del card */
+  display: flex;
+  flex-direction: column;
 }
-.card-vencimientos::-webkit-scrollbar {
-  width: 8px; /* Ancho de la barra */
-}
-.card-vencimientos::-webkit-scrollbar-thumb {
-  background: #88888879; /* Color del "thumb" */
-  border-radius: 4px;
-}
+
 
 .dashboard-card-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--color-text-main);
-  margin-bottom: 1rem;
+  color: var(--color-sidebar-bg);
+  /* margin-bottom eliminado para evitar solapamiento */
   font-family: "Montserrat", sans-serif;
   text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 1rem 0;
 }
 
 /* Vencimientos */
@@ -313,8 +315,15 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  overflow-y: auto;
 }
-
+.dashboard-vencimientos-list::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra */
+}
+.dashboard-vencimientos-list::-webkit-scrollbar-thumb {
+  background: #88888879; /* Color del "thumb" */
+  border-radius: 4px;
+}
 .dashboard-vencimiento-item {
   display: flex;
   justify-content: space-around;
