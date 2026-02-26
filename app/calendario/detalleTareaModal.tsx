@@ -16,9 +16,9 @@ interface DetalleTareaModalProps {
 
 const DetalleTareaModal = ({ tarea, onClose }: DetalleTareaModalProps) => {
   const getPrioridadStyle = (prioridad: string) => {
-    if (prioridad?.toLowerCase() === 'baja') return 'bg-[#a3c981] text-white';
-    if (prioridad?.toLowerCase() === 'media') return 'bg-yellow-400 text-white';
-    return 'bg-red-400 text-white';
+    if (prioridad?.toLowerCase() === 'baja') return 'bg-[#90BF77] ';
+    if (prioridad?.toLowerCase() === 'media') return 'bg-[#F7D78C] ';
+    return 'bg-[#E87A58] ';
   };
 
   return (
@@ -30,15 +30,12 @@ const DetalleTareaModal = ({ tarea, onClose }: DetalleTareaModalProps) => {
           <h2 className="text-2xl font-medium text-gray-500 tracking-tight">Detalle</h2>
 
           <div className="flex items-center gap-5">
-            <span className="text-2xl font-semibold text-[#f5b041]">
+            <span className="text-2xl font-semibold text-[#F9C56D]">
               {tarea.estado}
             </span>
             <div className="flex items-center gap-3">
-              <button className="text-gray-400 hover:text-blue-500 transition-colors">
+              <button className="text-gray-400 hover:text-[#90BF77] transition-colors">
                 <Pencil size={20} />
-              </button>
-              <button className="text-[#e67e22] hover:text-red-500 transition-colors">
-                <Trash2 size={20} />
               </button>
             </div>
           </div>
