@@ -79,14 +79,21 @@ export default function CalendarioEventos({ eventos }: { eventos: any[] }) {
   const handleSelectEvent = (event: any) => {
     setTareaSeleccionada({
       id: event.resource?.id,
+      type: event.resource?.type, // 'tarea' o 'vencimiento'
+      // Campos de Tarea
+      tareaId: event.resource?.tareaId,
+      taId: event.resource?.taId,
+      // Campos de Vencimiento
+      vencimientoId: event.resource?.vencimientoId,
+      // Común
+      fechaOc: event.resource?.fechaOc,
       titulo: event.title,
       descripcion: event.resource?.descripcion,
       prioridad: event.resource?.prioridad,
       estado: event.resource?.estado,
       color: getEventColor(event),
-      // Al usar el evento procesado, event.start ya es la fecha local corregida
       fecha: format(event.start, "EEEE, d 'de' MMMM", { locale: es }),
-      type: event.resource?.type
+      tipoTarea: event.resource?.tipoTarea,
     });
   };
 
