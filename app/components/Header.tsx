@@ -30,6 +30,7 @@ export default function Header() {
     if (pathname.startsWith("/tareas-asignadas")) return "Tareas Asignadas"
     if (pathname.startsWith("/tareas-propias")) return "Mis Tareas"
     if (pathname.startsWith("/recursos-ref")) return "Recursos de Referencia"
+    if (pathname.startsWith("/reportes")) return "Reportes"
     return "Tablero General"
   }
 
@@ -41,6 +42,7 @@ export default function Header() {
   if (pathname.startsWith("/tareas-asignadas")) return "Visualizar y gestionar las tareas asignadas"
   if (pathname.startsWith("/tareas-propias")) return "Visualizar y gestionar las tareas que tienes asignadas como usuario"
   if (pathname.startsWith("/recursos-ref")) return "Acceder a recursos adicionales"
+  if (pathname.startsWith("/reportes")) return "Generar y visualizar reportes personalizados"
   return "Tablero General"
   }
 
