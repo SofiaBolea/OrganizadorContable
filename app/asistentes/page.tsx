@@ -36,11 +36,11 @@ export default async function AsistentesPage(props: { searchParams: Promise<any>
             <ShieldAlert className="w-10 h-10 text-red-500" />
           </div>
           
-          <h2 className="text-3xl font-black text-slate-900 tracking-tighter italic mb-4">
+          <h2 className="text-3xl font-bold mb-4">
             Acceso Restringido
           </h2>
           
-          <p className="text-slate-500 italic mb-8 leading-relaxed">
+          <p className=" mb-8 leading-relaxed">
             Lo sentimos, tu cuenta no tiene los permisos necesarios para gestionar el staff. 
             Si creés que esto es un error, contactá al administrador del estudio.
           </p>

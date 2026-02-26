@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import DashboardContainer from "./components/dashboard/DashboardContainer";
 import { ShieldAlert } from "lucide-react";
-import PaginaCalendario from "./calendario/page";
+import PaginaCalendario from "./calendario/calendario";
 import BotonScroll from "./components/botonScroll";
 
 

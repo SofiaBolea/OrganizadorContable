@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useAuth } from "@clerk/nextjs"
 import {
   LayoutGrid,
   Users,
@@ -53,6 +54,8 @@ function NavItem({ href, icon: Icon, label }: NavItemProps) {
 }
 
 export default function Sidebar() {
+  const { has, isLoaded } = useAuth();
+  const esAdmin = isLoaded && has?.({ role: "org:admin" });
   return (
     <aside className="w-64 bg-[#2C2C2C] text-white flex flex-col px-6 py-8 h-screen sticky top-0 ">
 
@@ -124,17 +127,13 @@ export default function Sidebar() {
           label="Mis Tareas"
         />
 
-        <NavItem
-          href="/calendario"
-          icon={Calendar}
-          label="Calendario"
-        />
-        <NavItem
-          href="/reportes"
-          icon={LayoutGrid}
-          label="Reportes"
-        />
-
+        {esAdmin && (
+          <NavItem
+            href="/reportes"
+            icon={LayoutGrid} // Puedes cambiar el icono si prefieres uno específico para reportes
+            label="Reportes"
+          />
+        )}
 
       </nav>
 

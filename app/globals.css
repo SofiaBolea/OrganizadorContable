@@ -583,7 +583,8 @@ body {
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   background-color: #fff;
   border-radius: 20px;
-  overflow-y: auto;
+  overflow: auto; /* Asegura que el contenedor controle el scroll */
+  position: relative;
 }
 
 /* Table card para tabla asistentes en formulario de cliente */
@@ -614,7 +615,8 @@ body {
 .table-base {
   width: 100%;
   text-align: left;
-  border-collapse: collapse;
+  border-collapse: separate; /* Cambiar de collapse a separate */
+  border-spacing: 0;
 }
 
 .table-base thead {
@@ -626,6 +628,11 @@ body {
   font-size: 0.875rem;
   font-weight: bold;
   color: #475569;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .table-base tbody {
