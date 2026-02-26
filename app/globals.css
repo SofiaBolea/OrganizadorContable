@@ -552,6 +552,14 @@ body {
   overflow-y: auto;
 }
 
+/* Table card para tabla asistentes en formulario de cliente */
+.table-card-asistentes {
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--color-app-bg);
+  border-radius: 20px;
+}
+
 /* Header */
 .table-card-header {
   color: var(--color-text-main);

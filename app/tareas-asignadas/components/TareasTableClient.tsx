@@ -9,7 +9,7 @@ import type {
   TareaAsignacionRow,
   TareaDisplayRow,
 } from "@/lib/tareas-shared";
-import { expandirTareasADisplayRows } from "@/lib/tareas-shared";
+import { expandirTareasADisplayRows, formatDateISO } from "@/lib/tareas-shared";
 import { ModalError } from "./modalError";
 
 // ═══════════════════════════════════════
@@ -792,7 +792,9 @@ export default function TareasTableClient({
       {/* Modal Eliminar */}
       <ConfirmDeleteTareaModal
         isOpen={deleteModal.isOpen}
-        titulo={deleteModal.row?.titulo || ""}
+        titulo={
+          formatFecha(deleteModal.row?.fechaOcurrencia || "") 
+        }
         esRecurrente={deleteModal.row?.tieneRecurrencia || false}
         onClose={() => setDeleteModal({ isOpen: false, row: null })}
         onDeleteOne={handleDeleteOne}
@@ -802,7 +804,9 @@ export default function TareasTableClient({
       {/* Modal Confirmar Estado (Asistente) */}
       <ConfirmEstadoModal
         isOpen={estadoModal.isOpen}
-        titulo={estadoModal.row?.titulo || ""}
+        titulo={
+          formatFecha(estadoModal.row?.fechaOcurrencia || "") 
+        }
         nuevoEstado={estadoModal.nuevoEstado}
         onClose={() => setEstadoModal({ isOpen: false, row: null, nuevoEstado: "" })}
         onConfirm={handleConfirmEstado}

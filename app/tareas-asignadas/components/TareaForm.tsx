@@ -526,7 +526,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
                 setCamposModificados(prev => new Set([...prev, "titulo"]));
               }}
               disabled={isViewMode}
-              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text placeholder:text-text/40 focus:ring-2 focus:ring-primary transition-all"
+              className="input-base"
               required
             />
           </div>
@@ -542,7 +542,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
               }}
               disabled={isViewMode}
               rows={3}
-              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-2xl outline-none text-text placeholder:text-text/40 focus:ring-2 focus:ring-primary transition-all resize-none"
+              className="w-full bg-[#e9e8e0] p-3 px-5 rounded-2xl outline-none text-text placeholder:text-text/40 focus:ring-1 focus:ring-primary transition-all resize-none"
             />
           </div>
 
@@ -660,7 +660,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
                 }}
                 disabled={!isCreateMode}
                 required={!esRecurrente}
-                className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text focus:ring-2 focus:ring-primary transition-all"
+                className="input-base"
               />
             </div>
 
@@ -675,7 +675,7 @@ export default function TareaForm({ mode, tipoTarea, basePath, initialData, ocur
                   setCamposModificados(prev => new Set([...prev, "prioridad"]));
                 }}
                 disabled={isViewMode}
-                className="w-full bg-[#e9e8e0] p-3 px-5 rounded-full outline-none text-text focus:ring-2 focus:ring-primary transition-all appearance-none cursor-pointer"
+                className="input-base"
               >
                 {prioridades.map((p) => (
                   <option key={p} value={p}>{p === "ALTA" ? "Prioridad Alta" : p === "MEDIA" ? "Prioridad Media" : "Prioridad Baja"}</option>

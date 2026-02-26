@@ -25,7 +25,7 @@ export default async function TareasPropiasPage() {
     );
   }
 
-  const [esAdmin, canView, canCreate, canModify, canDelete, canRevertEstado] = await Promise.all([  
+  const [esAdmin, canView, canCreate, canModify, canDelete, canRevertEstado] = await Promise.all([
     Permisos.esAdmin(),
     Permisos.puedeVerTarea(),
     Permisos.puedeCrearTarea(),
@@ -33,7 +33,7 @@ export default async function TareasPropiasPage() {
     Permisos.puedeEliminarTarea(),
     Permisos.puedeCambiarEstadoTarea(),
   ]);
-  
+
 
   if (!canView) {
     return (
@@ -48,28 +48,25 @@ export default async function TareasPropiasPage() {
       </main>
     );
   }
-  
-  const tareas = await getTareasPropias(orgId, userId); 
+
+  const tareas = await getTareasPropias(orgId, userId);
 
   return (
-    <main className="p-8">
-      <div className="flex flex-row justify-between items-center mb-2">
+    <main>
+      <div className="flex flex-row justify-between items-center">
+        <div className="flex w-full justify-end mb-8 gap-4">
+          <BotonScroll targetId="refColor-section" label="Referencias de color" />
 
-        <h1 className="text-3xl font-bold text-text">Mis Tareas</h1>
-        <div className="flex flex-row gap-4">
           {canCreate && (
-          <Button variant="primario">
-            <Link href="/tareas-propias/nueva">
-              Nueva Tarea
-            </Link>
-          </Button>
-        )}
+            <Button variant="primario">
+              <Link href="/tareas-propias/nueva">
+                Nueva Tarea
+              </Link>
+            </Button>
+          )}
 
-        <BotonScroll targetId="refColor-section" label="Referencias de color" />
         </div>
-        
       </div>
-      <p className="text-text/50 mb-8">Gestionar tus tareas personales</p>
 
       <TareasTableClient
         tareas={tareas}

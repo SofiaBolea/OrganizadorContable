@@ -34,11 +34,13 @@ export default function ConfirmDeleteTareaModal({
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-xl p-8 max-w-md w-full mx-4">
-        <h3 className="text-xl font-bold text-text mb-4">Cancelar / Eliminar Tarea</h3>
+
+        <h3 className="text-xl pb-4 flex justify-center">Cancelar / Eliminar Tarea</h3>
 
         <p className="text-text/70 mb-6 text-center">
           <strong className="text-text">{titulo}</strong>
         </p>
+
 
         <div className="space-y-3 mb-8">
           <label className="flex items-center gap-3 cursor-pointer group">

@@ -25,7 +25,7 @@ const CustomToolbar = (props: ToolbarProps<any, any>) => {
 
 
       </div>
-      <div className="flex bg-gray-100 p-1 rounded-xl border border-gray-200">
+      <div className="flex p-1 rounded-xl border border-gray-200">
         {[
           { id: Views.MONTH, label: 'Mes' },
           { id: Views.WEEK, label: 'Semana' },

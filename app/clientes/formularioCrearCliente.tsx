@@ -142,7 +142,7 @@ export function FormularioCrearCliente({ onClienteCreado }: { onClienteCreado?: 
               <input name="telefono" placeholder="Teléfono" className="input-base" />
             </div>
 
-            <div className="bg-[#ecebe4] rounded-[30px] p-6 shadow-inner">
+            <div className="table-card-asistentes">
               <div className="flex justify-between items-center mb-4 border-b border-gray-300 pb-2">
                 <span className="font-bold text-gray-600">Asistentes asignados</span>
                 <div className="flex items-center gap-3">

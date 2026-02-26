@@ -1,6 +1,6 @@
 type ButtonProps = {
   children: React.ReactNode
-  variant?: "primario" | "peligro"
+  variant?: "primario" | "peligro" | "general"
   className?: string
 } & React.ButtonHTMLAttributes<HTMLButtonElement>
 
@@ -17,7 +17,9 @@ export function Button({
     primario:
       "bg-primary text-primary-foreground border-primary-foreground hover:opacity-90",
     peligro:
-      "bg-danger text-danger-foreground border-danger-foreground hover:opacity-90"
+      "bg-danger text-danger-foreground border-danger-foreground hover:opacity-90",
+    general:
+      "bg-white text-text border-text/80 hover:bg-app hover:border-text/50",
   }
 
   return (
