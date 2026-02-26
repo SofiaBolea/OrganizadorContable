@@ -266,7 +266,7 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   align-items: center;
 }
 
@@ -313,7 +313,19 @@ body {
   z-index: 2;
   padding: 1rem 0;
 }
-
+.side-bar-scroll{
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+}
+.side-bar-scroll::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra */
+}
+.side-bar-scroll::-webkit-scrollbar-thumb {
+  background: #88888800; /* Color del "thumb" */
+  border-radius: 4px;
+}
 /* Vencimientos */
 .dashboard-vencimientos-list {
   display: flex;

@@ -54,7 +54,7 @@ function NavItem({ href, icon: Icon, label }: NavItemProps) {
 
 export default function Sidebar() {
   return (
-    <aside className="w-64 bg-[#2C2C2C] text-white flex flex-col px-6 py-8 h-full ">
+    <aside className="w-64 bg-[#2C2C2C] text-white flex flex-col px-6 py-8 h-screen sticky top-0 ">
 
       {/* Logo */}
       <div className="mb-10">
@@ -69,13 +69,12 @@ export default function Sidebar() {
           />
         </div>
         <h1 className="text-m text-center font-light tracking-wide text-white/80">
-          ESTUDIO CONTABLE
+          Organizador Contable
         </h1>
       </div>
 
       {/* Navegación */}
-      <nav className="flex flex-col gap-2">
-
+      <nav className="side-bar-scroll">
         <NavItem
           href="/"
           icon={LayoutGrid}
@@ -141,7 +140,7 @@ export default function Sidebar() {
 
 
       <div className="mt-auto pt-8 text-xs text-white/40">
-        © {new Date().getFullYear()} Estudio
+        © {new Date().getFullYear()} BianculliBolea
       </div>
 
     </aside>

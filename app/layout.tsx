@@ -21,12 +21,12 @@ export default function RootLayout({
       <html lang="es">
         <body>
           <SignedIn>
-            <div className="flex bg-[#EFEDE7]">
-              <div>
+            <div className="flex h-screen bg-[#EFEDE7] overflow-hidden">
+              
                  <Sidebar />
-              </div>
+              
              
-              <div className="flex flex-col flex-1">
+              <div className="flex flex-col flex-1 min-h-0 min-w-0">
                 <Header />
                 <main className="flex-1 pr-12 pl-12 pt-4 overflow-auto">
                   {children}
