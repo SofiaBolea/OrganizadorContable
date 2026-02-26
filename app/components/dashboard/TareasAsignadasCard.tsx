@@ -70,7 +70,7 @@ export default function TareasAsignadasCard({
 
   return (
     <>
-      <div className="dashboard-card dashboard-card-tareas-asignadas ">
+      <div className="dashboard-card dashboard-card-tareas-asignadas card">
         <h2 className="dashboard-card-title">Tareas Asignadas</h2>
 
         <div className="dashboard-tareas-list">

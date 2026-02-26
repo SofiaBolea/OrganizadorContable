@@ -28,7 +28,7 @@ export default async function Home() {
 
   return (
     <div>
-      <div className="p-6">
+      <div>
         <BotonScroll targetId="calendario-section" label="Ir al Calendario" />
       </div>
       <section>
