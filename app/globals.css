@@ -603,3 +603,23 @@ body {
 .table-actions {
   text-align: center;
 }
+
+:root {
+  --clerk-color-primary: #90BF77;
+  --clerk-color-primary-foreground: #2c2c2c;
+  --clerk-color-danger: #E87A58;
+  --clerk-color-success: #90BF77;
+  --clerk-color-warning: #F7D78C;
+  --clerk-color-neutral: #2c2c2c;
+  --clerk-color-foreground: #2c2c2c;
+  --clerk-color-muted-foreground: #747686;
+  --clerk-color-background: #FFFFFF;
+  --clerk-color-input: #FFFFFF;
+  --clerk-color-input-foreground: #2c2c2c;
+  --clerk-color-ring: #2c2c2c;
+  --clerk-color-shimmer: #90BF77;
+  --clerk-color-modal-backdrop: #2c2c2c;
+  --clerk-border-radius: 1rem;
+  --clerk-spacing: 1rem;
+}
+
