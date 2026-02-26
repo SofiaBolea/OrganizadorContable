@@ -78,20 +78,7 @@ export default function TareaItemRow({
                 className="dashboard-tarea-item"
                 style={styleVariant}
             >
-                {/* Checkbox */}
-                <button
-                    onClick={handleToggleEstado}
-                    disabled={loading || (esAsignada && esCompletada)}
-                    className="dashboard-tarea-checkbox"
-                >
-                    {esCompletada ? (
-                        <div className="w-5 h-5 bg-green-500 rounded-sm flex items-center justify-center">
-                            <Check size={14} className="text-white" />
-                        </div>
-                    ) : (
-                        <div className="w-5 h-5 border border-gray-400 rounded-sm" />
-                    )}
-                </button>
+
 
                 {/* Contenido */}
                 <div className="dashboard-tarea-content">
@@ -109,23 +96,39 @@ export default function TareaItemRow({
                     <div className="dashboard-tarea-meta">
                         <span className="dashboard-tarea-fecha">{formatFecha(tarea.fechaOcurrencia)}</span>
                         <span className={`dashboard-tarea-prioridad badge-prioridad ${tarea.prioridad === "ALTA"
-                                ? "badge-prioridad-alta"
-                                : tarea.prioridad === "MEDIA"
-                                    ? "badge-prioridad-media"
-                                    : "badge-prioridad-baja"
+                            ? "badge-prioridad-alta"
+                            : tarea.prioridad === "MEDIA"
+                                ? "badge-prioridad-media"
+                                : "badge-prioridad-baja"
                             }`}>
                             {tarea.prioridad}
                         </span>
                     </div>
                 </div>
 
-                {/* Ver Detalle */}
+                 {/* Ver detalle */}
                 <button
                     onClick={onVerDetalle}
                     className="dashboard-tarea-detalle"
                 >
                     Ver detalle
                 </button>
+
+                {/* Checkbox */}
+                <button
+                    onClick={handleToggleEstado}
+                    disabled={loading || (esAsignada && esCompletada)}
+                    className="dashboard-tarea-checkbox"
+                >
+                    {esCompletada ? (
+                        <div className="w-5 h-5 bg-green-500 rounded-sm flex items-center justify-center">
+                            <Check size={14} className="text-white" />
+                        </div>
+                    ) : (
+                        <div className="w-5 h-5 border border-gray-400 rounded-sm" />
+                    )}
+                </button>
+
             </div>
 
             {esAsignada && (

@@ -687,9 +687,6 @@ export default function TareasTableClient({
                         <td className="px-4 py-3 font-medium text-text">
                           <div className="flex items-center gap-2">
                             {row.titulo}
-                            {row.tieneRecurrencia && (
-                              <span className="badge-recurrencia">{row.frecuencia}</span>
-                            )}
                           </div>
                         </td>
 

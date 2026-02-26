@@ -17,7 +17,7 @@ export default function VencimientosCard({
   vencimientos,
 }: VencimientosCardProps) {
   return (
-    <div className=" card card-vencimientos">
+    <div className=" card card-dashboard card-vencimientos">
       <h2 className="dashboard-card-title">Vencimientos Próximos</h2>
 
       <div className="dashboard-vencimientos-list">

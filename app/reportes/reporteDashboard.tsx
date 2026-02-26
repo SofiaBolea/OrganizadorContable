@@ -57,11 +57,11 @@ export default function ReporteDashboard() {
       <div className="card p-10">
         {/* Header */}
         <div className="mb-8 border-0">
-          <h2 className="text-2xl font-bold">Reporte Semanal</h2>
+          <h2 className="text-2xl font-bold ">Reporte Semanal</h2>
 
           {rango && (
             <p className="text-gray-400 text-sm">
-              Desde el {formatFecha(rango.inicio)} hasta el {formatFecha(rango.fin)}
+              Desde el <span className="font-bold text-[#425C5A] ">{formatFecha(rango.inicio)}</span> hasta el <span className="font-bold text-[#425C5A]">{formatFecha(rango.fin)}</span>
             </p>
           )}
         </div>
@@ -72,14 +72,14 @@ export default function ReporteDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <BigMetricCard title="Tareas Realizadas" value={totales.completadas} color="text-slate-700" />
           <BigMetricCard title="Tareas Pendientes" value={totales.pendientes} color="text-gray-400" />
-          <BigMetricCard title="Tareas Vencidas" value={totales.vencidas} color="text-orange-400" />
+          <BigMetricCard title="Tareas Vencidas" value={totales.vencidas} color="text-[#CB6B4E]" />
         </div>
 
         {/* Resumen de Prioridades */}
         <div className="flex gap-4 mb-12 justify-center">
-          <PriorityPill label="Prioridad Alta" count={totales.alta} color="bg-[#e9b6a5]" />
-          <PriorityPill label="Prioridad Media" count={totales.media} color="bg-[#f3d990]" />
-          <PriorityPill label="Prioridad Baja" count={totales.baja} color="bg-[#94c084]" />
+          <PriorityPill label="Prioridad Alta" count={totales.alta} color="bg-[#EFBEAF]" colorTexto="text-[#CB6B4E]" />
+          <PriorityPill label="Prioridad Media" count={totales.media} color="bg-[#f3d990]" colorTexto="text-[#F59E0B]" />
+          <PriorityPill label="Prioridad Baja" count={totales.baja} color="bg-[#94c084]" colorTexto="text-[#425C5A" />
         </div>
 
         {/* Tabla Detallada */}
@@ -100,7 +100,7 @@ export default function ReporteDashboard() {
                   <td className="py-5">
                     <div className="flex items-center justify-center gap-3">
                       <span className="text-lg font-bold mr-2">{item.completadas}</span>
-                      <Badge label="Alta" count={item.alta} color="bg-[#e9b6a5]" />
+                      <Badge label="Alta" count={item.alta} color="bg-[#EFBEAF]" />
                       <Badge label="Media" count={item.media} color="bg-[#f3d990]" />
                       <Badge label="Baja" count={item.baja} color="bg-[#94c084]" />
                     </div>
@@ -129,11 +129,11 @@ function BigMetricCard({ title, value, color }: { title: string, value: number, 
   );
 }
 
-function PriorityPill({ label, count, color }: { label: string, count: number, color: string }) {
+function PriorityPill({ label, count, color, colorTexto }: { label: string, count: number, color: string, colorTexto?: string }) {
   return (
     <div className={`${color} px-6 py-2 rounded-full flex items-center gap-4 min-w-[180px]`}>
       <span className="text-slate-700 font-bold text-sm flex-1">{label}</span>
-      <span className="text-slate-800 font-bold text-lg">{count}</span>
+      <span className={`${colorTexto || "text-slate-800"} font-bold text-lg`}>{count}</span>
     </div>
   );
 }
@@ -141,7 +141,7 @@ function PriorityPill({ label, count, color }: { label: string, count: number, c
 function Badge({ label, count, color }: { label: string, count: number, color: string }) {
   return (
     <div className={`${color} px-2 py-0.5 rounded flex items-center gap-1.5`}>
-      <span className="text-[10px] font-bold text-white uppercase">{count} {label}</span>
+      <span className="text-[10px] font-bold uppercase">{count} {label}</span>
     </div>
   );
 }

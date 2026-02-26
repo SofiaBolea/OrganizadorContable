@@ -63,7 +63,7 @@ body {
 /* Fuente y color de texto base del calendario */
 .rbc-calendar {
   font-family: 'Montserrat', sans-serif !important;
-  color: #2C2C2C !important; /* Texto base en negro */
+  color: var(--color-text-main)!important; /* Texto base en negro */
 }
 
 /* Grilla del calendario estilo Google */
@@ -79,7 +79,7 @@ body {
 
 /* Cabeceras de días (Lunes, Martes...) y números de fecha */
 .rbc-header, .rbc-button-link, .rbc-date-cell {
-  color: #2C2C2C !important;
+  color: var(--color-text-main) !important;
 }
 
 .rbc-header {
@@ -103,7 +103,7 @@ body {
 /* Eventos: fondo dinámico pero texto negro para visibilidad */
 .rbc-event {
   border: none !important;
-  color: #2C2C2C !important; /* Texto del evento en negro */
+  color: var(--color-text-main) !important; /* Texto del evento en el color principal definido */
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
   transition: transform 0.1s ease-in-out !important;
 }
@@ -115,13 +115,13 @@ body {
 .rbc-event-content {
   font-size: 0.75rem !important;
   font-weight: 600 !important;
-  color: #2C2C2C !important;
+  color: var(--color-text-main) !important;
 }
 
 /* Texto de "Ver más" */
 .rbc-show-more {
   background: transparent !important;
-  color: #2C2C2C !important; /* Texto "+X más" en negro */
+  color: var(--color-text-main) !important; /* Texto "+X más" en el color principal definido */
   font-weight: 700 !important;
   font-size: 0.75rem !important;
 }
@@ -266,7 +266,8 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
   width: 100%;
-  height: 100vh
+  height: 100vh;
+  align-items: center;
 }
 
 @media (max-width: 1024px) {
@@ -286,21 +287,24 @@ body {
   position: relative;
 }
 
-.card-vencimientos{
-  background-color: #F8A287;
-  color: #2C2C2C;
+.card-dashboard {
+  color: var(--color-text-main);
   /* ESTO ES CLAVE: */
-  max-height: 500px; /* O la altura que prefieras */
+  height: 90vh; /* O la altura que prefieras */
   overflow-y: auto;  /* Permite el scroll dentro del card */
   display: flex;
   flex-direction: column;
 }
 
+.card-vencimientos{
+  background: #F8A287;
+
+}
 
 .dashboard-card-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--color-sidebar-bg);
+  color: var(--color-text-main);
   /* margin-bottom eliminado para evitar solapamiento */
   font-family: "Montserrat", sans-serif;
   text-align: center;
@@ -354,7 +358,7 @@ body {
 .dashboard-vencimiento-titulo {
   display: flex;
   font-weight: 600;
-  color: #2C2C2C;
+  color: var(--color-text-main);
   font-size: 0.95rem;
   align-items: center;
 }
@@ -374,6 +378,14 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  overflow-y: auto;
+}
+.dashboard-tareas-list::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra */
+}
+.dashboard-tareas-list::-webkit-scrollbar-thumb {
+  background: #88888879; /* Color del "thumb" */
+  border-radius: 4px;
 }
 
 .dashboard-tarea-item {
@@ -416,6 +428,7 @@ body {
 .dashboard-tarea-content {
   flex: 1;
   min-width: 0;
+  
 }
 
 .dashboard-tarea-titulo {

@@ -140,7 +140,7 @@ export default function RefColorTable() {
 
   if (loading) {
     return (
-      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-8 mt-8">
+      <div className="card bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-8 ">
         <p className="text-text/50 text-sm">Cargando colores de referencia...</p>
       </div>
     );
@@ -148,11 +148,11 @@ export default function RefColorTable() {
 
   return (
     <>
-      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-8 mt-8">
+      <div className=" card bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-8">
         <h2 className="text-xl font-bold text-text mb-6">Colores de Referencia</h2>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
+          <table className="table-base">
             <thead>
               <tr className="border-b-2 border-text/20">
                 <th className="px-4 py-3 text-sm font-semibold text-text/70">Titulo de Tarea</th>

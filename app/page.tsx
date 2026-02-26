@@ -36,6 +36,7 @@ export default async function Home() {
       </section>
 
       <section id="calendario-section" className="mt-16">
+        <p className=" text-xl mb-4">Calendario</p>
         <PaginaCalendario />
       </section>
     </div>
