@@ -11,9 +11,6 @@ export default async function NuevaMiTareaPage() {
 
   return (
     <main className="p-8">
-      <h1 className="text-3xl font-bold text-text mb-2">Mis Tareas</h1>
-      <p className="text-text/50 mb-8">Crear una nueva tarea personal</p>
-
       <TareaForm
         mode="create"
         tipoTarea="PROPIA"

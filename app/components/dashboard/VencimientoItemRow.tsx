@@ -41,9 +41,9 @@ export default function VencimientoItemRow({
       <div className="dashboard-vencimiento-fecha">{formatFecha(fecha)}</div>
       <div className="dashboard-vencimiento-content">
         <p className="dashboard-vencimiento-titulo">{titulo}</p>
-        {jurisdiccion && (
+        {tipoVencimiento && (
           <span className="dashboard-vencimiento-jurisdiccion">
-            {jurisdiccion}
+            {tipoVencimiento}
           </span>
         )}
       </div>

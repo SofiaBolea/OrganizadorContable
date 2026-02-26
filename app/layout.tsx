@@ -22,7 +22,10 @@ export default function RootLayout({
         <body>
           <SignedIn>
             <div className="flex bg-[#EFEDE7]">
-              <Sidebar />
+              <div>
+                 <Sidebar />
+              </div>
+             
               <div className="flex flex-col flex-1">
                 <Header />
                 <main className="flex-1 pr-12 pl-12 pt-4 overflow-auto">

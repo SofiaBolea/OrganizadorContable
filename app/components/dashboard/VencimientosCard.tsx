@@ -17,13 +17,13 @@ export default function VencimientosCard({
   vencimientos,
 }: VencimientosCardProps) {
   return (
-    <div className="dashboard-card dashboard-card-vencimientos">
+    <div className=" card card-vencimientos">
       <h2 className="dashboard-card-title">Vencimientos Próximos</h2>
 
       <div className="dashboard-vencimientos-list">
         {vencimientos.length === 0 ? (
           <div className="dashboard-empty-state">
-            <p>No hay vencimientos próximos</p>
+            <p >No hay vencimientos próximos</p>
           </div>
         ) : (
           vencimientos.map((vencimiento) => (

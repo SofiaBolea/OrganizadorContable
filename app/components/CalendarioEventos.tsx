@@ -14,14 +14,14 @@ const localizer = dateFnsLocalizer({ format, parse, startOfWeek, getDay, locales
 const CustomToolbar = (props: ToolbarProps<any, any>) => {
   const { label, onView, onNavigate, view } = props;
   return (
-    <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
+    <div className="table-card-header table-calendario-header">
       <div className="flex items-center gap-3">
-        <h2 className="text-xl font-extrabold text-black ml-2 capitalize">{label}</h2>
-        <div className="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-200">
-          <button onClick={() => onNavigate('PREV')} className="p-1.5 hover:bg-white rounded-lg transition-all text-[#2C2C2C]"><ChevronLeft size={20} /></button>
-          <button onClick={() => onNavigate('NEXT')} className="p-1.5 hover:bg-white rounded-lg transition-all text-[#2C2C2C]"><ChevronRight size={20} /></button>
+        <h2 className="text-xl font-extrabold capitalize">{label}</h2>
+        <div className="flex items-center bg-gray-50 rounded-xl ">
+          <button onClick={() => onNavigate('PREV')} className="p-1.5 hover:bg-white rounded-lg transition-all text-[ --color-sidebar-bg]"><ChevronLeft size={20} /></button>
+          <button onClick={() => onNavigate('NEXT')} className="p-1.5 hover:bg-white rounded-lg transition-all text-[ --color-sidebar-bg]"><ChevronRight size={20} /></button>
         </div>
-        <button onClick={() => onNavigate('TODAY')} className="px-5 py-2 text-sm bg-[#EFEDE7] font-bold text-[#2C2C2C] bg-gray-50 hover:bg-gray-100 rounded-xl transition-all border border-gray-200">Hoy</button>
+        <button onClick={() => onNavigate('TODAY')} className="px-5 py-2 text-sm bg- font-bold text-[ --color-sidebar-bg] bg-gray-50 hover:bg-gray-100 rounded-xl transition-all border border-gray-200">Hoy</button>
 
 
       </div>
@@ -93,7 +93,7 @@ export default function CalendarioEventos({ eventos }: { eventos: any[] }) {
   const components = useMemo(() => ({ toolbar: CustomToolbar }), []);
 
   return (
-    <div className="h-[85vh] relative font-sans">
+    <div className="h-[85vh] relative">
       <Calendar
         localizer={localizer}
         events={eventosProcesados}

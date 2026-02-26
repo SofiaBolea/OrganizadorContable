@@ -54,7 +54,7 @@ function NavItem({ href, icon: Icon, label }: NavItemProps) {
 
 export default function Sidebar() {
   return (
-    <aside className="w-64 bg-[#2C2C2C] text-white flex flex-col px-6 py-8">
+    <aside className="w-64 bg-[#2C2C2C] text-white flex flex-col px-6 py-8 h-full ">
 
       {/* Logo */}
       <div className="mb-10">

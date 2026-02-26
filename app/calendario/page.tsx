@@ -16,11 +16,11 @@ export default async function PaginaCalendario() {
         const eventos = await obtenerEventosCalendario(orgId, userId);
 
         return (
-            <main className="p-6 bg-gray-50 min-h-screen">
-                <div className="max-w-7xl mx-auto">
-                    <CalendarioEventos eventos={eventos} />
-                </div>
-            </main>
+
+            <div className="max-w-7xl mx-auto card">
+                <CalendarioEventos eventos={eventos} />
+            </div>
+
         );
     } catch (error) {
         return (

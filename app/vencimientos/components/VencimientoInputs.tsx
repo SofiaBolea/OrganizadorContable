@@ -166,16 +166,9 @@ export default function VencimientoInputs(props: VencimientoInputsProps) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-8 max-w-3xl mx-auto">
+      <div className="card max-w-3xl mx-auto">
 
-        {/* Título del card */}
-        <h2 className="text-xl font-bold text-text mb-6">
-          {isViewMode
-            ? "Detalle de Vencimiento"
-            : isCreateMode
-              ? "Cargar Vencimiento Impositivo"
-              : "Modificar Vencimiento"}
-        </h2>
+
 
         {error && (
           <div className="mb-6 p-3 bg-danger/20 border border-danger text-danger-foreground rounded-xl text-sm font-medium">
@@ -255,17 +248,17 @@ export default function VencimientoInputs(props: VencimientoInputsProps) {
         </div>
 
         {/* ── Tabla de Fechas ── */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-black/10">
-                <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide w-24">
+        <div className="table-card">
+          <table className="table-base">
+            <thead >
+              <tr className="table-row">
+                <th >
                   {getLabelPeriodo(periodicidad)}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">
+                <th >
                   Rango
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-text/60 uppercase tracking-wide">
+                <th>
                   Fecha Vencimiento
                 </th>
               </tr>
@@ -275,7 +268,7 @@ export default function VencimientoInputs(props: VencimientoInputsProps) {
                 const fechaValue = fechasPorRango[idx] || "";
                 const tieneFecha = !!fechaValue;
                 return (
-                  <tr key={idx} className="border-b border-black/5 hover:bg-black/[0.02] transition-colors">
+                  <tr key={idx} className="table-row">
                     <td className="px-4 py-3 text-center text-text font-medium">{r.num}</td>
                     <td className="px-4 py-3 text-text/70 font-medium">{r.rango}</td>
                     <td className="px-4 py-3">
@@ -284,9 +277,9 @@ export default function VencimientoInputs(props: VencimientoInputsProps) {
                         value={fechaValue}
                         onChange={(e) => handleFechaChange(idx, e.target.value)}
                         disabled={isViewMode}
-                        className={`px-4 py-2 rounded-full outline-none text-sm font-medium transition-all
+                        className={`input-base
                           ${tieneFecha
-                            ? "bg-primary/30 text-text border border-primary/50 focus:ring-2 focus:ring-primary"
+                            ? "input-base-tiene-fecha"
                             : "bg-[#e9e8e0] text-text/50 border border-transparent focus:ring-2 focus:ring-primary"
                           } ${isViewMode ? "cursor-default" : "cursor-pointer"}`}
                       />

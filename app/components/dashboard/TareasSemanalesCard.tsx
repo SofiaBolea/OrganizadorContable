@@ -72,7 +72,7 @@ export default function TareasSemanalesCard({
 
   return (
     <>
-      <div className="dashboard-card dashboard-card-tareas">
+      <div className="card">
         <h2 className="dashboard-card-title">Mis Tareas de la Semana</h2>
 
         <div className="dashboard-tareas-list">
