@@ -88,7 +88,6 @@ const DetalleTareaModal = ({ tarea, onClose }: DetalleTareaModalProps) => {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
