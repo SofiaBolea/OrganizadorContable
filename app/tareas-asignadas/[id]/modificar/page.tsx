@@ -40,9 +40,6 @@ export default async function ModificarTareaAsignadaPage({ params, searchParams 
 
   return (
     <main className="p-8">
-      <h1 className="text-3xl font-bold text-text mb-2">Tareas Asignadas</h1>
-      <p className="text-text/50 mb-8">Modificar tarea asignada</p>
-
       <TareaForm
         mode="edit"
         tipoTarea="ASIGNADA"
