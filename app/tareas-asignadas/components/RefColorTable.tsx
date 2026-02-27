@@ -151,7 +151,7 @@ export default function RefColorTable() {
       <div className=" card bg-card rounded-[var(--radius-base)] border border-white shadow-sm p-8">
         <h2 className="text-xl font-bold text-text mb-6">Colores de Referencia</h2>
 
-        <div className="overflow-x-auto">
+        <div className="table-card">
           <table className="table-base">
             <thead>
               <tr className="border-b-2 border-text/20">

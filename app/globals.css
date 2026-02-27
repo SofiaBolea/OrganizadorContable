@@ -628,11 +628,7 @@ body {
   font-size: 0.875rem;
   font-weight: bold;
   color: #475569;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
+  
 }
 
 .table-base tbody {
