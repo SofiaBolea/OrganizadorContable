@@ -290,9 +290,9 @@ export default function VencimientosTableClient({
 
                   // Color badge para tipo
                   const tipoBadgeColor: Record<string, string> = {
-                    Nacional: "bg-[#d4edda] text-[#155724]",
-                    Provincial: "bg-[#fff3cd] text-[#856404]",
-                    Municipal: "bg-[#fce4ec] text-[#b71c1c]",
+                    Nacional: "bg-[#A7D6DC] text-[#5C7174]",
+                    Provincial: "bg-[#C1C4FF] text-[#676AA0]",
+                    Municipal: "bg-[#F7D78C] text-[#97865F]",
                   };
                   const badgeClass = tipoBadgeColor[o.vencimiento.tipoVencimiento] || "bg-gray-100 text-gray-600";
 
@@ -312,7 +312,7 @@ export default function VencimientosTableClient({
                         <td className="px-4 py-3 flex gap-3 items-center">
                           <Link
                             href={`/vencimientos/${o.vencimientoId}`}
-                            className="text-text/50 hover:text-text text-sm underline transition-colors"
+                            className="text-[#425C5A] hover:text-text text-sm transition-colors "
                             title="Ver detalle"
                           >
                             Ver detalle
@@ -320,7 +320,7 @@ export default function VencimientosTableClient({
                           {canModify && (
                             <Link
                               href={`/vencimientos/${o.vencimientoId}/modificar`}
-                              className="text-text/40 hover:text-primary-foreground transition-colors"
+                              className="text-[#425C5A] hover:text-primary-foreground transition-colors"
                               title="Modificar"
                             >
                               <Edit size={18} />

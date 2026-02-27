@@ -169,18 +169,18 @@ body {
   }
 
   .badge-prioridad-alta {
-    background-color: #fce4ec;
-    color: #b71c1c;
+    background-color: #F8A287;
+    color: #494E5F;
   }
 
   .badge-prioridad-media {
-    background-color: #fff3cd;
-    color: #856404;
+    background-color: #F7D78C;
+    color: #494E5F;
   }
 
   .badge-prioridad-baja {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: #90BF77;
+    color: #494E5F;
   }
 
   .badge-prioridad-default {
@@ -200,18 +200,18 @@ body {
   }
 
   .badge-estado-pendiente {
-    background-color: #fff3cd;
-    color: #856404;
+    background-color: #94A3B8;
+    color: #494E5F;
   }
 
   .badge-estado-completada {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: #90BF77;
+    color: #494E5F;
   }
 
   .badge-estado-vencida {
     background-color: #f5c6cb;
-    color: #721c24;
+    color: #E87A58;
   }
 
   .badge-estado-cancelada {
