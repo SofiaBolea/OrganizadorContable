@@ -52,7 +52,7 @@ export default function OrganizationProfilePage() {
   if (loadingPerms) return null;
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-[#F8F8F6] p-4">
+    <div className="flex min-h-screen w-full items-center justify-center p-4">
       <div className="w-full max-w-4xl">
         <OrganizationProfile
           routing="path"
