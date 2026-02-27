@@ -1,0 +1,67 @@
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
+import VencimientoInputs from "@/app/vencimientos/components/VencimientoInputs";
+import { Permisos } from "@/lib/permisos";
+
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function EditarVencimientoPage({ params }: PageProps) {
+  const { orgId } = await auth();
+
+  if (!orgId) {
+    redirect("/");
+  }
+
+  const puedeModificar = await Permisos.puedeModificarVencimiento();
+  if (!puedeModificar) {
+    redirect("/vencimientos");
+  }
+
+  const { id } = await params;
+
+  // Buscar vencimiento con sus ocurrencias
+  const vencimiento = await prisma.vencimiento.findUnique({
+    where: { id },
+    include: {
+      ocurrencias: {
+        orderBy: { fechaVencimiento: "asc" },
+      },
+      recurso: {
+        select: { organizacionId: true },
+      },
+    },
+  });
+
+  if (!vencimiento) {
+    return (
+      <main className="p-8">
+        <div className="text-center text-red-600">
+          <h2 className="text-2xl font-bold mb-2">Vencimiento no encontrado</h2>
+          <p>El vencimiento que buscas no existe o fue eliminado.</p>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="p-8">
+      <VencimientoInputs
+        mode="edit"
+        initialData={{
+          id: vencimiento.id,
+          titulo: vencimiento.titulo,
+          tipoVencimiento: vencimiento.tipoVencimiento,
+          periodicidad: vencimiento.periodicidad,
+          jurisdiccion: vencimiento.jurisdiccion,
+        }}
+        ocurrencias={vencimiento.ocurrencias.map((o) => ({
+          id: o.id,
+          fecha: o.fechaVencimiento.toISOString().split("T")[0],
+        }))}
+      />
+    </main>
+  );
+}

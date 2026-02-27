@@ -4,19 +4,12 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/api/webhooks(.*)',
-]);
-
-const isAdminRoute = createRouteMatcher([
-  '/vencimientos(.*)',
+  '/organizacion(.*)',
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
     await auth.protect();
-  }
-
-  if (isAdminRoute(request)) {
-    await auth.protect({ role: 'org:admin' });
   }
 });
 

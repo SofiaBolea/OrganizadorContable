@@ -1,26 +1,681 @@
 @import "tailwindcss";
 
+/* =========================
+   TOKENS DE DISEÑO
+========================= */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Fondos */
+  --color-app-bg: #EFEDE7;
+  --color-sidebar-bg: #2C2C2C;
+  --color-card-bg: #FFFFFF;
+
+  /* Texto */
+  --color-text-main: #494E5F;
+
+  /* Botón primario */
+  --color-primary-bg: #90BF77;
+  --color-primary-text: #425C5A;
+
+  /* Botón peligro */
+  --color-danger-bg: #EFBEAF;
+  --color-danger-text: #E87A58;
+
+  /* Radio */
+  --radius-base: 20px;
 }
+
+/* =========================
+   VINCULAMOS A TAILWIND
+========================= */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-app: var(--color-app-bg);
+  --color-sidebar: var(--color-sidebar-bg);
+  --color-card: var(--color-card-bg);
+
+  --color-text: var(--color-text-main);
+
+  --color-primary: var(--color-primary-bg);
+  --color-primary-foreground: var(--color-primary-text);
+
+  --color-danger: var(--color-danger-bg);
+  --color-danger-foreground: var(--color-danger-text);
+
+  --radius-xl: var(--radius-base);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* =========================
+   ESTILOS BASE
+========================= */
+
+body {
+  background: var(--color-app-bg);
+  color: var(--color-text-main);
+  font-family: 'Montserrat', sans-serif;
+  padding: 0%;
+}
+
+/* =========================
+   CUSTOM CALENDAR (MODERN FLAT THEME)
+========================= */
+
+/* Fuente y color de texto base del calendario */
+.rbc-calendar {
+  font-family: 'Montserrat', sans-serif !important;
+  color: var(--color-text-main)!important; /* Texto base en negro */
+}
+
+/* Grilla del calendario estilo Google */
+.rbc-month-view, 
+.rbc-time-view, 
+.rbc-agenda-view {
+  border-radius: 1rem !important;
+  background-color: white !important;
+  border: 1px solid #e5e7eb !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+/* Cabeceras de días (Lunes, Martes...) y números de fecha */
+.rbc-header, .rbc-button-link, .rbc-date-cell {
+  color: var(--color-text-main) !important;
+}
+
+.rbc-header {
+  background-color: var(--color-app-bg);
+  padding: 1rem 0 !important;
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+}
+
+/* Resaltado de día actual y días fuera de mes */
+.rbc-today {
+  background-color: #F7D78C !important;
+}
+
+.rbc-off-range-bg {
+  background-color: #f9fafb !important;
+}
+
+/* Eventos: fondo dinámico pero texto negro para visibilidad */
+.rbc-event {
+  border: none !important;
+  color: var(--color-text-main) !important; /* Texto del evento en el color principal definido */
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+  transition: transform 0.1s ease-in-out !important;
+}
+
+.rbc-event:hover {
+  transform: scale(1.02);
+}
+
+.rbc-event-content {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: var(--color-text-main) !important;
+}
+
+/* Texto de "Ver más" */
+.rbc-show-more {
+  background: transparent !important;
+  color: var(--color-text-main) !important; /* Texto "+X más" en el color principal definido */
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+}
+
+/* =========================
+   BADGES – PRIORIDAD
+========================= */
+/* app/globals.css */
+@layer utilities {
+  /* Animación de rebote suave */
+  @keyframes bounce-slow {
+    0%, 100% {
+      transform: translateY(-5%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+  .animate-bounce-slow {
+    animation: bounce-slow 2s infinite;
+  }
+
+  /* Animación de brillo pulsante */
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.6);
+    }
+  }
+  .animate-glow-pulse {
+    animation: glow-pulse 2s infinite;
+  }
+}
+@layer components {
+  .badge-prioridad {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .badge-prioridad-alta {
+    background-color: #F8A287;
+    color: #494E5F;
+  }
+
+  .badge-prioridad-media {
+    background-color: #F7D78C;
+    color: #494E5F;
+  }
+
+  .badge-prioridad-baja {
+    background-color: #90BF77;
+    color: #494E5F;
+  }
+
+  .badge-prioridad-default {
+    background-color: #f3f4f6;
+    color: #4b5563;
+  }
+
+  /* =========================
+     BADGES – ESTADO
+  ========================= */
+
+  .badge-estado {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .badge-estado-pendiente {
+    background-color: #94A3B8;
+    color: #494E5F;
+  }
+
+  .badge-estado-completada {
+    background-color: #90BF77;
+    color: #494E5F;
+  }
+
+  .badge-estado-vencida {
+    background-color: #f5c6cb;
+    color: #E87A58;
+  }
+
+  .badge-estado-cancelada {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+
+  .badge-estado-default {
+    background-color: #f3f4f6;
+    color: #4b5563;
+  }
+
+  /* =========================
+     BADGES – RECURRENCIA / VIRTUAL
+  ========================= */
+
+  .badge-recurrencia {
+    font-size: 10px;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    padding: 0.125rem 0.375rem;
+    border-radius: 9999px;
+    font-weight: 600;
+  }
+
+  .badge-virtual {
+    font-size: 10px;
+    background-color: #f3e8ff;
+    color: #9333ea;
+    padding: 0.125rem 0.375rem;
+    border-radius: 9999px;
+    font-weight: 600;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* =========================
+   DASHBOARD STYLES
+========================= */
+
+.dashboard-container {
+  min-height: calc(100vh - 80px);
+  background-color: var(--color-app-bg);
 }
+
+.dashboard-grid-full {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.dashboard-grid-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  width: 100%;
+  min-height: 100vh;
+  align-items: center;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-grid-two {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Card Base */
+.card {
+  background: var(--color-card-bg);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.card-dashboard {
+  color: var(--color-text-main);
+  /* ESTO ES CLAVE: */
+  height: 90vh; /* O la altura que prefieras */
+  overflow-y: auto;  /* Permite el scroll dentro del card */
+  display: flex;
+  flex-direction: column;
+}
+
+.card-vencimientos{
+  background: #F8A287;
+
+}
+
+.dashboard-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  /* margin-bottom eliminado para evitar solapamiento */
+  font-family: "Montserrat", sans-serif;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 1rem 0;
+}
+.side-bar-scroll{
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+}
+.side-bar-scroll::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra */
+}
+.side-bar-scroll::-webkit-scrollbar-thumb {
+  background: #88888800; /* Color del "thumb" */
+  border-radius: 4px;
+}
+/* Vencimientos */
+.dashboard-vencimientos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+}
+.dashboard-vencimientos-list::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra */
+}
+.dashboard-vencimientos-list::-webkit-scrollbar-thumb {
+  background: #88888879; /* Color del "thumb" */
+  border-radius: 4px;
+}
+.dashboard-vencimiento-item {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  border-radius: 1rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.dashboard-vencimiento-fecha {
+  min-width: 70px;
+  background: #494E5F; 
+  padding: 0.25rem 0.25rem;
+  border-radius: 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.dashboard-vencimiento-content {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  
+}
+
+.dashboard-vencimiento-titulo {
+  display: flex;
+  font-weight: 600;
+  color: var(--color-text-main);
+  font-size: 0.95rem;
+  align-items: center;
+}
+
+.dashboard-vencimiento-jurisdiccion {
+  display: inline-block;
+  background: #EFEDE7;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Tareas */
+.dashboard-tareas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+}
+.dashboard-tareas-list::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra */
+}
+.dashboard-tareas-list::-webkit-scrollbar-thumb {
+  background: #88888879; /* Color del "thumb" */
+  border-radius: 4px;
+}
+
+.dashboard-tarea-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.dashboard-tarea-item:hover {
+  border-color: #d1d5db;
+  background: #f5f5f5;
+}
+
+.dashboard-tarea-checkbox {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.dashboard-tarea-checkbox:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+.dashboard-tarea-checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.dashboard-tarea-content {
+  flex: 1;
+  min-width: 0;
+  
+}
+
+.dashboard-tarea-titulo {
+  font-weight: 600;
+  color: var(--color-text-main);
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+.dashboard-tarea-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.dashboard-tarea-fecha {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.dashboard-tarea-prioridad {
+  font-size: 0.7rem;
+}
+
+.dashboard-tarea-color-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dashboard-tarea-detalle {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  background: var(--color-primary-bg);
+  color: var(--color-primary-text);
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.dashboard-tarea-detalle:hover {
+  opacity: 0.85;
+}
+
+/* Empty State */
+.dashboard-empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #494E5F;
+}
+
+.dashboard-empty-state p {
+  font-size: 0.95rem;
+  font-weight: 500;
+
+}
+
+/* =========================
+   INPUTS - SISTEMA OFICIAL
+========================= */
+
+.input-base {
+  width: 100%;
+  padding-right: 1rem;
+  height: 50px;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  border-radius: 20px;
+  border: 1px solid rgba(73, 78, 95, 0.15); /* border-text/15 */
+  background-color: var(--color-app-bg); /* bg-app */
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--color-text-main); /* text-text */
+  outline: none;
+  transition: all 0.2s;
+  appearance: none;
+}
+
+.input-base-tiene-fecha {
+  background-color: var(--color-primary-bg);
+  border: primary/50;
+}
+
+/* Focus state for input-base-tiene-fecha */
+.input-base-tiene-fecha:focus {
+  outline: 2px solid var(--color-primary-bg);
+  outline-offset: -2px;
+}
+
+
+/* Placeholder */
+.input-base::placeholder {
+  color: var(--color-text-main);
+  opacity: 0.5;
+}
+
+/* Focus */
+.input-base:focus {
+  border: 1px solid var(--color-primary-bg);
+}
+
+/* Disabled */
+.input-base:disabled {
+  background-color: var(--color-app-bg);
+  color: rgba(73, 78, 95, 0.5); /* text-text/50 */
+  cursor: not-allowed;
+}
+
+/* Variante compacta */
+.input-sm {
+  height: 44px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 14px;
+}
+
+/* Error */
+.input-error {
+  border: 1px solid var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+
+/* =========================
+   TABLE CARD SYSTEM
+========================= */
+
+.table-card {
+  width: 100%;
+  height: 75vh;
+  padding: 1rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  background-color: #fff;
+  border-radius: 20px;
+  overflow: auto; /* Asegura que el contenedor controle el scroll */
+  position: relative;
+}
+
+/* Table card para tabla asistentes en formulario de cliente */
+.table-card-asistentes {
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--color-app-bg);
+  border-radius: 20px;
+}
+
+/* Header */
+.table-card-header {
+  color: var(--color-text-main);
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.table-calendario-header {
+  border-bottom: none;
+}
+
+/* Tabla */
+.table-base {
+  width: 100%;
+  text-align: left;
+  border-collapse: separate; /* Cambiar de collapse a separate */
+  border-spacing: 0;
+}
+
+.table-base thead {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table-base th {
+  padding: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: #475569;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table-base tbody {
+  border-top: 1px solid #f1f5f9;
+}
+
+.table-row {
+  transition: background-color 0.2s;
+}
+.table-row:hover {
+  background-color: #f5f5f5;
+}
+
+.table-base td {
+  padding: 1.5rem;
+  color: #475569;
+}
+
+.table-base td:first-child {
+  font-weight: 500;
+  color: #334155;
+}
+
+.table-actions {
+  text-align: center;
+}
+
+:root {
+  --clerk-color-primary: #90BF77;
+  --clerk-color-primary-foreground: #2c2c2c;
+  --clerk-color-danger: #E87A58;
+  --clerk-color-success: #90BF77;
+  --clerk-color-warning: #F7D78C;
+  --clerk-color-neutral: #2c2c2c;
+  --clerk-color-foreground: #2c2c2c;
+  --clerk-color-muted-foreground: #747686;
+  --clerk-color-background: #FFFFFF;
+  --clerk-color-input: #FFFFFF;
+  --clerk-color-input-foreground: #2c2c2c;
+  --clerk-color-ring: #2c2c2c;
+  --clerk-color-shimmer: #90BF77;
+  --clerk-color-modal-backdrop: #2c2c2c;
+  --clerk-border-radius: 1rem;
+  --clerk-spacing: 1rem;
+}
+

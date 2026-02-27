@@ -1,22 +1,16 @@
 import 'dotenv/config';
 import { createClerkClient } from '@clerk/clerk-sdk-node';
-// Importamos la clase generada
 import prisma from '@/lib/prisma';
 
 const clerkClient = createClerkClient({ 
   secretKey: process.env.CLERK_SECRET_KEY 
 });
 
-const clerkRoles = [
-  { nombreRol: "org:admin", descripcion: "Administrador de la organización" },
-  { nombreRol: "org:member", descripcion: "Miembro estándar de la organización" },
-  { nombreRol: "org:viewer", descripcion: "Solo lectura" },
-];
-
 async function main() {
-  console.log("🚀 Iniciando sincronización Clerk -> Supabase...");
+  console.log("🚀 Iniciando sincronización Clerk (Orgs + Users + Roles) -> Supabase...");
 
   try {
+    // 1. Obtener todas las organizaciones de Clerk
     const response = await clerkClient.organizations.getOrganizationList();
     const clerkOrgs = response.data;
 
@@ -26,9 +20,9 @@ async function main() {
     }
 
     for (const clerkOrg of clerkOrgs) {
-      console.log(`\n📦 Procesando: ${clerkOrg.name}`);
-
-      // CORRECCIÓN: El modelo se llama 'organizacion' en singular (definido en el schema)
+      console.log(`\n🏢 Procesando Organización: ${clerkOrg.name} (${clerkOrg.id})`);
+      
+      // 2. Upsert de la Organización
       const org = await prisma.organizacion.upsert({
         where: { clerkOrganizationId: clerkOrg.id },
         update: {
@@ -39,36 +33,92 @@ async function main() {
           clerkOrganizationId: clerkOrg.id,
           nombre: clerkOrg.name,
           logoUrl: clerkOrg.imageUrl,
-          razonSocial: "",
-          cuit: "",
-          emailContacto: "",
-          telefonoContacto: "",
-          direccion: "",
           activa: true,
         },
       });
 
-      for (const rol of clerkRoles) {
-        await prisma.rol.upsert({
+      // 3. Obtener Miembros de la Organización
+      const memberships = await clerkClient.organizations.getOrganizationMembershipList({ 
+        organizationId: clerkOrg.id 
+      });
+
+      console.log(`👥 Sincronizando ${memberships.data.length} miembros para ${org.nombre}...`);
+
+      for (const membership of memberships.data) {
+        const userData = membership.publicUserData;
+        const clerkUserId = userData?.userId;
+        const clerkRole = membership.role; // "org:admin" o "org:member"
+
+        if (!clerkUserId || !userData) continue;
+
+        const email = userData.identifier;
+        const nombreCompleto = `${userData.firstName ?? ""} ${userData.lastName ?? ""}`.trim();
+        const esAdmin = clerkRole === "org:admin";
+
+        // 4. Upsert del Usuario usando la LLAVE COMPUESTA
+        // Como reseteaste las tablas, aquí se CREARÁN los registros.
+        const usuarioLocal = await prisma.usuario.upsert({
+          where: {
+            clerkId_organizacionId: {
+              clerkId: clerkUserId,
+              organizacionId: org.id,
+            },
+          },
+          update: {
+            email: email,
+            nombreCompleto: nombreCompleto || email,
+            permisoClientes: esAdmin,
+            permisoVencimiento: esAdmin,
+          },
+          create: {
+            clerkId: clerkUserId,
+            organizacionId: org.id,
+            email: email,
+            nombreCompleto: nombreCompleto || email,
+            nombreUsuario: email.split('@')[0],
+            permisoClientes: esAdmin,
+            permisoVencimiento: esAdmin,
+          },
+        });
+
+        // 5. Asegurar que el Rol existe para esta Org
+        const rolLocal = await prisma.rol.upsert({
           where: {
             organizacionId_nombreRol: {
               organizacionId: org.id,
-              nombreRol: rol.nombreRol,
+              nombreRol: clerkRole,
             },
           },
           update: {},
           create: {
             organizacionId: org.id,
-            nombreRol: rol.nombreRol,
-            descripcion: rol.descripcion,
+            nombreRol: clerkRole,
+            descripcion: `Rol ${clerkRole} sincronizado de Clerk`,
+          },
+        });
+
+        // 6. Vincular Usuario con el Rol
+        await prisma.usuarioRol.upsert({
+          where: {
+            usuarioId_rolId: {
+              usuarioId: usuarioLocal.id,
+              rolId: rolLocal.id,
+            },
+          },
+          update: { fechaBaja: null },
+          create: {
+            usuarioId: usuarioLocal.id,
+            rolId: rolLocal.id,
+            fechaAlta: new Date(),
           },
         });
       }
-      console.log(`✅ Sincronizado: ${clerkOrg.name}`);
+      console.log(`✅ Sincronización completa para: ${clerkOrg.name}`);
     }
-    console.log("\n✨ Proceso finalizado.");
+
+    console.log("\n✨ Base de datos poblada exitosamente.");
   } catch (error) {
-    console.error("❌ Error detallado:", error);
+    console.error("❌ Error crítico durante el seeding:", error);
     process.exit(1);
   }
 }
@@ -79,6 +129,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    // Cerramos la conexión correctamente
     await prisma.$disconnect();
   });

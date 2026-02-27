@@ -1,24 +1,45 @@
-import { ClerkProvider, SignedIn } from '@clerk/nextjs'
-import { Navbar } from './components/Navbar'
+"use client"
+import { ClerkProvider, SignedIn, SignedOut } from '@clerk/nextjs'
+import { Montserrat } from "next/font/google"
 import './globals.css'
+import Sidebar from './components/Sidebar'
+import Header from './components/Header'
+import { esES } from "@clerk/localizations";
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+})
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider
-      afterSignOutUrl="/"
-    >
+    <ClerkProvider afterSignOutUrl="/" localization={esES}>
       <html lang="es">
         <body>
           <SignedIn>
-            <Navbar />
+            <div className="flex h-screen bg-[#EFEDE7] overflow-hidden">
+              
+                 <Sidebar />
+              
+             
+              <div className="flex flex-col flex-1 min-h-0 min-w-0">
+                <Header />
+                <main className="flex-1 pr-12 pl-12 pt-4 overflow-auto">
+                  {children}
+                </main>
+              </div>
+            </div>
           </SignedIn>
-          {children}
+
+          <SignedOut>
+            {children}
+          </SignedOut>
         </body>
       </html>
     </ClerkProvider>
-  )
+  );
 }

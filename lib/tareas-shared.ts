@@ -1,0 +1,427 @@
+// ═══════════════════════════════════════
+// TIPOS Y FUNCIONES PURAS COMPARTIDAS
+// (importable desde client y server)
+// ═══════════════════════════════════════
+
+export interface OcurrenciaMaterializada {
+  id: string;
+  fechaOriginal: string;
+  estado: string;
+  tituloOverride: string | null;
+  fechaOverride: string | null;
+  colorOverride: string | null;
+  descripcionOverride: string | null;
+  prioridadOverride: string | null;
+  refColorId: string | null; // Override del color (si la ocurrencia tiene color diferente)
+  refColorHexa: string | null; // Hex del color override
+  refColorTitulo: string | null; // Nombre del color override
+}
+
+export interface RecurrenciaData {
+  frecuencia: string;
+  intervalo: number;
+  diaSemana: string | null;
+  diaDelMes: string | null;
+  mesDelAnio: string | null;
+  hastaFecha: string | null;
+  conteoMaximo: number | null;
+}
+
+export interface TareaAsignacionRow {
+  tareaAsignacionId: string;
+  tareaId: string;
+  titulo: string;
+  prioridad: string;
+  tipoTarea: string;
+  fechaVencimientoBase: string | null;
+  descripcion: string | null;
+  asignadoId: string;
+  asignadoNombre: string;
+  asignadoPorId: string;
+  asignadoPorNombre: string;
+  estado: string;
+  fechaAsignacion: string;
+  refColorId: string | null;
+  refColorTitulo: string | null;
+  refColorHexa: string | null;
+  recurrencia: RecurrenciaData | null;
+  ocurrenciasMaterializadas: OcurrenciaMaterializada[];
+}
+
+/** Fila expandida que se muestra en la tabla */
+export interface TareaDisplayRow {
+  /** Clave única para React */
+  key: string;
+  tareaAsignacionId: string;
+  tareaId: string;
+  /** null = virtual (no guardada en BD), string = materializada */
+  ocurrenciaId: string | null;
+  esVirtual: boolean;
+  titulo: string;
+  /** Título base de la tarea (sin override) */
+  tituloBase: string;
+  prioridad: string;
+  tipoTarea: string;
+  /** Fecha concreta de esta ocurrencia (con override si aplica) */
+  fechaOcurrencia: string | null;
+  /** Fecha original de la ocurrencia (sin override) — usada para materializar */
+  fechaOriginalOcurrencia: string | null;
+  descripcion: string | null;
+  asignadoId: string;
+  asignadoNombre: string;
+  asignadoPorId: string;
+  asignadoPorNombre: string;
+  estado: string;
+  fechaAsignacion: string;
+  refColorId: string | null;
+  refColorTitulo: string | null;
+  refColorHexa: string | null;
+  tieneRecurrencia: boolean;
+  frecuencia: string | null;
+}
+
+// ═══════════════════════════════════════
+// GENERADOR DE FECHAS VIRTUALES
+// ═══════════════════════════════════════
+
+const MAX_OCURRENCIAS_VIRTUALES = 200;
+
+const DIAS_SEMANA_MAP: Record<string, number> = {
+  // 2 letras (legacy)
+  DO: 0, LU: 1, MA: 2, MI: 3, JU: 4, VI: 5, SA: 6,
+  // 3 letras (usadas por el form)
+  DOM: 0, LUN: 1, MAR: 2, MIE: 3, JUE: 4, VIE: 5, SAB: 6,
+};
+
+export function formatDateISO(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+export function generarFechasRecurrencia(
+  rec: RecurrenciaData,
+  fechaBase: string | null,
+  limite: number = MAX_OCURRENCIAS_VIRTUALES
+): string[] {
+  // Si no hay fecha base, usar hoy como punto de partida
+  const fechaEfectiva = fechaBase || formatDateISO(new Date());
+  if (!fechaEfectiva) return [];
+
+  const fechas: string[] = [];
+  const inicio = new Date(fechaEfectiva.split("T")[0] + "T12:00:00");
+  const hastaDate = rec.hastaFecha
+    ? new Date(rec.hastaFecha.split("T")[0] + "T23:59:59")
+    : null;
+  const maxCount = rec.conteoMaximo
+    ? Math.min(rec.conteoMaximo, limite)
+    : limite;
+
+  const intervalo = rec.intervalo || 1;
+
+  switch (rec.frecuencia) {
+    case "DIARIA": {
+      const cur = new Date(inicio);
+      while (fechas.length < maxCount) {
+        if (hastaDate && cur > hastaDate) break;
+        fechas.push(formatDateISO(cur));
+        cur.setDate(cur.getDate() + intervalo);
+      }
+      break;
+    }
+
+    case "SEMANAL": {
+      if (rec.diaSemana) {
+        const diasTarget = rec.diaSemana
+          .split(",")
+          .map((d) => DIAS_SEMANA_MAP[d.trim().toUpperCase()])
+          .filter((d) => d !== undefined)
+          .sort((a, b) => a - b);
+
+        if (diasTarget.length === 0) {
+          diasTarget.push(inicio.getDay());
+        }
+
+        const cur = new Date(inicio);
+        const diaSemanaInicio = cur.getDay();
+        cur.setDate(cur.getDate() - diaSemanaInicio);
+
+        while (fechas.length < maxCount) {
+          for (const dia of diasTarget) {
+            const fecha = new Date(cur);
+            fecha.setDate(fecha.getDate() + dia);
+            if (fecha < inicio) continue;
+            if (hastaDate && fecha > hastaDate) return fechas;
+            if (fechas.length >= maxCount) return fechas;
+            fechas.push(formatDateISO(fecha));
+          }
+          cur.setDate(cur.getDate() + 7 * intervalo);
+        }
+      } else {
+        const cur = new Date(inicio);
+        while (fechas.length < maxCount) {
+          if (hastaDate && cur > hastaDate) break;
+          fechas.push(formatDateISO(cur));
+          cur.setDate(cur.getDate() + 7 * intervalo);
+        }
+      }
+      break;
+    }
+
+    case "MENSUAL": {
+      if (rec.diaDelMes) {
+        const diasMes = rec.diaDelMes
+          .split(",")
+          .map((d) => parseInt(d.trim(), 10))
+          .filter((d) => !isNaN(d) && d >= 1 && d <= 31)
+          .sort((a, b) => a - b);
+
+        if (diasMes.length === 0) diasMes.push(inicio.getDate());
+
+        let mesActual = inicio.getMonth();
+        let anioActual = inicio.getFullYear();
+
+        while (fechas.length < maxCount) {
+          for (const dia of diasMes) {
+            const ultimoDia = new Date(anioActual, mesActual + 1, 0).getDate();
+            const diaReal = Math.min(dia, ultimoDia);
+            const fecha = new Date(anioActual, mesActual, diaReal, 12, 0, 0);
+            if (fecha < inicio) continue;
+            if (hastaDate && fecha > hastaDate) return fechas;
+            if (fechas.length >= maxCount) return fechas;
+            fechas.push(formatDateISO(fecha));
+          }
+          mesActual += intervalo;
+          if (mesActual >= 12) {
+            anioActual += Math.floor(mesActual / 12);
+            mesActual = mesActual % 12;
+          }
+        }
+      } else {
+        const cur = new Date(inicio);
+        while (fechas.length < maxCount) {
+          if (hastaDate && cur > hastaDate) break;
+          fechas.push(formatDateISO(cur));
+          cur.setMonth(cur.getMonth() + intervalo);
+        }
+      }
+      break;
+    }
+
+    case "ANUAL": {
+      const cur = new Date(inicio);
+      while (fechas.length < maxCount) {
+        if (hastaDate && cur > hastaDate) break;
+        fechas.push(formatDateISO(cur));
+        cur.setFullYear(cur.getFullYear() + intervalo);
+      }
+      break;
+    }
+
+    default: {
+      fechas.push(formatDateISO(inicio));
+    }
+  }
+
+  return fechas;
+}
+
+// ═══════════════════════════════════════
+// EXPANSIÓN: TareaAsignacionRow[] → TareaDisplayRow[]
+// ═══════════════════════════════════════
+
+export function expandirTareasADisplayRows(
+  tareas: TareaAsignacionRow[]
+): TareaDisplayRow[] {
+  const rows: TareaDisplayRow[] = [];
+
+  // Fecha de hoy para detectar ocurrencias vencidas
+  // Usar ISO string YYYY-MM-DD para comparaciones consistentes entre timezones
+  const hoyStr = new Date().toISOString().split("T")[0];
+
+  /** Estado para una ocurrencia sin materializar según su fecha */
+  const estadoVirtualPorFecha = (fechaStr: string | null): string => {
+    if (!fechaStr) return "PENDIENTE";
+    return fechaStr.split("T")[0] < hoyStr ? "VENCIDA" : "PENDIENTE";
+  };
+
+  /** Helper: obtener el valor correcto de prioridad (usa override si existe, sino valor base) */
+  const getPrioridad = (mat: OcurrenciaMaterializada | null | undefined, basePrioridad: string): string => {
+    // Si hay una ocurrencia materializada Y tiene prioridadOverride definido (distinto de null/undefined), usarlo
+    if (mat && mat.prioridadOverride != null && mat.prioridadOverride !== "") {
+      return mat.prioridadOverride;
+    }
+    // Si no hay override, usar la prioridad base de la tarea
+    return basePrioridad;
+  };
+
+  for (const t of tareas) {
+    if (!t.recurrencia) {
+      // Tarea única: buscar ocurrencia materializada (si existe)
+      const mat = t.ocurrenciasMaterializadas.length > 0
+        ? t.ocurrenciasMaterializadas[0]
+        : null;
+
+      // No mostrar si la ocurrencia está cancelada
+      if (mat?.estado === "CANCELADA") continue;
+
+      rows.push({
+        key: t.tareaAsignacionId,
+        tareaAsignacionId: t.tareaAsignacionId,
+        tareaId: t.tareaId,
+        ocurrenciaId: mat?.id || null,
+        esVirtual: !mat,
+        titulo: mat?.tituloOverride || t.titulo,
+        tituloBase: t.titulo,
+        prioridad: getPrioridad(mat, t.prioridad),
+        tipoTarea: t.tipoTarea,
+        fechaOcurrencia: mat?.fechaOverride || mat?.fechaOriginal || t.fechaVencimientoBase,
+        fechaOriginalOcurrencia: mat?.fechaOriginal || t.fechaVencimientoBase,
+        descripcion: mat?.descripcionOverride || t.descripcion,
+        asignadoId: t.asignadoId,
+        asignadoNombre: t.asignadoNombre,
+        asignadoPorId: t.asignadoPorId,
+        asignadoPorNombre: t.asignadoPorNombre,
+        estado: mat?.estado || estadoVirtualPorFecha(mat?.fechaOverride || mat?.fechaOriginal || t.fechaVencimientoBase),
+        fechaAsignacion: t.fechaAsignacion,
+        // Si la ocurrencia tiene seu propio refColorId (override), usar ese. Si no, usar el base
+        refColorId: mat?.refColorId || t.refColorId,
+        refColorTitulo: mat?.refColorTitulo || t.refColorTitulo,
+        refColorHexa: mat?.refColorHexa || t.refColorHexa,
+        tieneRecurrencia: false,
+        frecuencia: null,
+      });
+    } else {
+      const fechas = generarFechasRecurrencia(
+        t.recurrencia,
+        t.fechaVencimientoBase
+      );
+
+      const matMap = new Map<string, OcurrenciaMaterializada>();
+      for (const o of t.ocurrenciasMaterializadas) {
+        const fechaKey = o.fechaOriginal.split("T")[0];
+        matMap.set(fechaKey, o);
+      }
+
+      // Si no se generaron fechas y no hay ocurrencias materializadas visibles
+      if (fechas.length === 0 && matMap.size === 0) {
+        // Si la recurrencia está agotada (hastaFecha < fechaBase), no mostrar nada
+        if (t.recurrencia?.hastaFecha && t.fechaVencimientoBase) {
+          const hastaStr = t.recurrencia.hastaFecha.split("T")[0];
+          const baseStr = t.fechaVencimientoBase.split("T")[0];
+          if (hastaStr < baseStr) continue;
+        }
+        // Si la asignación está en estado final, no mostrar
+        if (["FINALIZADA", "COMPLETADA", "REVOCADA"].includes(t.estado)) continue;
+
+        rows.push({
+          key: t.tareaAsignacionId,
+          tareaAsignacionId: t.tareaAsignacionId,
+          tareaId: t.tareaId,
+          ocurrenciaId: null,
+          esVirtual: true,
+          titulo: t.titulo,
+          tituloBase: t.titulo,
+          prioridad: t.prioridad,
+          tipoTarea: t.tipoTarea,
+          fechaOcurrencia: t.fechaVencimientoBase,
+          fechaOriginalOcurrencia: t.fechaVencimientoBase,
+          descripcion: t.descripcion,
+          asignadoId: t.asignadoId,
+          asignadoNombre: t.asignadoNombre,
+          asignadoPorId: t.asignadoPorId,
+          asignadoPorNombre: t.asignadoPorNombre,
+          estado: t.estado,
+          fechaAsignacion: t.fechaAsignacion,
+          refColorId: t.refColorId,
+          refColorTitulo: t.refColorTitulo,
+          refColorHexa: t.refColorHexa,
+          tieneRecurrencia: true,
+          frecuencia: t.recurrencia!.frecuencia,
+        });
+        continue;
+      }
+
+      for (const fechaStr of fechas) {
+        const mat = matMap.get(fechaStr);
+
+        // Ocultar ocurrencias canceladas
+        if (mat?.estado === "CANCELADA") {
+          matMap.delete(fechaStr);
+          continue;
+        }
+
+        rows.push({
+          key: `${t.tareaAsignacionId}--${fechaStr}`,
+          tareaAsignacionId: t.tareaAsignacionId,
+          tareaId: t.tareaId,
+          ocurrenciaId: mat?.id || null,
+          esVirtual: !mat,
+          titulo: mat?.tituloOverride || t.titulo,
+          tituloBase: t.titulo,
+          prioridad: getPrioridad(mat, t.prioridad),
+          tipoTarea: t.tipoTarea,
+          fechaOcurrencia: mat?.fechaOverride || mat?.fechaOriginal || fechaStr,
+          fechaOriginalOcurrencia: mat?.fechaOriginal || fechaStr,
+          descripcion: mat?.descripcionOverride || t.descripcion,
+          asignadoId: t.asignadoId,
+          asignadoNombre: t.asignadoNombre,
+          asignadoPorId: t.asignadoPorId,
+          asignadoPorNombre: t.asignadoPorNombre,
+          estado: mat?.estado || estadoVirtualPorFecha(mat?.fechaOverride || mat?.fechaOriginal || fechaStr),
+          fechaAsignacion: t.fechaAsignacion,
+          // Si la ocurrencia tiene su propio refColorId (override), usar ese. Si no, usar el base
+          refColorId: mat?.refColorId || t.refColorId,
+          refColorTitulo: mat?.refColorTitulo || t.refColorTitulo,
+          refColorHexa: mat?.refColorHexa || t.refColorHexa,
+          tieneRecurrencia: true,
+          frecuencia: t.recurrencia!.frecuencia,
+        });
+
+        matMap.delete(fechaStr);
+      }
+
+      // Ocurrencias materializadas huérfanas (excluir canceladas)
+      for (const [fechaKey, mat] of matMap.entries()) {
+        if (mat.estado === "CANCELADA") continue;
+
+        rows.push({
+          key: `${t.tareaAsignacionId}--${fechaKey}`,
+          tareaAsignacionId: t.tareaAsignacionId,
+          tareaId: t.tareaId,
+          ocurrenciaId: mat.id,
+          esVirtual: false,
+          titulo: mat.tituloOverride || t.titulo,
+          tituloBase: t.titulo,
+        prioridad: getPrioridad(mat, t.prioridad),
+          tipoTarea: t.tipoTarea,
+          fechaOcurrencia: mat.fechaOverride || fechaKey,
+          fechaOriginalOcurrencia: fechaKey,
+          descripcion: mat.descripcionOverride || t.descripcion,
+          asignadoId: t.asignadoId,
+          asignadoNombre: t.asignadoNombre,
+          asignadoPorId: t.asignadoPorId,
+          asignadoPorNombre: t.asignadoPorNombre,
+          estado: mat.estado,
+          fechaAsignacion: t.fechaAsignacion,
+          refColorId: t.refColorId,
+          refColorTitulo: t.refColorTitulo,
+          refColorHexa: mat.colorOverride || t.refColorHexa,
+          tieneRecurrencia: true,
+          frecuencia: t.recurrencia!.frecuencia,
+        });
+      }
+    }
+  }
+
+  // Ordenar por fecha ascendente (sin fecha al final)
+  rows.sort((a, b) => {
+    if (!a.fechaOcurrencia && !b.fechaOcurrencia) return 0;
+    if (!a.fechaOcurrencia) return 1;
+    if (!b.fechaOcurrencia) return -1;
+    return a.fechaOcurrencia.localeCompare(b.fechaOcurrencia);
+  });
+
+  return rows;
+}

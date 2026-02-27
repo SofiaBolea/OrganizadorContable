@@ -1,0 +1,111 @@
+"use client";
+
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useTransition, useEffect, useState } from "react";
+
+export function FiltrosClientes({ 
+  esAdmin 
+}: { 
+  esAdmin: boolean 
+}) {
+  const [asistentes, setAsistentes] = useState<any[]>([]);
+  const [asistentesLoading, setAsistentesLoading] = useState(true);
+  const [asistentesError, setAsistentesError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAsistentes = async () => {
+      setAsistentesLoading(true);
+      setAsistentesError(null);
+      try {
+        const res = await fetch("/api/selectorDeAsistentes");
+        if (!res.ok) throw new Error("No se pudieron obtener los asistentes");
+        const data = await res.json();
+        setAsistentes(data);
+      } catch (err) {
+        setAsistentesError("Error al cargar asistentes");
+      }
+      setAsistentesLoading(false);
+    };
+    fetchAsistentes();
+  }, []);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+
+  const handleSearch = (term: string, key: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (term) {
+      params.set(key, term);
+    } else {
+      params.delete(key);
+    }
+    
+    startTransition(() => {
+      router.push(`${pathname}?${params.toString()}`);
+    });
+  };
+
+  if (asistentesLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <span className="text-gray-500">Cargando asistentes...</span>
+      </div>
+    );
+  }
+  if (asistentesError) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <span className="text-red-500">{asistentesError}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 card ">
+      {/* Filtro por Nombre */}
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="Buscar por nombre..."
+          defaultValue={searchParams.get("nombre")?.toString()}
+          onChange={(e) => handleSearch(e.target.value, "nombre")}
+          className="input-base"
+        />
+      </div>
+
+      {/* Filtro por CUIT */}
+      <div>
+        <input
+          type="text"
+          placeholder="Buscar por CUIT..."
+          defaultValue={searchParams.get("cuit")?.toString()}
+          onChange={(e) => handleSearch(e.target.value, "cuit")}
+          className="input-base"
+        />
+      </div>
+
+     
+      {esAdmin && (
+        <select
+          defaultValue={searchParams.get("asistenteId")?.toString()}
+          onChange={(e) => handleSearch(e.target.value, "asistenteId")}
+          className="input-base"
+        >
+          <option value="">Todos los asistentes</option>
+          {asistentes.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.nombreCompleto}
+            </option>
+          ))}
+        </select>
+      )}
+      
+      {isPending && (
+        <div className="md:col-span-3 text-xs text-[#98c18c] font-bold animate-pulse ml-4">
+          Buscando...
+        </div>
+      )}
+    </div>
+  );
+}
